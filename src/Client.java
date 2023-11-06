@@ -1,3 +1,4 @@
-public class Client
-{
+import java.util.ArrayList;
+
+public class Client {
 }
