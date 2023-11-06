@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Marketplace implements Market {
+public class Marketplace  {
 
     ArrayList<Resource> marketResources;
 

@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class User implements Market {
+public class User  {
 
     ArrayList<Resource> userResources;
     String username;
