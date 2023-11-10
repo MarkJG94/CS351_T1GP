@@ -7,13 +7,13 @@ public class User  {
     int funds;
 
     public User(String username, ArrayList<Resource> userResources){
-        this.username = username;
+        this.username = username.toLowerCase();
         this.userResources = userResources;
         funds = 1000;
     }
 
     public User(String username, ArrayList<Resource> userResources, int funds){
-        this.username = username;
+        this.username = username.toLowerCase();
         this.userResources = userResources;
         this.funds = funds;
     }

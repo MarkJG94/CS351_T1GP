@@ -21,22 +21,22 @@ public interface Market {
     int getResourceQuantity(int resourceID);
 
     // Adds funds to a targeted users account
-    int addFunds(String username);
+    int addFunds(String username, int amount);
 
     // Deducts funds to a targeted users account
-    int deductFunds(String username);
+    int deductFunds(String username, int amount);
 
     // Transfers funds from one user to another
-    boolean transferFunds(String source, String destination);
+    boolean transferFunds(String source, String destination, int amount);
 
     // Checks if a username is valid
     boolean userExists(String username);
 
     // Adds a specified number of a specific resource
-    boolean addResource(int itemID, int quantity);
+    boolean addResource(int itemID, int quantity, String username);
 
     // Removes a specified number of a specific resource
-    boolean removeResource(int itemID, int quantity);
+    boolean removeResource(int itemID, int quantity, String username);
 
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
