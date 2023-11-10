@@ -20,7 +20,6 @@ class MarketplaceTest {
     User user3 = new User("User Three", resourceList, 10000);
     User user4 = new User("User Four", resourceList, 1);
 
-
     @BeforeEach
     void setup(){
         resourceList.add(wood);
@@ -35,6 +34,30 @@ class MarketplaceTest {
         userList.add(user4);
         marketplace.userList = userList;
 
+    }
+
+    @Test
+    void givenValidThenUserExists() {
+
+        assertEquals(true, marketplace.userExists("User One"));
+    }
+
+    @Test
+    void givenInvalidThenUserExistsReturnFalse() {
+
+        assertEquals(false, marketplace.userExists("User Five"));
+    }
+
+    @Test
+    void givenValidThenGetFunds() {
+
+        assertEquals(10000, marketplace.getFunds("User One"));
+    }
+
+    @Test
+    void givenInvalidThenGetFundsReturnsError() {
+
+        assertEquals(-1, marketplace.getFunds("User Five"));
     }
 
     @Test
@@ -76,11 +99,13 @@ class MarketplaceTest {
 
     @Test
     void givenValidThenAddFunds() {
+
         assertEquals(10100, marketplace.addFunds("User One", 100));
     }
 
     @Test
     void givenInvalidIdThenAddFundsReturnError() {
+
         assertEquals(-1, marketplace.addFunds("User Five",100));
     }
 
@@ -92,24 +117,77 @@ class MarketplaceTest {
 
     @Test
     void givenValidThenRemoveFunds() {
+
         assertEquals(9900, marketplace.deductFunds("User One", 100));
     }
 
     @Test
-    void givenInvalidIdThenRemoveFundsReturnFalse() {
+    void givenInvalidIdThenRemoveFundsReturnError() {
 
         assertEquals(-1, marketplace.deductFunds("User Five",100));
     }
 
     @Test
-    void givenInvalidAmountThenRemoveFundsReturnFalse() {
+    void givenInvalidAmountThenRemoveFundsReturnError() {
 
         assertEquals(-1, marketplace.deductFunds("User One",-100));
     }
 
     @Test
-    void givenNotEnoughInAccountAmountThenRemoveFundsReturnFalse() {
+    void givenNotEnoughInAccountAmountThenRemoveFundsReturnError() {
 
         assertEquals(-1, marketplace.deductFunds("User Four",-100));
+    }
+
+    @Test
+    void givenValidThenTransferFunds() {
+
+        assertEquals(true, marketplace.transferFunds("User One", "User Two", 500));
+
+        assertEquals(9500, marketplace.getFunds("User One"));
+        assertEquals(600, marketplace.getFunds("User Two"));
+
+    }
+
+    @Test
+    void givenSourceInvalidIdThenTransferFundsReturnFalse() {
+
+        assertEquals(false, marketplace.transferFunds("User Five", "User Two", 500));
+
+        assertEquals(100, marketplace.getFunds("User Two"));
+    }
+
+    @Test
+    void givenDestinationInvalidIdThenTransferFundsReturnFalse() {
+
+        assertEquals(false, marketplace.transferFunds("User One", "User Five", 500));
+
+        assertEquals(10000, marketplace.getFunds("User One"));
+    }
+
+    @Test
+    void givenInvalidAmountThenTransferFundsReturnFalse() {
+
+        assertEquals(false, marketplace.transferFunds("User One", "User Five", -500));
+
+        assertEquals(10000, marketplace.getFunds("User One"));
+        assertEquals(100, marketplace.getFunds("User Two"));
+    }
+
+    @Test
+    void givenNotEnoughInAccountAmountThenTransferFundsReturnFalse() {
+
+        assertEquals(false, marketplace.transferFunds("User Five", "User One", 500));
+
+        assertEquals(10000, marketplace.getFunds("User One"));
+        assertEquals(100, marketplace.getFunds("User Two"));
+    }
+
+    @Test
+    void givenSourceAndDestinationSameThenTransferFundsReturnFalse() {
+
+        assertEquals(false, marketplace.transferFunds("User One", "User One", 500));
+
+        assertEquals(10000, marketplace.getFunds("User One"));
     }
 }
