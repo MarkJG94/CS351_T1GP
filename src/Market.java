@@ -33,10 +33,10 @@ public interface Market {
     boolean userExists(String username);
 
     // Adds a specified number of a specific resource
-    boolean addItem(int itemID, int quantity);
+    boolean addResource(int itemID, int quantity);
 
     // Removes a specified number of a specific resource
-    boolean removeItem(int itemID, int quantity);
+    boolean removeResource(int itemID, int quantity);
 
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
