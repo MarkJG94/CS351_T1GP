@@ -61,6 +61,34 @@ class MarketplaceTest {
     }
 
     @Test
+    void givenValidThenGetResourceQuantity() {
+
+        assertEquals(wood, marketplace.getResourceDetails(1));
+        assertEquals(1, marketplace.getResourceDetails(1).getId());
+        assertEquals(1, marketplace.getResourceDetails(1).getCost());
+        assertEquals(1000, marketplace.getResourceDetails(1).getQuantity());
+        assertEquals("wood", marketplace.getResourceDetails(1).getName());
+    }
+
+    @Test
+    void givenInvalidThenGetResourceQuantityReturnsNull() {
+
+        assertEquals(null, marketplace.getResourceDetails(5));
+    }
+
+    @Test
+    void givenValidThenGetResourceDetails() {
+
+        assertEquals(1000, marketplace.getResourceQuantity(1));
+    }
+
+    @Test
+    void givenInvalidThenGetResourceDetailsReturnsError() {
+
+        assertEquals(-1, marketplace.getResourceQuantity(5));
+    }
+
+    @Test
     void givenValidThenAddResource() {
         assertEquals(true, marketplace.addResource(1,100));
         assertEquals(1100, marketplace.marketResources.get(0).getQuantity());

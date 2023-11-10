@@ -79,8 +79,25 @@ public class Marketplace implements Market {
     }
 
     @Override
-    public int getResourceDetails(int resourceID) {
-        return 0;
+    public int getResourceQuantity(int resourceID) {
+        for (Resource resource:marketResources) {
+            if ((resource.getId() == resourceID)){
+                return resource.getQuantity();
+            }
+        else return -1;
+        }
+        return -1;
+    }
+
+    public Resource getResourceDetails(int resourceID) {
+        for (Resource resource:marketResources) {
+            if ((resource.getId() == resourceID)){
+                return resource;
+            }
+            else return null;
+        }
+        return null;
+
     }
 
     @Override
@@ -108,6 +125,8 @@ public class Marketplace implements Market {
         return null;
     }
 
+
+
     @Override
     public int addFunds(String destination_username, int amount) {
         if (amount > 0) {
@@ -124,7 +143,6 @@ public class Marketplace implements Market {
         /*Can't deduct negative number, return error*/
         return -1;
     }
-
 
     @Override
     public int deductFunds(String destination_username, int amount) {
@@ -165,6 +183,5 @@ public class Marketplace implements Market {
         }
         return false;
     }
-
 
 }
