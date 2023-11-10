@@ -32,6 +32,9 @@ public interface Market {
     // Checks if a username is valid
     boolean userExists(String username);
 
+    //Returns details of a specific item
+    Item getItemDetails(int itemID);
+
     // Adds a specified number of a specific resource
     boolean addResource(int itemID, int quantity, String username);
 
