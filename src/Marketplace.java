@@ -11,12 +11,10 @@ public class Marketplace implements Market {
     public boolean addResource(int resourceId, int quantity) {
         if (quantity > 0) {
             /*Check for item already existing*/
-            for (Resource resource : marketResources) {
-                if (resource.getId() == resourceId) {
-                    /*If exists, update the quantity and return true*/
-                    resource.setQuantity(resource.getQuantity() + quantity);
-                    return true;
-                }
+            int resourceIndex = getResourceIndex(resourceId);
+            if (resourceIndex != -1){
+                marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() + quantity);
+                return true;
             }
         }
         /*Can't add negative number*/
@@ -26,26 +24,24 @@ public class Marketplace implements Market {
     @Override
     public boolean removeResource(int resourceId, int quantity) {
         if (quantity > 0) {
-            /*Check for Item already existing*/
-            for (Resource resource : marketResources) {
-                if (resource.getId() == resourceId) {
-                    /*If exists, update the quantity and return true*/
-                    resource.setQuantity(resource.getQuantity() - quantity);
-                    return true;
-                } else {
-                    /*Item doesn't exist*/
-                    return false;
-                }
+            /*Check for item already existing*/
+            int resourceIndex = getResourceIndex(resourceId);
+            if (resourceIndex != -1){
+                marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() - quantity);
+                return true;
             }
         }
-        /*Can't deduct negative number*/
+        /*Can't add negative number*/
         return false;
     }
 
-
+    @Override
+    public boolean notifyUser(String username, int quantity, int resourceID) {
+        return false;
+    }
 
     @Override
-    public boolean notifyUser(String username, int quantity, String resourceName) {
+    public boolean notifyUserCurrency(String username, int quantity, int funds){
         return false;
     }
 
@@ -56,7 +52,14 @@ public class Marketplace implements Market {
 
     @Override
     public int calculateTotal(int quantity, int resourceID) {
-        return 0;
+        if (quantity > 0){
+            int resourceIndex = getResourceIndex(resourceID);
+            if (resourceIndex == -1){
+                return -1;
+            }
+            return marketResources.get(resourceIndex).getCost() * quantity;
+        }
+        return -1;
     }
 
     @Override
@@ -78,28 +81,34 @@ public class Marketplace implements Market {
         return -1;
     }
 
+    public int getResourceIndex(int resourceID) {
+        for (Resource resource : marketResources) {
+            if (resource.getId() == resourceID) {
+                return marketResources.indexOf(resource);
+            }
+        }
+        return -1;
+    }
+
     @Override
     public int getResourceQuantity(int resourceID) {
-        for (Resource resource:marketResources) {
-            if ((resource.getId() == resourceID)){
-                return resource.getQuantity();
-            }
-        else return -1;
+        int resourceIndex = getResourceIndex(resourceID);
+        if (resourceIndex != -1){
+            return marketResources.get(resourceIndex).getQuantity();
         }
         return -1;
     }
 
     public Resource getResourceDetails(int resourceID) {
-        for (Resource resource:marketResources) {
-            if ((resource.getId() == resourceID)){
-                return resource;
-            }
-            else return null;
+        int resourceIndex = getResourceIndex(resourceID);
+        if (resourceIndex != -1){
+            return marketResources.get(resourceIndex);
         }
         return null;
 
     }
 
+    //    Not Implemented yet.  Marketplace has a list of Users, and needs an identifier
     @Override
     public int getFunds() {
         return 0;
@@ -107,38 +116,38 @@ public class Marketplace implements Market {
 
     @Override
     public int getFunds(String username) {
-        for (User user : userList) {
-            if (user.username.equals(username)) {
-                return user.funds;
-            }
+        int user_index = getUserIndex(username);
+        if (user_index == -1){
+            return -1;
         }
-        return -1;
+        return userList.get(user_index).funds;
     }
 
+//    Not Implemented yet.  Marketplace has a list of Users, and needs an identifier
     @Override
-    public ArrayList<Integer> getUserInventory() {
+    public ArrayList<Resource> getUserInventory() {
         return null;
     }
 
     @Override
-    public ArrayList<Integer> getUserInventory(String username) {
-        return null;
+    public ArrayList<Resource> getUserInventory(String username) {
+        int user_index = getUserIndex(username);
+        if (user_index == -1){
+            return null;
+        }
+        return userList.get(user_index).userResources;
     }
-
-
 
     @Override
     public int addFunds(String destination_username, int amount) {
         if (amount > 0) {
-            for (User user : userList) {
-                /*If user exists, deduct funds*/
-                if (user.username.equals(destination_username)) {
-                    user.funds = user.funds + amount;
-                    return user.funds;
-                }
+            int user_index = getUserIndex(destination_username);
+            if (user_index == -1){
+                return -1;
             }
-            /*If user doesn't exist, return error*/
-            return -1;
+            userList.get(user_index).funds += amount ;
+            return userList.get(user_index).funds;
+
         }
         /*Can't deduct negative number, return error*/
         return -1;
@@ -147,15 +156,12 @@ public class Marketplace implements Market {
     @Override
     public int deductFunds(String destination_username, int amount) {
         if (amount > 0) {
-            for (User user : userList) {
-                /*If user exists, deduct funds*/
-                if (user.username.equals(destination_username)) {
-                    user.funds = user.funds - amount;
-                    return user.funds;
-                }
+            int user_index = getUserIndex(destination_username);
+            if (user_index == -1){
+                return -1;
             }
-            /*If user doesn't exist, return error*/
-            return -1;
+            userList.get(user_index).funds -= amount ;
+            return userList.get(user_index).funds;
         }
         /*Can't deduct negative number, return error*/
         return -1;

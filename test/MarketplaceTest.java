@@ -218,4 +218,58 @@ class MarketplaceTest {
 
         assertEquals(10000, marketplace.getFunds("User One"));
     }
+
+    @Test
+    void givenValidThenGetUserInventory() {
+
+        assertEquals(resourceList, marketplace.getUserInventory("User One"));
+
+        Resource resourceOne = marketplace.getUserInventory("User One").get(0);
+        Resource resourceTwo = marketplace.getUserInventory("User One").get(1);
+        Resource resourceThree = marketplace.getUserInventory("User One").get(2);
+        Resource resourceFour = marketplace.getUserInventory("User One").get(3);
+
+        assertEquals(wood, marketplace.getUserInventory("User One").get(0));
+            assertEquals(1, resourceOne.getId());
+            assertEquals(1, resourceOne.getCost());
+            assertEquals(1000, resourceOne.getQuantity());
+            assertEquals("wood", resourceOne.getName());
+
+        assertEquals(iron, marketplace.getUserInventory("User One").get(1));
+            assertEquals(2, resourceTwo.getId());
+            assertEquals(2, resourceTwo.getCost());
+            assertEquals(1000, resourceTwo.getQuantity());
+            assertEquals("iron", resourceTwo.getName());
+
+        assertEquals(silver, marketplace.getUserInventory("User One").get(2));
+            assertEquals(3, resourceThree.getId());
+            assertEquals(5, resourceThree.getCost());
+            assertEquals(1000, resourceThree.getQuantity());
+            assertEquals("silver", resourceThree.getName());
+
+        assertEquals(gold, marketplace.getUserInventory("User Two").get(3));
+            assertEquals(4, resourceFour.getId());
+            assertEquals(10, resourceFour.getCost());
+            assertEquals(1000, resourceFour.getQuantity());
+            assertEquals("gold", resourceFour.getName());
+
+    }
+
+    @Test
+    void givenValidThenCalculateTotal() {
+
+        assertEquals(100, marketplace.calculateTotal(100, 1));
+    }
+
+    @Test
+    void givenInvalidIDThenCalculateTotalReturnsError() {
+
+        assertEquals(-1, marketplace.calculateTotal(100, 5));
+    }
+
+    @Test
+    void givenInvalidQuantityThenCalculateTotalReturnsError() {
+
+        assertEquals(-1, marketplace.calculateTotal(-100, 1));
+    }
 }
