@@ -36,12 +36,26 @@ public class Marketplace implements Market {
     }
 
     @Override
-    public boolean notifyUser(String username, int quantity, int resourceID) {
+    public boolean notifyUserResource(String username, int resourceID) {
+        int userIndex = getUserIndex(username);
+        int resourceIndex = getResourceIndex(resourceID);
+        if (userIndex != -1 && resourceIndex != -1){
+            System.out.println("Your " + marketResources.get(resourceIndex).getName() + " is now "  + userList.get(userIndex).userResources.get(resourceIndex).getQuantity());
+
+            return true;
+        }
+
         return false;
     }
 
     @Override
-    public boolean notifyUserCurrency(String username, int quantity, int funds){
+    public boolean notifyUserCurrency(String username){
+        int userIndex = getUserIndex(username);
+        if (userIndex != -1){
+            System.out.println("Your funds are now " + userList.get(userIndex).funds);
+
+            return true;
+        }
         return false;
     }
 
@@ -189,5 +203,6 @@ public class Marketplace implements Market {
         }
         return false;
     }
+
 
 }

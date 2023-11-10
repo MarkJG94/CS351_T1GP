@@ -272,4 +272,40 @@ class MarketplaceTest {
 
         assertEquals(-1, marketplace.calculateTotal(-100, 1));
     }
+
+    @Test
+    void givenValidThenNotifyUserResource() {
+
+        assertEquals(true, marketplace.notifyUserResource("User One", 1));
+        String string = String.format("Your 1$ is now 2$}.", marketplace.marketResources.get(1).getName(), userList.get(0).userResources.get(1).getQuantity());
+    }
+
+    @Test
+    void givenInvalidUserThenNotifyUserResourceReturnFalse() {
+
+        assertEquals(false, marketplace.notifyUserResource("User Five", 1));
+
+    }
+
+    @Test
+    void givenInvalidResourceThenNotifyUserResourceReturnError() {
+
+        assertEquals(false, marketplace.notifyUserResource("User One", 11));
+
+    }
+
+    @Test
+    void givenValidThenNotifyUserCurrency() {
+
+        assertEquals(true, marketplace.notifyUserCurrency("User One"));
+        String string = String.format("Your 1$ is now 2$}.", marketplace.marketResources.get(1).getName(), userList.get(0).userResources.get(1).getQuantity());
+    }
+
+    @Test
+    void givenInvalidUserThenNotifyUserCurrencyReturnFalse() {
+
+        assertEquals(false, marketplace.notifyUserCurrency("User Five"));
+
+    }
+
 }
