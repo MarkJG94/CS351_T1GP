@@ -41,13 +41,20 @@ public interface Market {
     // Removes a specified number of a specific resource
     boolean removeResource(int itemID, int quantity, String username);
 
-    // Notifies a target user the new quantity of a specific resource (or currency)
-    // E.g. "Your [resourceName] is now [quantity]."
-    boolean notifyUserResource(String username, int quantity, int resourceID);
+
+//    Are we changing the quantity here using the parameter, or informing after a change?
 
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
-    boolean notifyUserCurrency(String username, int quantity, int funds);
+    boolean notifyUserResource(String username, int resourceID);
+
+    // Notifies a target user the new quantity of a specific resource (or currency)
+    // E.g. "Your [resourceName] is now [quantity]."
+    boolean notifyUserCurrency(String username);
+
+
+
+
 
     // Takes a quantity and multiplies it by the number of
     int calculateTotal(int quantity, int resourceID);
