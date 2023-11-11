@@ -40,7 +40,7 @@ public interface Market {
 
 
 
-    //    Are we changing the quantity here using the parameter, or informing after a change?
+//    Are we changing the quantity here using the parameter, or informing after a change?
 
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
@@ -50,6 +50,7 @@ public interface Market {
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
     boolean notifyUserCurrency(String username);
+
 
 
 
