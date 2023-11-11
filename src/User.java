@@ -188,20 +188,8 @@ public class User {
         return added;
     }
 
-    public boolean buyItem(ArrayList<Resource> userResources, int funds){
-        return true;
-        //username, resource, fund
-    }
 
-    public boolean sellItem(ArrayList<Resource> userResources, int funds){
-        return true;
-    }
-
-    public boolean notifyUser(String username, int quantity, String resourceName){
-
-        System.out.println("Your "+ resourceName + "is now" + quantity);
-        return true;
-    }
+    
 
 
 
