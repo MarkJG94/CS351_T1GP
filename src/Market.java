@@ -20,35 +20,36 @@ public interface Market {
     // Returns how many of a specific resource is available
     int getResourceQuantity(int resourceID);
 
-    // Add funds to a targeted users account
+    // Adds funds to a targeted users account
     int addFunds(String username, int amount);
 
-    // Deduct funds to a targeted users account
+    // Deducts funds to a targeted users account
     int deductFunds(String username, int amount);
 
-    // Transfer funds from one user to another
+    // Transfers funds from one user to another
     boolean transferFunds(String source, String destination, int amount);
 
     // Checks if a username is valid
     boolean userExists(String username);
 
     // Adds a specified number of a specific resource
-    boolean addResource(int itemID, int quantity);
+    boolean addResource(int itemID, int quantity, String username);
 
     // Removes a specified number of a specific resource
-    boolean removeResource(int itemID, int quantity);
+    boolean removeResource(int itemID, int quantity, String username);
 
 
-//    Are we changing the quantity here using the parameter, or informing after a change?
+
+    //    Are we changing the quantity here using the parameter, or informing after a change?
 
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
     boolean notifyUserResource(String username, int resourceID);
 
+
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
     boolean notifyUserCurrency(String username);
-
 
 
 
