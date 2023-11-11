@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Marketplace implements Market {
+public class Marketplace {
 
     Server server = new Server();
     ArrayList<User> userList = server.getUserList();
     ArrayList<Resource> marketResources = new ArrayList<Resource>();
 
-    @Override
+    
     public boolean addResource(int resourceId, int quantity) {
         if (quantity > 0) {
             /*Check for item already existing*/
@@ -21,7 +21,7 @@ public class Marketplace implements Market {
         return false;
     }
 
-    @Override
+    
     public boolean removeResource(int resourceId, int quantity) {
         if (quantity > 0) {
             /*Check for item already existing*/
@@ -35,7 +35,7 @@ public class Marketplace implements Market {
         return false;
     }
 
-    @Override
+    
     public boolean notifyUserResource(String username, int resourceID) {
         int userIndex = getUserIndex(username);
         int resourceIndex = getResourceIndex(resourceID);
@@ -48,7 +48,7 @@ public class Marketplace implements Market {
         return false;
     }
 
-    @Override
+    
     public boolean notifyUserCurrency(String username){
         int userIndex = getUserIndex(username);
         if (userIndex != -1){
@@ -59,12 +59,12 @@ public class Marketplace implements Market {
         return false;
     }
 
-    @Override
+    
     public boolean validateCurrency(int amount) {
         return false;
     }
 
-    @Override
+    
     public int calculateTotal(int quantity, int resourceID) {
         if (quantity > 0){
             int resourceIndex = getResourceIndex(resourceID);
@@ -76,7 +76,7 @@ public class Marketplace implements Market {
         return -1;
     }
 
-    @Override
+    
     public boolean userExists(String username) {
         for (User user : userList) {
             if (user.username.equals(username)) {
@@ -104,7 +104,7 @@ public class Marketplace implements Market {
         return -1;
     }
 
-    @Override
+    
     public int getResourceQuantity(int resourceID) {
         int resourceIndex = getResourceIndex(resourceID);
         if (resourceIndex != -1){
@@ -123,12 +123,12 @@ public class Marketplace implements Market {
     }
 
     //    Not Implemented yet.  Marketplace has a list of Users, and needs an identifier
-    @Override
+    
     public int getFunds() {
         return 0;
     }
 
-    @Override
+    
     public int getFunds(String username) {
         int user_index = getUserIndex(username);
         if (user_index == -1){
@@ -138,12 +138,12 @@ public class Marketplace implements Market {
     }
 
 //    Not Implemented yet.  Marketplace has a list of Users, and needs an identifier
-    @Override
+    
     public ArrayList<Resource> getUserInventory() {
         return null;
     }
 
-    @Override
+    
     public ArrayList<Resource> getUserInventory(String username) {
         int user_index = getUserIndex(username);
         if (user_index == -1){
@@ -152,7 +152,7 @@ public class Marketplace implements Market {
         return userList.get(user_index).userResources;
     }
 
-    @Override
+    
     public int addFunds(String destination_username, int amount) {
         if (amount > 0) {
             int user_index = getUserIndex(destination_username);
@@ -167,7 +167,7 @@ public class Marketplace implements Market {
         return -1;
     }
 
-    @Override
+    
     public int deductFunds(String destination_username, int amount) {
         if (amount > 0) {
             int user_index = getUserIndex(destination_username);
@@ -181,7 +181,7 @@ public class Marketplace implements Market {
         return -1;
     }
 
-    @Override
+    
     public boolean transferFunds(String source, String destination, int amount) {
         if (amount > 0){
             int sourceIndex = getUserIndex(source);
