@@ -12,10 +12,10 @@ public interface Market {
     int getFunds(String username);
 
     // Returns an arraylist of the current users inventory
-    ArrayList<Integer> getUserInventory();
+    ArrayList<Resource> getUserInventory();
 
     // Returns an arraylist of a targeted users inventory
-    ArrayList<Integer> getUserInventory(String username);
+    ArrayList<Resource> getUserInventory(String username);
 
     // Returns how many of a specific resource is available
     int getResourceQuantity(int resourceID);
@@ -32,15 +32,29 @@ public interface Market {
     // Checks if a username is valid
     boolean userExists(String username);
 
+    //Returns details of a specific item
+    Item getItemDetails(int itemID);
+
     // Adds a specified number of a specific resource
     boolean addResource(int itemID, int quantity, String username);
 
     // Removes a specified number of a specific resource
     boolean removeResource(int itemID, int quantity, String username);
 
+
+//    Are we changing the quantity here using the parameter, or informing after a change?
+
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
-    boolean notifyUser(String username, int quantity, String resourceName);
+    boolean notifyUserResource(String username, int resourceID);
+
+    // Notifies a target user the new quantity of a specific resource (or currency)
+    // E.g. "Your [resourceName] is now [quantity]."
+    boolean notifyUserCurrency(String username);
+
+
+
+
 
     // Takes a quantity and multiplies it by the number of
     int calculateTotal(int quantity, int resourceID);

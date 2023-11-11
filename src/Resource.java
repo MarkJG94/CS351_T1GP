@@ -23,6 +23,10 @@ public class Resource {
         return quantity;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setCost(int cost) {
         this.cost = cost;
     }
@@ -33,5 +37,9 @@ public class Resource {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
