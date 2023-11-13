@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -22,6 +23,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
     private ArrayList<Resource> resources;
     private ArrayList<User> userList;
+    String filePath = new File("").getAbsolutePath();
     private Marketplace marketPlace;
 
     public ArrayList<User>getUserList(){
@@ -74,10 +76,11 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
     }
 
     private void importMarketDetails(){
+
         List<List<String>> records = new ArrayList<>();
         try (
                 BufferedReader br = new BufferedReader(
-                        new FileReader("C:\\Users\\pfb21179\\OneDrive - University of Strathclyde\\Coursework\\CS351 Programming\\CS351_T1GP\\src\\MarketDetails.csv")
+                        new FileReader(filePath + "/src/MarketDetails.csv")
                 )
         ) {
             String line;
@@ -98,7 +101,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
         List<List<String>> records = new ArrayList<>();
         try (
                 BufferedReader br = new BufferedReader(
-                        new FileReader("C:\\Users\\pfb21179\\OneDrive - University of Strathclyde\\Coursework\\CS351 Programming\\CS351_T1GP\\src\\UserDetails.csv")
+                        new FileReader(filePath + "/src/UserDetails.csv")
                 )
         ) {
             String line;
