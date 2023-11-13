@@ -76,7 +76,7 @@ public class User {
     }
     
     public boolean addResource(int resourceID, int quantity, String username) {
-        if (quantity > 0){
+        if (quantity > 0 && this.username.equals(username)){
             int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
                 int new_quantity = userResources.get(resourceIndex).getQuantity() + quantity;
@@ -88,7 +88,7 @@ public class User {
     }
     
     public boolean removeResource(int resourceID, int quantity, String username) {
-        if (quantity > 0){
+        if (quantity > 0 && this.username.equals(username)){
             int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
                 int new_quantity = userResources.get(resourceIndex).getQuantity() - quantity;
