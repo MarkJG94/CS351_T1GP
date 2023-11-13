@@ -37,11 +37,9 @@ public class User {
         return -1;
     }
 
-    
     public int getResourceQuantity(int resourceID) {
         return userResources.get(getResourceIndex( resourceID )).getQuantity();
     }
-
     
     public int addFunds(String username, int amount) {
         
@@ -52,9 +50,7 @@ public class User {
         }
         return -1;
     }
-    
 
-    
     public int deductFunds(String username, int amount) {
         if (amount > 0 && username.equals( this.username ) && validateCurrency( amount ))
         {
@@ -63,8 +59,6 @@ public class User {
         }
         return -1;
     }
-
-
     
     public boolean validateCurrency(int amount) {
         if (funds >= amount){
@@ -81,116 +75,28 @@ public class User {
         return username;
     }
     
-    public boolean addItem(String itemID, int quantity) {
-        //read file, add to wood or iron ... quantity
-        boolean added = false;
-        try {
-            Scanner scanner = new Scanner(new File("UserDetails.txt"));
-            while (scanner.hasNext()){
-                String line = scanner.nextLine();
-                if (line.contains(username)){
-                    String[] parts = line.split(",");
-                    System.out.println(line);
-                    username = parts[0].trim();
-                    String password = parts[1].trim();
-                    int currency = Integer.parseInt(parts[2].trim());
-                    String status = parts[3].trim();
-                    String accountType = parts[4].trim();
-                    int wood = Integer.parseInt(parts[5].trim());
-                    int stone = Integer.parseInt(parts[6].trim());
-                    int iron = Integer.parseInt(parts[7].trim());
-                    int gold = Integer.parseInt(parts[8].trim());
-                    int silver = Integer.parseInt(parts[9].trim());
-                    funds=funds+currency;
-
-                    if(itemID == "wood"){
-                        wood = quantity+wood;
-                        added=true;
-                        return added;
-                    }else if (itemID=="stone"){
-                        stone = quantity+stone;
-                        added=true;
-                        return added;
-                    }else if (itemID=="iron"){
-                        stone = quantity+iron;
-                        added=true;
-                        return added;
-                    }else if (itemID=="gold"){
-                        stone = quantity+gold;
-                        added=true;
-                        return added;
-                    }else if (itemID=="silver"){
-                        stone = quantity+silver;
-                        added=true;
-                        return added;
-                    }
-
-                }
+    public boolean addResource(int resourceID, int quantity, String username) {
+        if (quantity > 0 && this.username.equals(username)){
+            int resourceIndex = getResourceIndex(resourceID);
+            if (resourceIndex != -1){
+                int new_quantity = userResources.get(resourceIndex).getQuantity() + quantity;
+                userResources.get(resourceIndex).setQuantity(new_quantity);
+                return true;
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
-        //doesnt write back to file yet
-        return added;
+        return false;
     }
-
     
-    public boolean removeItem(String itemID, int quantity) {
-        //read file, add to wood or iron ... quantity
-        boolean added = false;
-        try {
-            Scanner scanner = new Scanner(new File("UserDetails.txt"));
-            while (scanner.hasNext()){
-                String line = scanner.nextLine();
-                if (line.contains(username)){
-                    String[] parts = line.split(",");
-                    System.out.println(line);
-                    username = parts[0].trim();
-                    String password = parts[1].trim();
-                    int currency = Integer.parseInt(parts[2].trim());
-                    String status = parts[3].trim();
-                    String accountType = parts[4].trim();
-                    int wood = Integer.parseInt(parts[5].trim());
-                    int stone = Integer.parseInt(parts[6].trim());
-                    int iron = Integer.parseInt(parts[7].trim());
-                    int gold = Integer.parseInt(parts[8].trim());
-                    int silver = Integer.parseInt(parts[9].trim());
-                    funds=funds+currency;
-
-                    if(itemID == "wood"){
-                        wood = quantity-wood;
-                        added=true;
-                        return added;
-                    }else if (itemID=="stone"){
-                        stone = quantity-stone;
-                        added=true;
-                        return added;
-                    }else if (itemID=="iron"){
-                        stone = quantity-iron;
-                        added=true;
-                        return added;
-                    }else if (itemID=="gold"){
-                        stone = quantity-gold;
-                        added=true;
-                        return added;
-                    }else if (itemID=="silver"){
-                        stone = quantity-silver;
-                        added=true;
-                        return added;
-                    }
-
-                }
+    public boolean removeResource(int resourceID, int quantity, String username) {
+        if (quantity > 0 && this.username.equals(username)){
+            int resourceIndex = getResourceIndex(resourceID);
+            if (resourceIndex != -1){
+                int new_quantity = userResources.get(resourceIndex).getQuantity() - quantity;
+                userResources.get(resourceIndex).setQuantity(new_quantity);
+                return true;
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
-        //doesnt write back to file yet
-        return added;
+        return false;
     }
-
-
-    
-
-
 
 }

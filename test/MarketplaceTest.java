@@ -89,40 +89,77 @@ class MarketplaceTest {
     }
 
     @Test
-    void givenValidThenAddResource() {
-        assertEquals(true, marketplace.addResource(1,100));
+    void givenValidThenAddResourceToMarket() {
+        assertEquals(true, marketplace.addResourceToMarket(1,100));
         assertEquals(1100, marketplace.marketResources.get(0).getQuantity());
     }
 
     @Test
-    void givenInvalidIdThenAddResourceReturnFalse() {
+    void givenInvalidIdThenAddResourceToMarketReturnFalse() {
 
-        assertEquals(false, marketplace.addResource(5,100));
+        assertEquals(false, marketplace.addResourceToMarket(5,100));
     }
 
     @Test
-    void givenInvalidAmountThenAddResourceReturnFalse() {
+    void givenInvalidAmountThenAddResourceToMarketReturnFalse() {
 
-        assertEquals(false, marketplace.addResource(1,-100));
+        assertEquals(false, marketplace.addResourceToMarket(1,-100));
     }
 
     @Test
-    void givenValidThenRemoveResource() {
+    void givenValidThenRemoveResourceFromMarket() {
 
-        assertEquals(true, marketplace.removeResource(1,100));
+        assertEquals(true, marketplace.removeResourceFromMarket(1,100));
         assertEquals(900, marketplace.marketResources.get(0).getQuantity());
     }
 
     @Test
-    void givenInvalidIdThenRemoveResourceReturnFalse() {
+    void givenInvalidIdThenRemoveResourceFromMarketReturnFalse() {
 
-        assertEquals(false, marketplace.removeResource(5,100));
+        assertEquals(false, marketplace.removeResourceFromMarket(5,100));
     }
 
     @Test
-    void givenInvalidAmountThenRemoveResourceReturnFalse() {
+    void givenInvalidAmountThenRemoveResourceFromMarketReturnFalse() {
 
-        assertEquals(false, marketplace.removeResource(1,-100));
+        assertEquals(false, marketplace.removeResourceFromMarket(1,-100));
+    }
+
+    @Test
+    void givenValidThenAddResourceToUser() {
+        assertEquals(true, marketplace.addResourceToUser(1,100, "User One"));
+        assertEquals(1100, marketplace.marketResources.get(0).getQuantity());
+    }
+
+    @Test
+    void givenInvalidIdThenAddResourceToUserReturnFalse() {
+
+        assertEquals(false, marketplace.addResourceToUser(5,100, "User One"));
+    }
+
+    @Test
+    void givenInvalidAmountThenAddResourceToUserReturnFalse() {
+
+        assertEquals(false, marketplace.addResourceToUser(1,-100, "User One"));
+    }
+
+    @Test
+    void givenValidThenRemoveResourceFromUser() {
+
+        assertEquals(true, marketplace.removeResourceFromUser(1,100, "User One"));
+        assertEquals(900, marketplace.marketResources.get(0).getQuantity());
+    }
+
+    @Test
+    void givenInvalidIdThenRemoveResourceFromUserReturnFalse() {
+
+        assertEquals(false, marketplace.removeResourceFromUser(5,100, "User One"));
+    }
+
+    @Test
+    void givenInvalidAmountThenRemoveResourceFroUserReturnFalse() {
+
+        assertEquals(false, marketplace.removeResourceFromUser(1,-100, "User One"));
     }
 
     @Test
@@ -308,4 +345,17 @@ class MarketplaceTest {
 
     }
 
+    @Test
+    void givenCorrectAmountThenValidateCurrency() {
+
+        assertEquals(true, marketplace.validateCurrency(5000, "User One"));
+
+    }
+
+    @Test
+    void givenInvalidAmountThenValidateCurrencyReturnFalse() {
+
+        assertEquals(false, marketplace.validateCurrency(5000, "User Two"));
+
+    }
 }
