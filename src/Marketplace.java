@@ -89,7 +89,14 @@ public class Marketplace {
         return false;
     }
 
-    public boolean validateCurrency(int amount) {
+    public boolean validateCurrency(int amount, String userName) {
+        if(amount > 0){
+            int userIndex = getUserIndex(userName);
+            if (userList.get(userIndex).funds >= amount){
+                return true;
+            }
+            return false;
+        }
         return false;
     }
     

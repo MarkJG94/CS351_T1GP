@@ -345,4 +345,17 @@ class MarketplaceTest {
 
     }
 
+    @Test
+    void givenCorrectAmountThenValidateCurrency() {
+
+        assertEquals(true, marketplace.validateCurrency(5000, "User One"));
+
+    }
+
+    @Test
+    void givenInvalidAmountThenValidateCurrencyReturnFalse() {
+
+        assertEquals(false, marketplace.validateCurrency(5000, "User Two"));
+
+    }
 }
