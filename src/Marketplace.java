@@ -37,7 +37,6 @@ public class Marketplace {
         return false;
     }
 
-    
     public boolean removeResourceFromMarket(int resourceID, int quantity) {
         if (quantity > 0) {
             /*Check for item already existing*/
@@ -68,7 +67,6 @@ public class Marketplace {
         return false;
     }
 
-    
     public boolean notifyUserResource(String username, int resourceID) {
         int userIndex = getUserIndex(username);
         int resourceIndex = getResourceIndex(resourceID);
@@ -80,7 +78,6 @@ public class Marketplace {
 
         return false;
     }
-
     
     public boolean notifyUserCurrency(String username){
         int userIndex = getUserIndex(username);
@@ -92,11 +89,9 @@ public class Marketplace {
         return false;
     }
 
-    
     public boolean validateCurrency(int amount) {
         return false;
     }
-
     
     public int calculateTotal(int quantity, int resourceID) {
         if (quantity > 0){
@@ -109,7 +104,6 @@ public class Marketplace {
         return -1;
     }
 
-    
     public boolean userExists(String username) {
         for (User user : userList) {
             if (user.username.equals(username)) {
@@ -136,7 +130,6 @@ public class Marketplace {
         }
         return -1;
     }
-
     
     public int getResourceQuantity(int resourceID) {
         int resourceIndex = getResourceIndex(resourceID);
@@ -176,8 +169,8 @@ public class Marketplace {
             if (user_index == -1){
                 return -1;
             }
-            userList.get(user_index).funds += amount ;
-            return userList.get(user_index).addFunds(destination_username, amount);
+            userList.get(user_index).addFunds(destination_username, amount);
+            return userList.get(user_index).getFunds();
 
         }
         /*Can't deduct negative number, return error*/
@@ -190,8 +183,8 @@ public class Marketplace {
             if (user_index == -1){
                 return -1;
             }
-            userList.get(user_index).funds -= amount ;
-            return userList.get(user_index).deductFunds(source_username, amount);
+            userList.get(user_index).deductFunds(source_username, amount);
+            return userList.get(user_index).getFunds();
         }
         /*Can't deduct negative number, return error*/
         return -1;
@@ -218,6 +211,5 @@ public class Marketplace {
         }
         return false;
     }
-
 
 }

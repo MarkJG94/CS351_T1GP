@@ -79,7 +79,7 @@ public class User {
         if (quantity > 0){
             int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
-                int new_quantity = getResourceIndex(resourceIndex) + quantity;
+                int new_quantity = userResources.get(resourceIndex).getQuantity() + quantity;
                 userResources.get(resourceIndex).setQuantity(new_quantity);
                 return true;
             }
@@ -91,7 +91,7 @@ public class User {
         if (quantity > 0){
             int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
-                int new_quantity = getResourceIndex(resourceIndex) - quantity;
+                int new_quantity = userResources.get(resourceIndex).getQuantity() - quantity;
                 userResources.get(resourceIndex).setQuantity(new_quantity);
                 return true;
             }

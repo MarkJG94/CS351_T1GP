@@ -125,11 +125,6 @@ class MarketplaceTest {
         assertEquals(false, marketplace.removeResourceFromMarket(1,-100));
     }
 
-
-
-
-
-
     @Test
     void givenValidThenAddResourceToUser() {
         assertEquals(true, marketplace.addResourceToUser(1,100, "User One"));
@@ -166,13 +161,6 @@ class MarketplaceTest {
 
         assertEquals(false, marketplace.removeResourceFromUser(1,-100, "User One"));
     }
-
-
-
-
-
-
-
 
     @Test
     void givenValidThenAddFunds() {
