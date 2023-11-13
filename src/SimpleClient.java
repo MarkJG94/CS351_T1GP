@@ -14,6 +14,16 @@ public class SimpleClient {
         Socket socket = new Socket("127.0.0.1", 11000);
         PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
         Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("Enter your username: ");
+        String username = scanner.nextLine();
+        
+        printWriter.println(username);
+        
+        Scanner serverScanner = new Scanner(socket.getInputStream());
+        String response = serverScanner.nextLine();
+        System.out.println(response);
+        
         String msg = "";
         while (!msg.equals("STOP")){
             msg = scanner.nextLine();

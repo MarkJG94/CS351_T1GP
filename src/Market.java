@@ -32,6 +32,9 @@ public interface Market {
     // Checks if a username is valid
     boolean userExists(String username);
 
+    //Returns details of a specific item
+    //Item getItemDetails(int itemID);
+
     // Adds a specified number of a specific resource
     boolean addResource(int itemID, int quantity, String username);
 
@@ -39,13 +42,11 @@ public interface Market {
     boolean removeResource(int itemID, int quantity, String username);
 
 
-
 //    Are we changing the quantity here using the parameter, or informing after a change?
 
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
     boolean notifyUserResource(String username, int resourceID);
-
 
     // Notifies a target user the new quantity of a specific resource (or currency)
     // E.g. "Your [resourceName] is now [quantity]."
