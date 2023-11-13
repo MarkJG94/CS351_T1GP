@@ -7,11 +7,10 @@ public class Marketplace {
     ArrayList<User> userList = server.getUserList();
     ArrayList<Resource> marketResources = new ArrayList<Resource>();
 
-    
-    public boolean addResource(int resourceId, int quantity) {
+    public boolean addResourceToMarket(int resourceID, int quantity) {
         if (quantity > 0) {
             /*Check for item already existing*/
-            int resourceIndex = getResourceIndex(resourceId);
+            int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
                 marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() + quantity);
                 return true;
@@ -21,17 +20,51 @@ public class Marketplace {
         return false;
     }
 
+    public boolean addResourceToUser(int resourceID, int quantity, String userName) {
+        if (quantity > 0) {
+            if (userExists(userName)){
+                int user_index = getUserIndex(userName);
+                int resourceIndex = getResourceIndex(resourceID);
+                if (resourceIndex != -1) {
+                    userList.get(user_index).addResource(resourceID, quantity, userName);
+                    return true;
+                }
+                /*Check for item already existing*/
+            }
+            /*Can't add negative number*/
+            return false;
+        }
+        return false;
+    }
+
     
-    public boolean removeResource(int resourceId, int quantity) {
+    public boolean removeResourceFromMarket(int resourceID, int quantity) {
         if (quantity > 0) {
             /*Check for item already existing*/
-            int resourceIndex = getResourceIndex(resourceId);
+            int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
                 marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() - quantity);
                 return true;
             }
         }
         /*Can't add negative number*/
+        return false;
+    }
+
+    public boolean removeResourceFromUser(int resourceID, int quantity, String userName) {
+        if (quantity > 0) {
+            if (userExists(userName)){
+                int user_index = getUserIndex(userName);
+                int resourceIndex = getResourceIndex(resourceID);
+                if (resourceIndex != -1) {
+                    userList.get(user_index).removeResource(resourceID, quantity, userName);
+                    return true;
+                }
+                /*Check for item already existing*/
+            }
+            /*Can't add negative number*/
+            return false;
+        }
         return false;
     }
 
@@ -119,40 +152,24 @@ public class Marketplace {
             return marketResources.get(resourceIndex);
         }
         return null;
-
     }
-
-    //    Not Implemented yet.  Marketplace has a list of Users, and needs an identifier
-    
-    public int getFunds() {
-        return 0;
-    }
-
     
     public int getFunds(String username) {
         int user_index = getUserIndex(username);
         if (user_index == -1){
             return -1;
         }
-        return userList.get(user_index).funds;
+        return userList.get(user_index).getFunds();
     }
 
-//    Not Implemented yet.  Marketplace has a list of Users, and needs an identifier
-    
-    public ArrayList<Resource> getUserInventory() {
-        return null;
-    }
-
-    
     public ArrayList<Resource> getUserInventory(String username) {
         int user_index = getUserIndex(username);
         if (user_index == -1){
             return null;
         }
-        return userList.get(user_index).userResources;
+        return userList.get(user_index).getUserInventory();
     }
 
-    
     public int addFunds(String destination_username, int amount) {
         if (amount > 0) {
             int user_index = getUserIndex(destination_username);
@@ -160,27 +177,25 @@ public class Marketplace {
                 return -1;
             }
             userList.get(user_index).funds += amount ;
-            return userList.get(user_index).funds;
+            return userList.get(user_index).addFunds(destination_username, amount);
 
         }
         /*Can't deduct negative number, return error*/
         return -1;
     }
 
-    
-    public int deductFunds(String destination_username, int amount) {
+    public int deductFunds(String source_username, int amount) {
         if (amount > 0) {
-            int user_index = getUserIndex(destination_username);
+            int user_index = getUserIndex(source_username);
             if (user_index == -1){
                 return -1;
             }
             userList.get(user_index).funds -= amount ;
-            return userList.get(user_index).funds;
+            return userList.get(user_index).deductFunds(source_username, amount);
         }
         /*Can't deduct negative number, return error*/
         return -1;
     }
-
     
     public boolean transferFunds(String source, String destination, int amount) {
         if (amount > 0){
