@@ -35,7 +35,8 @@ public class SocketHandler implements Runnable{
             if (userExists)
             {
                 // Allow access
-                printWriter.println("Welcome " + username + ". You have successfully logged in.");
+                printWriter.println("Login");
+                
                 String msg = "";
                 while (true)
                 {
@@ -45,7 +46,7 @@ public class SocketHandler implements Runnable{
             }
             else
             {
-                printWriter.println("Access denied");
+                printWriter.println("Denied");
                 socket.close();
             }
         } catch (IOException e)

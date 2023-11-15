@@ -1,0 +1,4 @@
+﻿Username,Password,Funds,Status,Wood,Stone,Iron,Gold,Silver
+testuser1,password1,1000,offline,0,0,5,0,0
+testuser2,password2,600,offline,0,3,0,0,0
+testuser3,password3,400,offline,0,0,0,10,0

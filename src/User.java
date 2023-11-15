@@ -9,18 +9,24 @@ public class User {
 
     ArrayList<Resource> userResources;
     String username;
+    String password;
+    boolean status;
     int funds;
 
-    public User(String username, ArrayList<Resource> userResources){
+    public User(String username, String password, ArrayList<Resource> userResources){
         this.username = username.toLowerCase(Locale.ROOT);
+        this.password = password;
         this.userResources = userResources;
         funds = 1000;
+        this.status = false;
     }
 
-    public User(String username, ArrayList<Resource> userResources, int funds){
+    public User(String username, String password, ArrayList<Resource> userResources, int funds){
         this.username = username;
+        this.password = password;
         this.userResources = userResources;
         this.funds = funds;
+        this.status = false;
     }
     
     public ArrayList<Resource> getUserInventory() {
