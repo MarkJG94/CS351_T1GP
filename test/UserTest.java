@@ -15,7 +15,7 @@ public class UserTest {
     Resource silver = new Resource(3, 5, 1000, "silver");
     Resource gold = new Resource(4, 10, 1000, "gold");
 
-    User user1 = new User("User One", resourceList, 10000);
+    User user1 = new User("User One", "password", resourceList, 10000);
 
     @Before
     public void setUp() throws Exception {

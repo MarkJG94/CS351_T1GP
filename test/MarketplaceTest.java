@@ -15,10 +15,10 @@ class MarketplaceTest {
     Resource gold = new Resource(4, 10, 1000, "gold");
 
     ArrayList<User> userList = new ArrayList<User>();
-    User user1 = new User("User One", resourceList, 10000);
-    User user2 = new User("User Two", resourceList, 100);
-    User user3 = new User("User Three", resourceList, 10000);
-    User user4 = new User("User Four", resourceList, 1);
+    User user1 = new User("User One", "password", resourceList, 10000);
+    User user2 = new User("User Two", "password", resourceList, 100);
+    User user3 = new User("User Three", "password", resourceList, 10000);
+    User user4 = new User("User Four", "password", resourceList, 1);
 
     @BeforeEach
     void setup(){
