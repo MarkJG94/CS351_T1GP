@@ -30,10 +30,22 @@ public class SimpleClient {
         Scanner serverScanner = new Scanner(socket.getInputStream());
         String response = serverScanner.nextLine();
         
+        if(response.equals( "Password" ))
+        {
+            System.out.println("Enter your password, (Case Sensitive): ");
+            String password = scanner.nextLine();
+            
+            printWriter.println(password);
+            
+            
+        }
+        response = serverScanner.nextLine();
+        
         if (response.equals( "Login" ))
         {
             start();
         }
+        
     }
     
     public void start() {

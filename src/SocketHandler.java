@@ -25,10 +25,17 @@ public class SocketHandler implements Runnable{
             boolean userExists = false;
             for (User user : userList)
             {
-                if (user.getUsername().equals( username ))
+                if ( user.getUsername().equalsIgnoreCase( username ))
                 {
-                    userExists = true;
-                    break;
+                    printWriter.println("Password");
+                    String password = scanner.nextLine();
+                    System.out.println(password);
+                    if(user.getPassword().equals( password ))
+                    {
+                        userExists = true;
+                        printWriter.println("Login");
+                        break;
+                    }
                 }
             }
             
@@ -36,13 +43,6 @@ public class SocketHandler implements Runnable{
             {
                 // Allow access
                 printWriter.println("Login");
-                
-                String msg = "";
-                while (true)
-                {
-                    msg = scanner.nextLine();
-                    System.out.println(msg);
-                }
             }
             else
             {
