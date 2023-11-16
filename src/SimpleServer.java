@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.Naming;
@@ -75,12 +72,13 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
         return options;
     }
 
-    private void importMarketDetails(){
+    private void importMarketDetails() throws IOException {
 
         List<List<String>> records = new ArrayList<>();
+        String resourceFilePath = filePath + "/src/MarketDetails.csv";
         try (
                 BufferedReader br = new BufferedReader(
-                        new FileReader(filePath + "/src/MarketDetails.csv")
+                        new FileReader(resourceFilePath)
                 )
         ) {
             String line;
@@ -88,20 +86,39 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
                 String[] values = line.split(",");
                 records.add(Arrays.asList(values));
             }
+            for(int i = 0; i < records.size();i++){
+                resources.add(new Resource(i + 1, Integer.parseInt(records.get(i).get(2)), Integer.parseInt(records.get(i).get(1)), records.get(i).get(0),Integer.parseInt(records.get(i).get(3))));
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
-        for(int i = 0; i < records.size();i++){
-            resources.add(new Resource(i + 1, Integer.parseInt(records.get(i).get(2)), Integer.parseInt(records.get(i).get(1)), records.get(i).get(0)));
+            File file = new File(resourceFilePath);
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            resources.add(new Resource(1, 10, 50, "Wood", 8));
+            resources.add(new Resource(2, 10, 100, "Stone", 8));
+            resources.add(new Resource(3, 30, 30, "Iron", 24));
+            resources.add(new Resource(4, 100, 5, "Gold", 80));
+            resources.add(new Resource(5, 50, 20, "Silver", 40));
+
+            for (int i = 0; i < resources.size(); i++) {
+                String resourceString = resources.get(i).getName() + "," + resources.get(i).getQuantity() + "," + resources.get(i).getCost() + "," + resources.get(i).getValue();
+                bw.write(resourceString);
+                if(i != resources.size() - 1) {bw.newLine();}
+            }
+
+            bw.close();
+            fw.close();
+
         }
     }
 
-    private void importUserDetails(){
+    private void importUserDetails() throws IOException {
         List<List<String>> records = new ArrayList<>();
+        String userFilePath = filePath + "/src/UserDetails.csv";
         try (
                 BufferedReader br = new BufferedReader(
-                        new FileReader(filePath + "/src/UserDetails.csv")
+                        new FileReader(userFilePath)
                 )
         ) {
             String line;
@@ -111,7 +128,32 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
                 records.add(Arrays.asList(values));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            File file = new File(userFilePath);
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            StringBuilder userHeader = new StringBuilder("Username,Password,Funds,Status,");
+
+            for(Resource resource: resources){
+                userHeader.append(resource.getName()).append(",");
+            }
+
+            String output = userHeader.deleteCharAt(userHeader.length() - 1).toString();
+            bw.write(output);
+            bw.newLine();
+
+            StringBuilder testUser = new StringBuilder("testuser,Test,0,Offline,");
+
+            for(Resource resource: resources){
+                testUser.append("0,");
+            }
+
+            output = testUser.deleteCharAt(testUser.length() - 1).toString();
+            bw.write(output);
+            bw.newLine();
+
+            bw.close();
+            fw.close();
         }
 
         for(List<String> user : records){
@@ -119,7 +161,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
             int start = 4;
 
             for(int i = 0; i < resources.size();i++){
-                userResources.add(new Resource(resources.get(i).getId(),resources.get(i).getCost(), Integer.parseInt(user.get(start)), resources.get(i).getName()));
+                userResources.add(new Resource(resources.get(i).getId(),resources.get(i).getCost(), Integer.parseInt(user.get(start)), resources.get(i).getName(),resources.get(i).getValue()));
                 start++;
             }
 
