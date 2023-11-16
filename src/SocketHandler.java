@@ -14,28 +14,44 @@ public class SocketHandler implements Runnable{
         this.userList = userList;
     }
 
+    private User checkUsername(String username){
+        for (User user : userList) {
+            if (user.getUsername().equalsIgnoreCase(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void run() {
         try {
 
             Scanner scanner = new Scanner(socket.getInputStream());
             PrintWriter printWriter = new PrintWriter( socket.getOutputStream(), true );
-            String username = scanner.nextLine();
-            
+            String username;
+            User user;
+
             boolean userExists = false;
-            for (User user : userList)
-            {
-                if ( user.getUsername().equalsIgnoreCase( username ))
-                {
+
+            while(true) {
+                username = scanner.nextLine();
+                user = checkUsername(username);
+                if (user == null) {
+                    printWriter.println("Username");
+                } else {
+                    break;
+                }
+            }
+            while(!userExists) {
+                printWriter.println("Password");
+                String password = scanner.nextLine();
+                System.out.println(password);
+                if (user.getPassword().equals(password)) {
+                    userExists = true;
+                    printWriter.println("Login");
+                } else {
                     printWriter.println("Password");
-                    String password = scanner.nextLine();
-                    System.out.println(password);
-                    if(user.getPassword().equals( password ))
-                    {
-                        userExists = true;
-                        printWriter.println("Login");
-                        break;
-                    }
                 }
             }
             

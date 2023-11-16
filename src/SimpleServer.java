@@ -20,7 +20,9 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
     private ArrayList<Resource> resources;
     private ArrayList<User> userList;
-    String filePath = new File("").getAbsolutePath();
+    private String filePath = new File("").getAbsolutePath();
+    private String userFilePath = filePath + "/src/UserDetails.csv";
+    private String resourceFilePath = filePath + "/src/MarketDetails.csv";
     private Marketplace marketPlace;
 
     public ArrayList<User>getUserList(){
@@ -75,7 +77,6 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
     private void importMarketDetails() throws IOException {
 
         List<List<String>> records = new ArrayList<>();
-        String resourceFilePath = filePath + "/src/MarketDetails.csv";
         try (
                 BufferedReader br = new BufferedReader(
                         new FileReader(resourceFilePath)
@@ -115,7 +116,6 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
     private void importUserDetails() throws IOException {
         List<List<String>> records = new ArrayList<>();
-        String userFilePath = filePath + "/src/UserDetails.csv";
         try (
                 BufferedReader br = new BufferedReader(
                         new FileReader(userFilePath)
@@ -174,6 +174,50 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
                     )
             );
         }
+    }
+
+    private void saveMarketFile() throws IOException{
+        File file = new File(resourceFilePath);
+        FileWriter fw = new FileWriter(file);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        for (int i = 0; i < resources.size(); i++) {
+            String resourceString = resources.get(i).getName() + "," + resources.get(i).getQuantity() + "," + resources.get(i).getCost() + "," + resources.get(i).getValue();
+            bw.write(resourceString);
+            if(i != resources.size() - 1) {bw.newLine();}
+        }
+
+        bw.close();
+        fw.close();
+    }
+
+    private void saveUserFile() throws IOException {
+        File file = new File(userFilePath);
+        FileWriter fw = new FileWriter(file, false);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        StringBuilder userHeader = new StringBuilder("Username,Password,Funds,Status,");
+
+        for(Resource resource: resources){
+            userHeader.append(resource.getName()).append(",");
+        }
+
+        String output = userHeader.deleteCharAt(userHeader.length() - 1).toString();
+        bw.write(output);
+        bw.newLine();
+
+        for(User user: userList){
+            StringBuilder output2 = new StringBuilder(user.getUsername() + "," + user.getPassword() + "," + user.funds + ",Offline");
+            for (int i = 0; i < resources.size(); i++){
+                output2.append(",").append(user.getResourceQuantity(i));
+            }
+            bw.write(output.toString());
+            bw.newLine();
+
+        }
+
+        bw.close();
+        fw.close();
     }
 
     public static void main(String[] args) {
