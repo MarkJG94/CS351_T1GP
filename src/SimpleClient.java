@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 public class SimpleClient {
 
+    User user;
+
     SimpleClient() {
 
     }
@@ -63,6 +65,7 @@ public class SimpleClient {
         
         if (response.equals( "Login" ))
         {
+//            this.user = get the user from the list
             start();
         }
         
@@ -89,7 +92,8 @@ public class SimpleClient {
             }
             switch (response) {
                 case 1:
-// View inventory
+                    ArrayList<Resource> resources = user.getUserInventory();
+                    printUserInventory(resources);
                     break;
                 case 2:
 // view logged in users
@@ -174,4 +178,12 @@ public class SimpleClient {
             e.printStackTrace();
         }
     }
+
+    public void printUserInventory(ArrayList<Resource> userResources){
+        System.out.println("***Your Inventory***");
+        for (Resource resource:userResources) {
+            System.out.println(resource.getName() + "\t" + resource.getQuantity() + "\t" + resource.getValue());
+        }
+    }
+
 }

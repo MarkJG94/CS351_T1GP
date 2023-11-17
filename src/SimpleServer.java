@@ -36,7 +36,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
         resources = new ArrayList<>();
         userList = new ArrayList<>();
-        Marketplace marketplace = new Marketplace();
+        Marketplace marketplace = new Marketplace(userList);
 
         importMarketDetails();
         importUserDetails();
