@@ -1,10 +1,16 @@
 import java.util.ArrayList;
-import java.util.List;
 
 public class Marketplace {
 
-    Server server = new Server();
-    ArrayList<User> userList = server.getUserList();
+    public Marketplace(){
+
+    }
+
+    public Marketplace(ArrayList userList){
+        this.userList = userList;
+    }
+
+    ArrayList<User> userList;
     ArrayList<Resource> marketResources = new ArrayList<Resource>();
 
     public boolean addResourceToMarket(int resourceID, int quantity) {
@@ -27,9 +33,9 @@ public class Marketplace {
                 int resourceIndex = getResourceIndex(resourceID);
                 if (resourceIndex != -1) {
                     userList.get(user_index).addResource(resourceID, quantity, userName);
+
                     return true;
                 }
-                /*Check for item already existing*/
             }
             /*Can't add negative number*/
             return false;
