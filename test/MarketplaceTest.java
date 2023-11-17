@@ -9,10 +9,10 @@ class MarketplaceTest {
 
     Marketplace marketplace = new Marketplace();
     ArrayList<Resource> resourceList = new ArrayList<Resource>();
-    Resource wood = new Resource(1, 1, 1000, "wood");
-    Resource iron = new Resource(2, 2, 1000, "iron");
-    Resource silver = new Resource(3, 5, 1000, "silver");
-    Resource gold = new Resource(4, 10, 1000, "gold");
+    Resource wood = new Resource(1, 1, 1000, "wood", 1);
+    Resource iron = new Resource(2, 2, 1000, "iron", 2);
+    Resource silver = new Resource(3, 5, 1000, "silver",5);
+    Resource gold = new Resource(4, 10, 1000, "gold",10);
 
     ArrayList<User> userList = new ArrayList<User>();
     User user1 = new User("User One", "password", resourceList, 10000);
