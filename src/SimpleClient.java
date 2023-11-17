@@ -16,14 +16,19 @@ public class SimpleClient {
 
     }
 
+    Socket socket;
+    PrintWriter printWriter;
+    Scanner scanner;
+    Scanner serverScanner;
+
     public void runClient() throws IOException, NotBoundException
     {
         
-        Socket socket = new Socket("127.0.0.1", 11000);
-        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-        Scanner scanner = new Scanner(System.in);
+        this.socket = new Socket("127.0.0.1", 11000);
+        this.printWriter = new PrintWriter(socket.getOutputStream(), true);
+        this.scanner = new Scanner(System.in);
 
-        Scanner serverScanner = new Scanner(socket.getInputStream());
+        this.serverScanner = new Scanner(socket.getInputStream());
         String response;
 
         while(true){
@@ -92,17 +97,17 @@ public class SimpleClient {
             }
             switch (response) {
                 case 1:
-                    ArrayList<Resource> resources = user.getUserInventory();
-                    printUserInventory(resources);
+                    String getInventoryMessage = user.getUsername() + ".getUserInventory";
+                    printWriter.println(getInventoryMessage);
+                    printResponse(serverScanner);
                     break;
                 case 2:
-// view logged in users
+                    //Get online users
                     break;
                 case 3:
                     marketStart();
                     break;
                 case 4:
-// quit
                     running = false;
                     break;
             }
@@ -130,12 +135,13 @@ public class SimpleClient {
             }
             switch (response) {
                 case 1:
-// View inventory
+                    //Get market inventory
                     break;
                 case 2:
-// view logged in users
+                    //Buy Item
                     break;
                 case 3:
+                    //Sell item
                     break;
                 case 4:
                     running = false;
@@ -179,10 +185,9 @@ public class SimpleClient {
         }
     }
 
-    public void printUserInventory(ArrayList<Resource> userResources){
-        System.out.println("***Your Inventory***");
-        for (Resource resource:userResources) {
-            System.out.println(resource.getName() + "\t" + resource.getQuantity() + "\t" + resource.getValue());
+    private void printResponse(Scanner serverScanner){
+        while (serverScanner.hasNextLine()){
+            System.out.println(serverScanner.nextLine());;
         }
     }
 
