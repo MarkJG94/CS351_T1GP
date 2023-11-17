@@ -81,6 +81,11 @@ public class User {
         return username;
     }
     
+    public String getPassword()
+    {
+        return password;
+    }
+    
     public boolean addResource(int resourceID, int quantity, String username) {
         if (quantity > 0 && this.username.equals(username)){
             int resourceIndex = getResourceIndex(resourceID);

@@ -10,7 +10,6 @@ import java.util.Scanner;
 
 public class SimpleClient {
 
-    
     SimpleClient() {
 
     }
@@ -21,19 +20,52 @@ public class SimpleClient {
         Socket socket = new Socket("127.0.0.1", 11000);
         PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
         Scanner scanner = new Scanner(System.in);
-        
-        System.out.println("Enter your username: ");
-        String username = scanner.nextLine();
-        
-        printWriter.println(username);
-        
+
         Scanner serverScanner = new Scanner(socket.getInputStream());
-        String response = serverScanner.nextLine();
+        String response;
+
+        while(true){
+            System.out.println("Enter your username: ");
+            String username = scanner.nextLine();
+
+            printWriter.println(username);
+
+            serverScanner = new Scanner(socket.getInputStream());
+            response = serverScanner.nextLine();
+            if(response.equals( "Password" )){
+                break;
+            } else {
+                System.out.println("Username not found. Please try again");
+            }
+        }
+
+        int passwordAttempts = 0;
+        while(true) {
+
+            if(passwordAttempts > 4) {
+                break;
+            } else {
+                System.out.println("Enter your password: ");
+            }
+
+            String password = scanner.nextLine();
+            printWriter.println(password);
+
+            response = serverScanner.nextLine();
+
+            if (response.equals( "Login" )){
+                break;
+            } else {
+                System.out.println("Invalid Password! " + (3 - passwordAttempts) + " attempts remaining.");
+                passwordAttempts++;
+            }
+        }
         
         if (response.equals( "Login" ))
         {
             start();
         }
+        
     }
     
     public void start() {
