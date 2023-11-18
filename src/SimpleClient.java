@@ -1,23 +1,22 @@
-
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.net.Socket;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class SimpleClient {
-
-    SimpleClient() {
-
+    Socket socket;
+    String username;
+    SimpleClient() throws IOException {
+        socket = new Socket("127.0.0.1", 11000);
     }
 
     public void runClient() throws IOException, NotBoundException
     {
-        
-        Socket socket = new Socket("127.0.0.1", 11000);
+
+
         PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
         Scanner scanner = new Scanner(System.in);
 
@@ -26,7 +25,7 @@ public class SimpleClient {
 
         while(true){
             System.out.println("Enter your username: ");
-            String username = scanner.nextLine();
+            username = scanner.nextLine();
 
             printWriter.println(username);
 
@@ -60,25 +59,26 @@ public class SimpleClient {
                 passwordAttempts++;
             }
         }
-        
+
         if (response.equals( "Login" ))
         {
             start();
         }
-        
+
     }
-    
-    public void start() {
+
+    public void start() throws IOException {
         String input;
-        int response;
+        String response;
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
         Scanner scanner = new Scanner( System.in );
         boolean running = true;
         while (running) {
             mainMenu();
             while (true) {
-                System.out.println("Please enter a number (1-4): ");
-                response = scanner.nextInt();
-                if ((response > 0) && (response < 5))
+                System.out.println("Please enter a number (1-5): ");
+                response = scanner.nextLine();
+                if ((Integer.parseInt(response) > 0) && ((Integer.parseInt(response) < 6)))
                 {
                     break;
                 }
@@ -87,31 +87,62 @@ public class SimpleClient {
                     System.out.println("Invalid entry");
                 }
             }
-            switch (response) {
+            Scanner serverScanner = new Scanner(socket.getInputStream());
+            switch (Integer.parseInt(response)) {
                 case 1:
-// View inventory
+                    // View inventory
+                    printWriter.println("Inventory-" + username);
+                    ArrayList<String> data = new ArrayList<>(Arrays.asList(serverScanner.nextLine().split("`")));
+                    for(String s : data){
+                        System.out.println(s);
+                    }
+                    System.out.println();
                     break;
                 case 2:
-// view logged in users
+                    // view logged in users
+                    printWriter.println("Users-" + username);
+                    System.out.println(serverScanner.nextLine());
                     break;
                 case 3:
                     marketStart();
                     break;
                 case 4:
-// quit
+                    // transferFunds
+                    transferFunds();
+                    break;
+                case 5:
+                    // quit
                     running = false;
                     break;
             }
         }
     }
-    
-    public void marketStart() {
-        marketMenu();
-        String input;
+
+    private void transferFunds() throws IOException {
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+        Scanner scanner = new Scanner( System.in );
+        Scanner serverScanner = new Scanner(socket.getInputStream());
+
+        System.out.println("Enter the username you would like to transfer to: ");
+        String input = scanner.nextLine();
+
+        System.out.println("Amount you want to transfer: ");
+        int amount = scanner.nextInt();
+
+        printWriter.println("Transfer-" + username + "-" + input + "-" + amount);
+        System.out.println(serverScanner.nextLine());
+
+    }
+
+    public void marketStart() throws IOException {
+
         int response;
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+        Scanner serverScanner = new Scanner(socket.getInputStream());
         Scanner scanner = new Scanner( System.in );
         boolean running = true;
         while (running) {
+            marketMenu();
             while (true) {
                 System.out.println("Please enter a number (1-4): ");
                 response = scanner.nextInt();
@@ -126,12 +157,20 @@ public class SimpleClient {
             }
             switch (response) {
                 case 1:
-// View inventory
+                    // View listings
+                    printWriter.println("Inventory-Marketplace");
+                    ArrayList<String> data = new ArrayList<>(Arrays.asList(serverScanner.nextLine().split("`")));
+                    for(String s : data){
+                        System.out.println(s);
+                    }
+                    System.out.println();
                     break;
                 case 2:
-// view logged in users
+                    // Buy item
+                    buyItem();
                     break;
                 case 3:
+                    sellItem();
                     break;
                 case 4:
                     running = false;
@@ -139,7 +178,7 @@ public class SimpleClient {
             }
         }
     }
-    
+
     public void mainMenu(){
         ArrayList<String> options = new ArrayList<String>();
         options.add("Welcome to the Application");
@@ -147,12 +186,13 @@ public class SimpleClient {
         options.add("\t 1. View my inventory");
         options.add("\t 2. View logged on users");
         options.add("\t 3. View MarketPlace");
-        options.add("\t 4. Quit");
+        options.add("\t 4. Transfer Funds");
+        options.add("\t 5. Quit");
         for(String s : options){
             System.out.println(s);
         }
     }
-    
+
     public void marketMenu(){
         ArrayList<String> options = new ArrayList<String>();
         options.add("Marketplace Menu");
@@ -165,8 +205,98 @@ public class SimpleClient {
             System.out.println(s);
         }
     }
-    
-    public static void main(String[] args) {
+
+    private void sellItem() throws IOException {
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+        Scanner scanner = new Scanner( System.in );
+        Scanner serverScanner = new Scanner(socket.getInputStream());
+        printWriter.println("Inventory-Marketplace-" + username);
+        String response = serverScanner.nextLine();
+
+        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("-")));
+        boolean loop = true;
+        int resourceID = 0, quantity = 0;
+
+        while (loop) {
+            System.out.println("Which item would you like to sell? (enter Q to exit)");
+            for (int i = 0; i < data.size(); i++) {
+                System.out.print(data.get(i) + "(" + (i + 1) + ")   ");
+            }
+            response = scanner.nextLine();
+            if (response.equalsIgnoreCase("q")) {
+                loop = false;
+                break;
+            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
+                resourceID = Integer.parseInt(response);
+                break;
+            } else {
+                System.out.println("Invalid entry. Try again.");
+            }
+        }
+        while (loop) {
+            System.out.println("How many would you like to sell? (enter Q to exit)");
+            response = scanner.nextLine();
+            if (response.equalsIgnoreCase("q")) {
+                loop = false;
+                break;
+            } else if (Integer.parseInt(response) > 0) {
+                quantity = Integer.parseInt(response);
+                break;
+            } else {
+                System.out.println("Invalid entry. Try again.");
+            }
+        }
+        if(loop) {
+            printWriter.println("Sell-Marketplace-" + username + "-" + resourceID + "-" + quantity);
+        }
+    }
+
+    private void buyItem() throws IOException {
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+        Scanner scanner = new Scanner( System.in );
+        Scanner serverScanner = new Scanner(socket.getInputStream());
+        printWriter.println("Inventory-Marketplace-" + username);
+        serverScanner = new Scanner(socket.getInputStream());
+        String response = serverScanner.nextLine();
+        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("-")));
+        boolean loop = true;
+        int resourceID = 0, quantity = 0;
+
+        while (loop) {
+            System.out.println("Which item would you like to buy? (enter Q to exit)");
+            for (int i = 0; i < data.size(); i++) {
+                System.out.print(data.get(i) + "(" + (i + 1) + ")   ");
+            }
+            response = scanner.nextLine();
+            if (response.equalsIgnoreCase("q")) {
+                loop = false;
+                break;
+            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
+                resourceID = Integer.parseInt(response);
+                break;
+            } else {
+                System.out.println("Invalid entry. Try again.");
+            }
+        }
+        while (loop) {
+            System.out.println("How many would you like to buy? (enter Q to exit)");
+            response = scanner.nextLine();
+            if (response.equalsIgnoreCase("q")) {
+                loop = false;
+                break;
+            } else if (Integer.parseInt(response) > 0) {
+                quantity = Integer.parseInt(response);
+                break;
+            } else {
+                System.out.println("Invalid entry. Try again.");
+            }
+        }
+        if(loop) {
+            printWriter.println("Buy-Marketplace-" + username + "-" + resourceID + "-" + quantity);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
         SimpleClient simpleClient = new SimpleClient();
         try {
             simpleClient.runClient();

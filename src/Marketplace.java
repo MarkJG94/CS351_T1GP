@@ -2,12 +2,9 @@ import java.util.ArrayList;
 
 public class Marketplace {
 
-    public Marketplace(){
 
-    }
-
-    public Marketplace(ArrayList userList){
-        this.userList = userList;
+    public Marketplace(ArrayList<Resource> resourceList){
+        this.marketResources = resourceList;
     }
 
     ArrayList<User> userList;
@@ -32,7 +29,7 @@ public class Marketplace {
                 int user_index = getUserIndex(userName);
                 int resourceIndex = getResourceIndex(resourceID);
                 if (resourceIndex != -1) {
-                    userList.get(user_index).addResource(resourceID, quantity, userName);
+                    userList.get(user_index).addResource(resourceID, quantity);
 
                     return true;
                 }
@@ -62,7 +59,7 @@ public class Marketplace {
                 int user_index = getUserIndex(userName);
                 int resourceIndex = getResourceIndex(resourceID);
                 if (resourceIndex != -1) {
-                    userList.get(user_index).removeResource(resourceID, quantity, userName);
+                    userList.get(user_index).removeResource(resourceID, quantity);
                     return true;
                 }
                 /*Check for item already existing*/
@@ -153,11 +150,7 @@ public class Marketplace {
     }
 
     public Resource getResourceDetails(int resourceID) {
-        int resourceIndex = getResourceIndex(resourceID);
-        if (resourceIndex != -1){
-            return marketResources.get(resourceIndex);
-        }
-        return null;
+        return marketResources.get(resourceID - 1);
     }
     
     public int getFunds(String username) {
@@ -176,53 +169,53 @@ public class Marketplace {
         return userList.get(user_index).getUserInventory();
     }
 
-    public int addFunds(String destination_username, int amount) {
-        if (amount > 0) {
-            int user_index = getUserIndex(destination_username);
-            if (user_index == -1){
-                return -1;
-            }
-            userList.get(user_index).addFunds(destination_username, amount);
-            return userList.get(user_index).getFunds();
+//    public int addFunds(String destination_username, int amount) {
+//        if (amount > 0) {
+//            int user_index = getUserIndex(destination_username);
+//            if (user_index == -1){
+//                return -1;
+//            }
+//            userList.get(user_index).addFunds(destination_username, amount);
+//            return userList.get(user_index).getFunds();
+//
+//        }
+//        /*Can't deduct negative number, return error*/
+//        return -1;
+//    }
 
-        }
-        /*Can't deduct negative number, return error*/
-        return -1;
-    }
-
-    public int deductFunds(String source_username, int amount) {
-        if (amount > 0) {
-            int user_index = getUserIndex(source_username);
-            if (user_index == -1){
-                return -1;
-            }
-            userList.get(user_index).deductFunds(source_username, amount);
-            return userList.get(user_index).getFunds();
-        }
-        /*Can't deduct negative number, return error*/
-        return -1;
-    }
+//    public int deductFunds(String source_username, int amount) {
+//        if (amount > 0) {
+//            int user_index = getUserIndex(source_username);
+//            if (user_index == -1){
+//                return -1;
+//            }
+//            userList.get(user_index).deductFunds(source_username, amount);
+//            return userList.get(user_index).getFunds();
+//        }
+//        /*Can't deduct negative number, return error*/
+//        return -1;
+//    }
     
-    public boolean transferFunds(String source, String destination, int amount) {
-        if (amount > 0){
-            int sourceIndex = getUserIndex(source);
-            int destinationIndex = getUserIndex(destination);
-            /*Check that both source and destination user exists and not the same user*/
-            if((sourceIndex != -1 && destinationIndex != -1) && (sourceIndex != destinationIndex)){
-                /*Check that source user has enough funds to transfer*/
-                if (getFunds(source) >= amount){
-                    deductFunds(source, amount);
-                    addFunds(destination,amount);
-                    return true;
-                } else {
-                    return false;
-                }
-            /*If source or destination user doesn't exist*/
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
+//    public boolean transferFunds(String source, String destination, int amount) {
+//        if (amount > 0){
+//            int sourceIndex = getUserIndex(source);
+//            int destinationIndex = getUserIndex(destination);
+//            /*Check that both source and destination user exists and not the same user*/
+//            if((sourceIndex != -1 && destinationIndex != -1) && (sourceIndex != destinationIndex)){
+//                /*Check that source user has enough funds to transfer*/
+//                if (getFunds(source) >= amount){
+//                    deductFunds(source, amount);
+//                    addFunds(destination,amount);
+//                    return true;
+//                } else {
+//                    return false;
+//                }
+//            /*If source or destination user doesn't exist*/
+//            } else {
+//                return false;
+//            }
+//        }
+//        return false;
+//    }
 
 }
