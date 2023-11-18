@@ -101,7 +101,9 @@ public class SimpleClient {
                 case 2:
                     // view logged in users
                     printWriter.println("Users-" + username);
+                    System.out.println("Online Users:");
                     System.out.println(serverScanner.nextLine());
+                    System.out.println();
                     break;
                 case 3:
                     marketStart();
@@ -112,26 +114,11 @@ public class SimpleClient {
                     break;
                 case 5:
                     // quit
+                    printWriter.println("Quit-" + username);
                     running = false;
                     break;
             }
         }
-    }
-
-    private void transferFunds() throws IOException {
-        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-        Scanner scanner = new Scanner( System.in );
-        Scanner serverScanner = new Scanner(socket.getInputStream());
-
-        System.out.println("Enter the username you would like to transfer to: ");
-        String input = scanner.nextLine();
-
-        System.out.println("Amount you want to transfer: ");
-        int amount = scanner.nextInt();
-
-        printWriter.println("Transfer-" + username + "-" + input + "-" + amount);
-        System.out.println(serverScanner.nextLine());
-
     }
 
     public void marketStart() throws IOException {
@@ -204,6 +191,22 @@ public class SimpleClient {
         for(String s : options){
             System.out.println(s);
         }
+    }
+
+    private void transferFunds() throws IOException {
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+        Scanner scanner = new Scanner( System.in );
+        Scanner serverScanner = new Scanner(socket.getInputStream());
+
+        System.out.println("Enter the username you would like to transfer to: ");
+        String input = scanner.nextLine();
+
+        System.out.println("Amount you want to transfer: ");
+        int amount = scanner.nextInt();
+
+        printWriter.println("Transfer-" + username + "-" + input + "-" + amount);
+        System.out.println(serverScanner.nextLine());
+
     }
 
     private void sellItem() throws IOException {

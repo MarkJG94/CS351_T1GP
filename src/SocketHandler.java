@@ -41,7 +41,6 @@ public class SocketHandler implements Runnable{
             printWriter.println("Password");
             while(!userExists) {
                 String password = scanner.nextLine();
-                System.out.println(password);
                 if (user.getPassword().equals(password)) {
                     userExists = true;
                     printWriter.println("Login");
@@ -52,6 +51,7 @@ public class SocketHandler implements Runnable{
             
             if (userExists)
             {
+                userManager.setUserStatus(username,true);
                 while(true){
                     String command = scanner.nextLine();
                     ArrayList<String> data = new ArrayList<>(Arrays.asList(command.split("-")));
@@ -90,13 +90,34 @@ public class SocketHandler implements Runnable{
                             }
                             int amount = Integer.parseInt(data.get(3));
                             if(sender.validateCurrency(amount)){
-                                userManager.transferFunds(sender.getUsername(),receiver.getUsername(),amount);
+                                if(userManager.transferFunds(sender.getUsername(),receiver.getUsername(),amount) < 1){
+                                    printWriter.println("An error has occurred");
+                                } else {
+                                    printWriter.println(amount + " transferred successfully to " + receiver.getUsername());
+                                }
                             } else {
                                 printWriter.println("You do not have enough funds!");
                             }
                             printWriter.println("Your currency is " + sender.getFunds());
                             break;
-                        case "Userlist":
+                        case "Users":
+                            StringBuilder str = new StringBuilder();
+                            int count = 0;
+                            for( String s : userManager.getOnlineUsers()){
+                                if(!s.equals(data.get(1))){
+                                    str.append(s).append(", ");
+                                    count++;
+                                }
+                            }
+                            if(count == 0){
+                                printWriter.println("You are currently the only logged on user.");
+                            } else {
+                                str = str.deleteCharAt(str.length()-2);
+                                printWriter.println(str.toString());
+                            }
+                            break;
+                        case "Quit":
+                            userManager.setUserStatus(username,false);
                             break;
                     }
                 }

@@ -33,6 +33,10 @@ public class User {
         return userResources;
 
     }
+
+    public boolean getStatus(){
+        return status;
+    }
     
     public int getResourceIndex(int resourceID) {
         for (Resource resource : userResources) {
@@ -99,6 +103,14 @@ public class User {
             return true;
         }
         return false;
+    }
+
+    public void setOnline(){
+        this.status = true;
+    }
+
+    public void setOffline(){
+        this.status = false;
     }
 
 }

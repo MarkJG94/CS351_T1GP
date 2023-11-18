@@ -54,24 +54,13 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
             while (true) {
                 Socket client = serverSocket.accept();
-                System.out.println("Client connected");
+                System.out.println("Client connected " + client.toString() );
                 //create socket handler and pass to thread pool
                 threadpool.submit(new SocketHandler(client, userManager,marketPlace));
             }
         }catch (IOException e){
             e.printStackTrace();
         }
-    }
-    public ArrayList<String> marketMenu(){
-        ArrayList<String> options = new ArrayList<String>();
-        options.add("Marketplace Menu");
-        options.add("Please select an option from the list below;");
-        options.add("\t 1. View listings");
-        options.add("\t 2. Buy Items");
-        options.add("\t 3. Sell Items");
-        options.add("\t 4. Main Menu");
-        
-        return options;
     }
 
     private void importMarketDetails() throws IOException {

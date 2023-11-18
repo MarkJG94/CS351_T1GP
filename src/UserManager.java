@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class UserManager {
@@ -49,6 +50,25 @@ public class UserManager {
             return 1;
         }
         return -1;
+    }
+
+    public void setUserStatus(String username, boolean s){
+        if(s){
+            getUser(username).setOnline();
+        } else {
+            getUser(username).setOffline();
+        }
+
+    }
+
+    public ArrayList<String> getOnlineUsers(){
+        ArrayList<String> ul = new ArrayList<>();
+        for(User u : userList){
+            if(u.getStatus()){
+                ul.add(u.getUsername());
+            }
+        }
+        return ul;
     }
 
     public boolean addResource(int resourceID, int quantity, String username) {
