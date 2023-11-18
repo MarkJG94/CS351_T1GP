@@ -52,6 +52,8 @@ public class SocketHandler implements Runnable{
             if (userExists)
             {
                 userManager.setUserStatus(username,true);
+                userManager.assignToSocket(socket, username);
+
                 while(true){
                     String command = scanner.nextLine();
                     ArrayList<String> data = new ArrayList<>(Arrays.asList(command.split("-")));
@@ -78,6 +80,22 @@ public class SocketHandler implements Runnable{
                             }
                             break;
                         case "Buy":
+                            User u = userManager.getUser(data.get(2));
+                            int resourceID = Integer.parseInt(data.get(3));
+                            int quantity = Integer.parseInt(data.get(4));
+                            int cost = marketplace.calculateTotal(quantity, resourceID);
+                            if(marketplace.getResourceQuantity(resourceID) >= quantity){
+                                if(u.getFunds() >= marketplace.calculateTotal(quantity, resourceID)){
+                                    marketplace.removeResourceFromMarket(resourceID, quantity);
+                                    userManager.addResource(resourceID, quantity,u.getUsername());
+                                    userManager.deductFunds(u.getUsername(),cost);
+                                    printWriter.println("You have bought " + quantity + " " + marketplace.getResourceDetails(resourceID).getName() + " for " + cost);
+                                } else {
+                                    printWriter.println("You do not have enough funds for this transaction! (Have: " + u.getFunds() + " Need:" + cost + ")");
+                                }
+                            } else {
+                                printWriter.println("The Marketplace does not have that much " + marketplace.getResourceDetails(resourceID).getName() +"!");
+                            }
                             break;
                         case "Sell":
                             break;

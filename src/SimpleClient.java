@@ -97,6 +97,7 @@ public class SimpleClient {
                         System.out.println(s);
                     }
                     System.out.println();
+                    confirmation();
                     break;
                 case 2:
                     // view logged in users
@@ -104,6 +105,7 @@ public class SimpleClient {
                     System.out.println("Online Users:");
                     System.out.println(serverScanner.nextLine());
                     System.out.println();
+                    confirmation();
                     break;
                 case 3:
                     marketStart();
@@ -111,6 +113,7 @@ public class SimpleClient {
                 case 4:
                     // transferFunds
                     transferFunds();
+                    confirmation();
                     break;
                 case 5:
                     // quit
@@ -151,13 +154,16 @@ public class SimpleClient {
                         System.out.println(s);
                     }
                     System.out.println();
+                    confirmation();
                     break;
                 case 2:
                     // Buy item
                     buyItem();
+                    confirmation();
                     break;
                 case 3:
                     sellItem();
+                    confirmation();
                     break;
                 case 4:
                     running = false;
@@ -254,22 +260,48 @@ public class SimpleClient {
         }
     }
 
+    private void checkForUpdates(){
+        Scanner serverScanner = null;
+        try {
+            serverScanner = new Scanner(socket.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+            System.out.println(
+                    "test"
+            );
+            System.out.println(serverScanner.nextLine());
+
+
+    }
+
+    public void confirmation(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Press enter to continue.");
+        scanner.nextLine();
+    }
+
     private void buyItem() throws IOException {
         PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
         Scanner scanner = new Scanner( System.in );
         Scanner serverScanner = new Scanner(socket.getInputStream());
         printWriter.println("Inventory-Marketplace-" + username);
-        serverScanner = new Scanner(socket.getInputStream());
         String response = serverScanner.nextLine();
-        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("-")));
+        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
+
         boolean loop = true;
         int resourceID = 0, quantity = 0;
 
         while (loop) {
             System.out.println("Which item would you like to buy? (enter Q to exit)");
-            for (int i = 0; i < data.size(); i++) {
-                System.out.print(data.get(i) + "(" + (i + 1) + ")   ");
+
+            int i = 1;
+            for(String s : data){
+                System.out.print(s.split(":")[0] + " (" + i + ")    ");
+                i++;
             }
+            System.out.println();
             response = scanner.nextLine();
             if (response.equalsIgnoreCase("q")) {
                 loop = false;
@@ -297,6 +329,8 @@ public class SimpleClient {
         if(loop) {
             printWriter.println("Buy-Marketplace-" + username + "-" + resourceID + "-" + quantity);
         }
+        System.out.println(serverScanner.nextLine());
+
     }
 
     public static void main(String[] args) throws IOException {
