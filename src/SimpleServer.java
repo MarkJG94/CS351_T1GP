@@ -24,6 +24,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
     private String userFilePath = filePath + "/src/UserDetails.csv";
     private String resourceFilePath = filePath + "/src/MarketDetails.csv";
     private Marketplace marketPlace;
+    private UserManager userManager;
 
     public ArrayList<User>getUserList(){
         return userList;
@@ -36,13 +37,13 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
         resources = new ArrayList<>();
         userList = new ArrayList<>();
-        Marketplace marketplace = new Marketplace();
 
         importMarketDetails();
         importUserDetails();
+
+        marketPlace = new Marketplace(resources);
+
     }
-    
-    
     
     @Override
     public void run() {
@@ -51,12 +52,11 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
             User test = new User( "Test", "Test",resources, 500 );
             userList.add( test );
 
-
             while (true) {
                 Socket client = serverSocket.accept();
                 System.out.println("Client connected");
                 //create socket handler and pass to thread pool
-                threadpool.submit(new SocketHandler(client, userList));
+                threadpool.submit(new SocketHandler(client, userManager,marketPlace));
             }
         }catch (IOException e){
             e.printStackTrace();
@@ -110,7 +110,6 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
             bw.close();
             fw.close();
-
         }
     }
 
@@ -173,6 +172,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
                             Integer.parseInt(user.get(2))
                     )
             );
+            userManager = new UserManager(userList);
         }
     }
 

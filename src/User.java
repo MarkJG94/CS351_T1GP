@@ -47,7 +47,7 @@ public class User {
         return userResources.get(getResourceIndex( resourceID )).getQuantity();
     }
     
-    public int addFunds(String username, int amount) {
+    public int addFunds(int amount) {
         
         if (amount > 0 && username.equals( this.username ))
         {
@@ -57,7 +57,7 @@ public class User {
         return -1;
     }
 
-    public int deductFunds(String username, int amount) {
+    public int deductFunds(int amount) {
         if (amount > 0 && username.equals( this.username ) && validateCurrency( amount ))
         {
             funds = funds - amount;
@@ -86,26 +86,17 @@ public class User {
         return password;
     }
     
-    public boolean addResource(int resourceID, int quantity, String username) {
-        if (quantity > 0 && this.username.equals(username)){
-            int resourceIndex = getResourceIndex(resourceID);
-            if (resourceIndex != -1){
-                int new_quantity = userResources.get(resourceIndex).getQuantity() + quantity;
-                userResources.get(resourceIndex).setQuantity(new_quantity);
-                return true;
-            }
-        }
-        return false;
+    public boolean addResource(int resourceID, int quantity) {
+        int currentQuantity = getResourceQuantity(resourceID);
+        userResources.get(resourceID - 1).setQuantity(currentQuantity + quantity);
+        return true;
     }
     
-    public boolean removeResource(int resourceID, int quantity, String username) {
-        if (quantity > 0 && this.username.equals(username)){
-            int resourceIndex = getResourceIndex(resourceID);
-            if (resourceIndex != -1){
-                int new_quantity = userResources.get(resourceIndex).getQuantity() - quantity;
-                userResources.get(resourceIndex).setQuantity(new_quantity);
-                return true;
-            }
+    public boolean removeResource(int resourceID, int quantity) {
+        int currentQuantity = getResourceQuantity(resourceID);
+        if(currentQuantity >= quantity) {
+            userResources.get(resourceID - 1).setQuantity(currentQuantity - quantity);
+            return true;
         }
         return false;
     }
