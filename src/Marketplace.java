@@ -6,8 +6,9 @@ public class Marketplace {
 
     }
 
-    public Marketplace(ArrayList userList){
+    public Marketplace(ArrayList userList, ArrayList<Resource> marketResources){
         this.userList = userList;
+        this.marketResources = marketResources;
     }
 
     ArrayList<User> userList;
@@ -174,6 +175,10 @@ public class Marketplace {
             return null;
         }
         return userList.get(user_index).getUserInventory();
+    }
+
+    public ArrayList<Resource> getMarketInventory() {
+        return marketResources;
     }
 
     public int addFunds(String destination_username, int amount) {

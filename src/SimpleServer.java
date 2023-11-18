@@ -36,13 +36,16 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
         resources = new ArrayList<>();
         userList = new ArrayList<>();
-        Marketplace marketplace = new Marketplace(userList);
 
         importMarketDetails();
         importUserDetails();
+
+        marketPlace = new Marketplace(userList, resources);
     }
     
-    
+    public Marketplace getMarketPlace(){
+        return marketPlace;
+    }
     
     @Override
     public void run() {
@@ -74,7 +77,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
         return options;
     }
 
-    private void importMarketDetails() throws IOException {
+    public void importMarketDetails() throws IOException {
 
         List<List<String>> records = new ArrayList<>();
         try (
@@ -114,7 +117,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
         }
     }
 
-    private void importUserDetails() throws IOException {
+    public void importUserDetails() throws IOException {
         List<List<String>> records = new ArrayList<>();
         try (
                 BufferedReader br = new BufferedReader(
@@ -219,6 +222,87 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
         bw.close();
         fw.close();
     }
+
+
+
+    public boolean parseClientMessage(String message){
+        String array[] = message.split("-");
+        String command = array[0];
+        if (command.equals("Inventory")){
+            String source = array[1];
+            if (source.equals("Marketplace")){
+                ArrayList<Resource> marketResources = marketPlace.getMarketInventory();
+                printInventory(marketResources, true, null);
+                return true;
+            } else if (marketPlace.userExists(source)){
+                ArrayList<Resource> userResources = marketPlace.getUserInventory(source);
+                printInventory(userResources, false, source);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        else if(command.equals("Buy")){
+            String source = array[1];
+            //Can only buy from Marketplace
+            if (source.equals("Marketplace")){
+                //If user exists
+                if (marketPlace.userExists(array[2])){
+                    String dest = array[2];
+                    Integer amount = Integer.parseInt(array[3]);
+                    Integer itemId = Integer.parseInt(array[4]);
+                    int resourceCost = marketPlace.getResourceDetails(itemId).getCost();
+                    int total = amount * resourceCost;
+                    //If user has enough money, perform transaction
+                    if(marketPlace.getFunds(dest) >= total){
+                        marketPlace.removeResourceFromMarket(itemId, amount);
+                        marketPlace.addResourceToUser(itemId, amount, dest);
+                        marketPlace.deductFunds(dest, total);
+                        return true;
+                    } else {
+                        //User did not have enough money
+                        return false;
+                    }
+                }
+                //User did not exist
+                else {
+                    return false;
+                }
+
+                //Source was not Marketplace
+            } else {
+                return false;
+            }
+        }
+        else if (command.equals("Sell")){
+
+        }
+        else if (command.equals("Transfer")){
+
+        } else {
+            array[0] = "-1";
+        }
+
+        return false;
+    }
+
+    private void printInventory(ArrayList<Resource> inventory, boolean market, String username){
+        if(market){
+            System.out.println("*** Market Inventory ***");
+            System.out.println("\tResource\tAmount\tCost to buy");
+            for (Resource resource: inventory) {
+                System.out.println("\t" + resource.getName() +"\t" + resource.getQuantity() + resource.getCost());
+            }
+        } else {
+            System.out.println("*** " + username + "'s Inventory ***");
+            System.out.println("\tResource\tAmount\tValue if sold");
+            for (Resource resource: inventory) {
+                System.out.println("\t" + resource.getName() +"\t" + resource.getQuantity() + resource.getValue());
+            }
+        }
+    }
+
+
 
     public static void main(String[] args) {
 
