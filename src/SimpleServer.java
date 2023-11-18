@@ -253,8 +253,8 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
                     Integer itemId = Integer.parseInt(array[4]);
                     int resourceCost = marketPlace.getResourceDetails(itemId).getCost();
                     int total = amount * resourceCost;
-                    //If user has enough money, perform transaction
-                    if(marketPlace.getFunds(dest) >= total){
+                    //If user has enough money and enough resources in marketplace, perform transaction
+                    if((marketPlace.getFunds(dest) >= total) && (amount <= marketPlace.getResourceDetails(itemId).getQuantity())){
                         marketPlace.removeResourceFromMarket(itemId, amount);
                         marketPlace.addResourceToUser(itemId, amount, dest);
                         marketPlace.deductFunds(dest, total);
@@ -278,7 +278,10 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
         }
         else if (command.equals("Transfer")){
+            //If both users exist
+            if((marketPlace.userExists(array[1])) && (marketPlace.userExists(array[2]))){
 
+            }
         } else {
             array[0] = "-1";
         }
@@ -289,15 +292,15 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
     private void printInventory(ArrayList<Resource> inventory, boolean market, String username){
         if(market){
             System.out.println("*** Market Inventory ***");
-            System.out.println("\tResource\tAmount\tCost to buy");
+            System.out.println("\tResource\tAmount\tCost to buy\n");
             for (Resource resource: inventory) {
-                System.out.println("\t" + resource.getName() +"\t" + resource.getQuantity() + resource.getCost());
+                System.out.println("\t" + resource.getName() + "\t\t" + resource.getQuantity() + "\t\t\t" + resource.getCost());
             }
         } else {
             System.out.println("*** " + username + "'s Inventory ***");
             System.out.println("\tResource\tAmount\tValue if sold");
             for (Resource resource: inventory) {
-                System.out.println("\t" + resource.getName() +"\t" + resource.getQuantity() + resource.getValue());
+                System.out.println("\t" + resource.getName() +"\t\t" + resource.getQuantity() + "\t\t\t" + resource.getValue());
             }
         }
     }
