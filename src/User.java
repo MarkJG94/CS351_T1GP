@@ -91,16 +91,21 @@ public class User {
     }
     
     public boolean addResource(int resourceID, int quantity) {
-        int currentQuantity = getResourceQuantity(resourceID);
-        userResources.get(resourceID - 1).setQuantity(currentQuantity + quantity);
-        return true;
+        if (getResourceIndex(resourceID) != -1 && (quantity > 0)){
+            int currentQuantity = getResourceQuantity(resourceID);
+            userResources.get(resourceID - 1).setQuantity(currentQuantity + quantity);
+            return true;
+        }
+        else return false;
     }
     
     public boolean removeResource(int resourceID, int quantity) {
-        int currentQuantity = getResourceQuantity(resourceID);
-        if(currentQuantity >= quantity) {
-            userResources.get(resourceID - 1).setQuantity(currentQuantity - quantity);
-            return true;
+        if (getResourceIndex(resourceID) != -1 && (quantity > 0)){
+            int currentQuantity = getResourceQuantity(resourceID);
+            if(currentQuantity >= quantity) {
+                userResources.get(resourceID - 1).setQuantity(currentQuantity - quantity);
+                return true;
+            }
         }
         return false;
     }

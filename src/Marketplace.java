@@ -150,7 +150,11 @@ public class Marketplace {
     }
 
     public Resource getResourceDetails(int resourceID) {
-        return marketResources.get(resourceID - 1);
+        if(marketResources.size() > resourceID - 1){
+            return marketResources.get(resourceID - 1);
+        } else {
+            return null;
+        }
     }
     
     public int getFunds(String username) {
