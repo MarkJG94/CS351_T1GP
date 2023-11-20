@@ -66,6 +66,8 @@ public class SimpleClient {
                     break;
                 }
             }
+        } else {
+            printWriter.println("Username");
         }
 
         while (true) {
@@ -167,8 +169,9 @@ public class SimpleClient {
                 case 2:
                     // view logged in users
                     sendAnswer("Users-" + username);
+                    response = retrieveResponse();
                     System.out.println("Online Users:");
-                    System.out.println(retrieveResponse());
+                    System.out.println(response);
                     System.out.println();
                     confirmation();
                     break;
