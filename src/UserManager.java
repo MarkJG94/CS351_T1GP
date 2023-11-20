@@ -54,7 +54,7 @@ public class UserManager {
     public int transferFunds(String source, String destination, int amount) throws IOException {
         if(deductFunds(source,amount) >= 0){
             addFunds(destination,amount);
-            //notifyUser(source,destination,amount);
+            notifyUser(source,destination,amount);
             return 1;
         }
         return -1;
@@ -96,6 +96,10 @@ public class UserManager {
         return false;
     }
 
+    public ArrayList<User> getUserList() {
+        return userList;
+    }
+
     public void assignToSocket(Socket s, String u){
         socketUserMap.put(getUser(u), s);
     }
@@ -105,7 +109,7 @@ public class UserManager {
         if(socketUserMap.containsKey(u)){
             Socket s = socketUserMap.get(u);
             PrintWriter printWriter = new PrintWriter( s.getOutputStream(), true );
-            printWriter.println(source + " has sent you " + amount);
+            printWriter.println("IMPORTANT" + source + " has sent you " + amount);
         }
 
     }

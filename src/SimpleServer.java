@@ -5,11 +5,12 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
@@ -25,10 +26,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
     private String resourceFilePath = filePath + "/src/MarketDetails.csv";
     private Marketplace marketPlace;
     private UserManager userManager;
-
-    public ArrayList<User>getUserList(){
-        return userList;
-    }
+    private ArrayList<Socket> clients;
 
     SimpleServer() throws IOException
     {
@@ -37,6 +35,8 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
 
         resources = new ArrayList<>();
         userList = new ArrayList<>();
+
+        clients = new ArrayList<>();
 
         importMarketDetails();
         importUserDetails();
@@ -49,17 +49,77 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
     public void run() {
         try {
             System.out.println("server running");
-            User test = new User( "Test", "Test",resources, 500 );
-            userList.add( test );
+            System.out.println();
+            Administrator administrator = new Administrator();
+            Thread adminThread = new Thread(administrator);
+            threadpool.submit(adminThread);
+            Thread server = new Thread(this::runServer);
+            server.start();
+            while(true){
+                sleep(1000);
+                if(clients.size() > 0) {
+                    if (clients.get(0).isClosed()) {
+                        break;
+                    }
+                    // This should set a client to offline if the alt f4 but its not working
+                    for(Socket c : clients){
+                        if(c.isClosed() || !c.isConnected() || !c.isBound()) {
+                            for (Map.Entry<User, Socket> entry : userManager.socketUserMap.entrySet()) {
+                                if (entry.getValue() == c) {
+                                    entry.getKey().setOffline();
+                                }
+                            }
+                            clients.remove(c);
+                        }
 
-            while (true) {
-                Socket client = serverSocket.accept();
-                System.out.println("Client connected " + client.toString() );
-                //create socket handler and pass to thread pool
-                threadpool.submit(new SocketHandler(client, userManager,marketPlace));
+
+                    }
+                }
             }
+            for(Socket s : clients){
+                if(!s.isClosed()){
+                    PrintWriter pw =  new PrintWriter(s.getOutputStream(), true);
+                    pw.println("IMPORTANTServer is shutting in 10 seconds.");
+
+                }
+            }
+            for(int i = 0; i < 10; i++) {
+                System.out.print(10 - i + "   ");
+                sleep(1000);
+            }
+            for(Socket s : clients){
+                if(!s.isClosed()){
+                    PrintWriter pw =  new PrintWriter(s.getOutputStream(), true);
+                    pw.println("Server Offline");
+                }
+            }
+            sleep(1000);
+
+            adminThread.interrupt();
+            server.interrupt();
+            threadpool.shutdown();
+            System.out.print("Goodbye");
+            saveMarketFile();
+            saveUserFile();
+
+            System.exit(0);
         }catch (IOException e){
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void runServer() {
+        while (true) {
+            try {
+                Socket client = serverSocket.accept();
+                clients.add(client);
+                //create socket handler and pass to thread pool
+                threadpool.submit(new SocketHandler(client, userManager,marketPlace));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -169,7 +229,7 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
         File file = new File(resourceFilePath);
         FileWriter fw = new FileWriter(file);
         BufferedWriter bw = new BufferedWriter(fw);
-
+        ArrayList<Resource> resources = marketPlace.getMarketResources();
         for (int i = 0; i < resources.size(); i++) {
             String resourceString = resources.get(i).getName() + "," + resources.get(i).getQuantity() + "," + resources.get(i).getCost() + "," + resources.get(i).getValue();
             bw.write(resourceString);
@@ -184,23 +244,23 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
         File file = new File(userFilePath);
         FileWriter fw = new FileWriter(file, false);
         BufferedWriter bw = new BufferedWriter(fw);
-
-        StringBuilder userHeader = new StringBuilder("Username,Password,Funds,Status,");
-
+        ArrayList<Resource> resources = marketPlace.getMarketResources();
+        StringBuilder userHeader = new StringBuilder();
+        userHeader.append("Username,Password,Funds,Status");
         for(Resource resource: resources){
-            userHeader.append(resource.getName()).append(",");
+            userHeader.append(",").append(resource.getName());
         }
 
-        String output = userHeader.deleteCharAt(userHeader.length() - 1).toString();
+        String output = userHeader.toString();
         bw.write(output);
         bw.newLine();
-
+        ArrayList<User> userList = userManager.getUserList();
         for(User user: userList){
-            StringBuilder output2 = new StringBuilder(user.getUsername() + "," + user.getPassword() + "," + user.funds + ",Offline");
+            StringBuilder output2 = new StringBuilder(user.getUsername() + "," + user.getPassword() + "," + user.getFunds() + ",Offline");
             for (int i = 0; i < resources.size(); i++){
-                output2.append(",").append(user.getResourceQuantity(i));
+                output2.append(",").append(user.getResourceQuantity(i+1));
             }
-            bw.write(output.toString());
+            bw.write(output2.toString());
             bw.newLine();
 
         }

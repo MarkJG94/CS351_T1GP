@@ -173,6 +173,10 @@ public class Marketplace {
         return userList.get(user_index).getUserInventory();
     }
 
+    public ArrayList<Resource> getMarketResources(){
+        return marketResources;
+    }
+
 //    public int addFunds(String destination_username, int amount) {
 //        if (amount > 0) {
 //            int user_index = getUserIndex(destination_username);
