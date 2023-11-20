@@ -127,6 +127,7 @@ public class Client extends InputReader{
                         messageQueue.add(response);
                         break;
                     } else if(response.contains("IMPORTANT")) {
+                        System.out.println();
                         System.out.println(response.replace("IMPORTANT",""));
                     } else if(response.equals("heartbeat")) {
                         continue;
