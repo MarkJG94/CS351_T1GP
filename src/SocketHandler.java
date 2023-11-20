@@ -1,4 +1,3 @@
-
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -10,11 +9,9 @@ public class SocketHandler implements Runnable{
     String username;
     UserManager userManager;
     Marketplace marketplace;
-    private String filePath = new File("").getAbsolutePath();
     PrintWriter printWriter;
     Scanner scanner;
-    private String userFilePath = filePath + "/src/UserDetails.csv";
-    private String resourceFilePath = filePath + "/src/MarketDetails.csv";
+    boolean userExists;
     String admin = "42b0307fc70d04e46e2c189eb011259c94998921fc6b394448f4a2705453cf698f749cb733226d80f40786cb12c857122d253a5e325cdbe91ad325e75b129ab8ba88008c10a5160035e21bc92993c3647fc10fb1307049d14a51789bdca7e436d5fee2b3b4dc5c3b7e611add83edf71284764d775bd049d286c23760765263f965559f20b77b794d6365678be2ae47f8572a4fd253cef295e0b1e4412245bb63";
 
     SocketHandler(Socket socket, UserManager userManager, Marketplace marketplace)
@@ -23,6 +20,7 @@ public class SocketHandler implements Runnable{
         this.socket = socket;
         this.userManager = userManager;
         this.marketplace = marketplace;
+        this.userExists = false;
     }
 
 
@@ -33,60 +31,15 @@ public class SocketHandler implements Runnable{
 
             scanner = new Scanner(socket.getInputStream());
             printWriter = new PrintWriter(socket.getOutputStream(), true);
-            User user = null;
-
-            boolean userExists = false;
 
             String command = scanner.nextLine();
             if(command.equals(admin)) {
             } else if(command.equals("NewAccount")){
-                while(true) {
-                    username = scanner.nextLine();
-                    user = userManager.getUser(username);
-                    if (user == null) {
-                        printWriter.println("password");
-                        break;
-                    } else {
-                        printWriter.println("username");
-                    }
-                }
-                String password = scanner.nextLine();
-                if(userManager.addUser(username,password,marketplace.marketResources)){
-                    printWriter.println("success");
-                } else {
-                    printWriter.println("fail");
-                }
+                newAccountPrompt();
             }
 
-            while (true) {
-                username = scanner.nextLine();
-                if(username.equals(admin)) {
-                    printWriter.println("AdminAuth");
-                    break;
-                }
-                user = userManager.getUser(username);
+            login();
 
-                if (user == null) {
-                    printWriter.println("Username");
-                } else {
-                    break;
-                }
-            }
-            if(username.equals(admin)) {
-                userExists = true;
-            } else
-            {
-                printWriter.println("Password");
-                while (!userExists) {
-                    String password = scanner.nextLine();
-                    if (user.getPassword().equals(password)) {
-                        userExists = true;
-                        printWriter.println("Login");
-                    } else {
-                        printWriter.println("Password");
-                    }
-                }
-            }
             if (userExists)
             {
                 if(!username.equals(admin)) {
@@ -128,6 +81,59 @@ public class SocketHandler implements Runnable{
         } catch (IOException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private void newAccountPrompt(){
+        User user;
+        while(true) {
+            username = scanner.nextLine();
+            user = userManager.getUser(username);
+            if (user == null) {
+                printWriter.println("password");
+                break;
+            } else {
+                printWriter.println("username");
+            }
+        }
+        String password = scanner.nextLine();
+        if(userManager.addUser(username,password,marketplace.marketResources)){
+            printWriter.println("success");
+        } else {
+            printWriter.println("fail");
+        }
+    }
+
+    private void login(){
+        User user = null;
+        while (true) {
+            username = scanner.nextLine();
+            if(username.equals(admin)) {
+                printWriter.println("AdminAuth");
+                break;
+            }
+            user = userManager.getUser(username);
+
+            if (user == null) {
+                printWriter.println("Username");
+            } else {
+                break;
+            }
+        }
+        if(username.equals(admin)) {
+            userExists = true;
+        } else
+        {
+            printWriter.println("Password");
+            while (!userExists) {
+                String password = scanner.nextLine();
+                if (user.getPassword().equals(password)) {
+                    userExists = true;
+                    printWriter.println("Login");
+                } else {
+                    printWriter.println("Password");
+                }
+            }
         }
     }
 
