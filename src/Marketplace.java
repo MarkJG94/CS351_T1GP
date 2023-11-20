@@ -103,13 +103,24 @@ public class Marketplace {
         return false;
     }
     
-    public int calculateTotal(int quantity, int resourceID) {
+    public int calculateTotalCost(int quantity, int resourceID) {
         if (quantity > 0){
             int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex == -1){
                 return -1;
             }
             return marketResources.get(resourceIndex).getCost() * quantity;
+        }
+        return -1;
+    }
+
+    public int calculateTotalValue(int quantity, int resourceID) {
+        if (quantity > 0){
+            int resourceIndex = getResourceIndex(resourceID);
+            if (resourceIndex == -1){
+                return -1;
+            }
+            return marketResources.get(resourceIndex).getValue() * quantity;
         }
         return -1;
     }

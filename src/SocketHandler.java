@@ -11,6 +11,8 @@ public class SocketHandler implements Runnable{
     UserManager userManager;
     Marketplace marketplace;
     private String filePath = new File("").getAbsolutePath();
+    PrintWriter printWriter;
+    Scanner scanner;
     private String userFilePath = filePath + "/src/UserDetails.csv";
     private String resourceFilePath = filePath + "/src/MarketDetails.csv";
     String admin = "42b0307fc70d04e46e2c189eb011259c94998921fc6b394448f4a2705453cf698f749cb733226d80f40786cb12c857122d253a5e325cdbe91ad325e75b129ab8ba88008c10a5160035e21bc92993c3647fc10fb1307049d14a51789bdca7e436d5fee2b3b4dc5c3b7e611add83edf71284764d775bd049d286c23760765263f965559f20b77b794d6365678be2ae47f8572a4fd253cef295e0b1e4412245bb63";
@@ -29,8 +31,8 @@ public class SocketHandler implements Runnable{
     public void run() {
         try {
 
-            Scanner scanner = new Scanner(socket.getInputStream());
-            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+            scanner = new Scanner(socket.getInputStream());
+            printWriter = new PrintWriter(socket.getOutputStream(), true);
             User user = null;
 
             boolean userExists = false;
@@ -99,16 +101,17 @@ public class SocketHandler implements Runnable{
                         case "Inventory":
                             getInventory(data);
                             break;
-                        case "Buy":
-                            buyResource(data);
-                            break;
-                        case "Sell":
+                        case "Users":
+                            getUsers(data);
                             break;
                         case "Transfer":
                             transferFunds(data);
                             break;
-                        case "Users":
-                            getUsers(data);
+                        case "Buy":
+                            buyResource(data);
+                            break;
+                        case "Sell":
+                            sellResource(data);
                             break;
                         case "Quit":
                             quit();
@@ -128,19 +131,29 @@ public class SocketHandler implements Runnable{
         }
     }
 
-    private void quit() throws IOException {
-        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-        if(username.equals(admin)) {
-            printWriter.println("Closing server in 10 seconds");
-            socket.close();
+    private void getInventory(ArrayList<String> data) throws IOException {
+        if(data.get(1).equals("Marketplace")){
+            StringBuilder s = new StringBuilder();
+            for(int i = 1; i<6;i++) {
+                Resource r = marketplace.getResourceDetails(i);
+                s.append(r.getName()).append(": ").append(r.getQuantity()).append("`");
+            }
+            String t = s.toString();
+            printWriter.println(t);
         } else {
-            printWriter.println("Logging out");
-            userManager.setUserStatus(username, false);
+            User u = userManager.getUser(data.get(1));
+            ArrayList<Resource> rl = u.getUserInventory();
+            StringBuilder s = new StringBuilder();
+            s.append("Currency: ").append(u.getFunds()).append("`");
+            for(Resource r:rl){
+                s.append(r.getName()).append(": ").append(r.getQuantity()).append("`");
+            }
+            String t = s.toString();
+            printWriter.println(t);
         }
     }
 
     private void getUsers(ArrayList<String> data) throws IOException {
-        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
         StringBuilder str = new StringBuilder();
         int count = 0;
         for( String s : userManager.getOnlineUsers()){
@@ -158,7 +171,6 @@ public class SocketHandler implements Runnable{
     }
 
     private void transferFunds(ArrayList<String> data) throws IOException {
-        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
         User sender = userManager.getUser(data.get(1));
         User receiver = userManager.getUser(data.get(2));
         if(receiver == null){
@@ -178,13 +190,12 @@ public class SocketHandler implements Runnable{
     }
 
     private void buyResource(ArrayList<String> data) throws IOException {
-        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
         User u = userManager.getUser(data.get(2));
         int resourceID = Integer.parseInt(data.get(3));
         int quantity = Integer.parseInt(data.get(4));
-        int cost = marketplace.calculateTotal(quantity, resourceID);
+        int cost = marketplace.calculateTotalCost(quantity, resourceID);
         if(marketplace.getResourceQuantity(resourceID) >= quantity){
-            if(u.getFunds() >= marketplace.calculateTotal(quantity, resourceID)){
+            if(u.getFunds() >= marketplace.calculateTotalCost(quantity, resourceID)){
                 marketplace.removeResourceFromMarket(resourceID, quantity);
                 userManager.addResource(resourceID, quantity,u.getUsername());
                 userManager.deductFunds(u.getUsername(),cost);
@@ -197,27 +208,28 @@ public class SocketHandler implements Runnable{
         }
     }
 
-    private void getInventory(ArrayList<String> data) throws IOException {
-        Scanner scanner = new Scanner(socket.getInputStream());
-        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-        if(data.get(1).equals("Marketplace")){
-            StringBuilder s = new StringBuilder();
-            for(int i = 1; i<6;i++) {
-                Resource r = marketplace.getResourceDetails(i);
-                s.append(r.getName()).append(": ").append(r.getQuantity()).append("`");
-            }
-            String t = s.toString();
-            printWriter.println(t);
+    private void sellResource(ArrayList<String> data) throws IOException {
+        User u = userManager.getUser(data.get(2));
+        int resourceID = Integer.parseInt(data.get(3));
+        int quantity = Integer.parseInt(data.get(4));
+        int value = marketplace.calculateTotalValue(quantity, resourceID);
+        if (u.getResourceQuantity(resourceID) >= quantity) {
+            marketplace.addResourceToMarket(resourceID, quantity);
+            userManager.removeResource(resourceID, quantity, u.getUsername());
+            userManager.addFunds(u.getUsername(), value);
+            printWriter.println("You have sold " + quantity + " " + marketplace.getResourceDetails(resourceID).getName() + " for " + value);
         } else {
-            User u = userManager.getUser(data.get(1));
-            ArrayList<Resource> rl = u.getUserInventory();
-            StringBuilder s = new StringBuilder();
-            s.append("Currency: ").append(u.getFunds()).append("`");
-            for(Resource r:rl){
-                s.append(r.getName()).append(": ").append(r.getQuantity()).append("`");
-            }
-            String t = s.toString();
-            printWriter.println(t);
+            printWriter.println("You do not have enough " + marketplace.getResourceDetails(resourceID).getName() + " for this transaction! (Have: " + u.getResourceQuantity(resourceID) + " Need:" + quantity + ")");
+        }
+    }
+
+    private void quit() throws IOException {
+        if(username.equals(admin)) {
+            printWriter.println("Closing server in 10 seconds");
+            socket.close();
+        } else {
+            printWriter.println("Logging out");
+            userManager.setUserStatus(username, false);
         }
     }
 }

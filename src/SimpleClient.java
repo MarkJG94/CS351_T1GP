@@ -7,9 +7,10 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Stack;
 
-public class SimpleClient {
+public class SimpleClient extends InputReader{
     private final Socket socket;
     private String username;
+    InputReader inputReader;
     private final Stack<String> messageQueue;
     Thread operator;
     PrintWriter printWriter;
@@ -17,11 +18,11 @@ public class SimpleClient {
         socket = new Socket("127.0.0.1", 11000);
         printWriter = new PrintWriter(socket.getOutputStream(), true);
         messageQueue = new Stack<>();
+        inputReader = new InputReader();
     }
 
 
     public void runClient() throws IOException, NotBoundException {
-        Scanner scanner = new Scanner(System.in);
         String response;
 
         startServerResponseQueue();
@@ -29,22 +30,26 @@ public class SimpleClient {
 
         while (true) {
             System.out.println("Select an option:");
-            System.out.println("Sign-in (1)     Create Account (2)");
+            System.out.println("    1. Sign-in");
+            System.out.println("    2. Create Account");
+            System.out.println("    3. Exit");
 
-            response = scanner.nextLine();
-            if (Integer.parseInt(response) != 1 && Integer.parseInt(response) != 2) {
+            response = inputReader.getResponse();
+            if (Integer.parseInt(response) != 1 && Integer.parseInt(response) != 2 && Integer.parseInt(response) != 3) {
                 System.out.println("Invalid Entry, please try again");
                 System.out.println();
             } else {
                 break;
             }
         }
-
+        if(Integer.parseInt(response) == 3) {
+            exit();
+        } else
         if(Integer.parseInt(response) == 2) {
             printWriter.println("NewAccount");
             while (true) {
                 System.out.println("Please enter your username:");
-                username = scanner.nextLine();
+                username = inputReader.getResponse();
                 printWriter.println(username);
                 if (retrieveResponse().equals("password")) {
                     break;
@@ -54,7 +59,7 @@ public class SimpleClient {
             }
             while (true) {
                 System.out.println("Please enter your password:");
-                String password = scanner.nextLine();
+                String password = inputReader.getResponse();
                 printWriter.println(password);
                 if (password.contains(",")) {
                     System.out.println("Password cannot contain ','. Please try again.");
@@ -72,7 +77,7 @@ public class SimpleClient {
 
         while (true) {
             System.out.println("Enter your username: ");
-            username = scanner.nextLine();
+            username = inputReader.getResponse();
 
             sendAnswer(username);
 
@@ -93,7 +98,7 @@ public class SimpleClient {
                 System.out.println("Enter your password: ");
             }
 
-            String password = scanner.nextLine();
+            String password = inputReader.getResponse();
             sendAnswer(password);
 
             response = retrieveResponse();
@@ -139,13 +144,12 @@ public class SimpleClient {
 
     public void start() throws IOException {
         String response;
-        Scanner scanner = new Scanner( System.in );
         boolean running = true;
         while (running) {
             mainMenu();
             while (true) {
                 System.out.println("Please enter a number (1-5): ");
-                response = scanner.nextLine();
+                response = inputReader.getResponse();
                 if ((Integer.parseInt(response) > 0) && ((Integer.parseInt(response) < 6)))
                 {
                     break;
@@ -193,13 +197,14 @@ public class SimpleClient {
 
     public void marketStart() throws IOException {
         int reply;
-        Scanner scanner = new Scanner( System.in );
+        String response;
         boolean running = true;
         while (running) {
             marketMenu();
             while (true) {
                 System.out.println("Please enter a number (1-4): ");
-                reply = scanner.nextInt();
+                response = inputReader.getResponse();
+                reply = Integer.parseInt(response);
                 if ((reply > 0) && (reply < 5))
                 {
                     break;
@@ -213,10 +218,8 @@ public class SimpleClient {
                 case 1:
                     // View listings
                     sendAnswer("Inventory-Marketplace");
-                    while(messageQueue.size() == 0){
-
-                    }
-                    ArrayList<String> data = new ArrayList<>(Arrays.asList(messageQueue.pop().split("`")));
+                    response = retrieveResponse();
+                    ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
                     for(String s : data){
                         System.out.println(s);
                     }
@@ -267,35 +270,37 @@ public class SimpleClient {
     }
 
     private void transferFunds() throws IOException {
-        Scanner scanner = new Scanner( System.in );
-
         System.out.println("Enter the username you would like to transfer to: ");
-        String input = scanner.nextLine();
+        String response;
+        String input = inputReader.getResponse();
 
         System.out.println("Amount you want to transfer: ");
-        int amount = scanner.nextInt();
-
-        sendAnswer("Transfer-" + username + "-" + input + "-" + amount);
-
-        System.out.println(retrieveResponse());
-
+        response = inputReader.getResponse();
+        int amount = Integer.parseInt(response);
+        if(amount > 0) {
+            sendAnswer("Transfer-" + username + "-" + input + "-" + amount);
+            System.out.println(retrieveResponse());
+        } else {
+            System.out.println("Invalid amount.");
+        }
     }
 
     private void sellItem() throws IOException {
-        Scanner scanner = new Scanner( System.in );
         sendAnswer("Inventory-Marketplace-" + username);
         String response = retrieveResponse();
+        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
 
-        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("-")));
         boolean loop = true;
         int resourceID = 0, quantity = 0;
 
         while (loop) {
-            System.out.println("Which item would you like to sell? (enter Q to exit)");
-            for (int i = 0; i < data.size(); i++) {
-                System.out.print(data.get(i) + "(" + (i + 1) + ")   ");
+            int i = 1;
+            for(String s : data){
+                System.out.print(s.split(":")[0] + " (" + i + ")    ");
+                i++;
             }
-            response = scanner.nextLine();
+            System.out.println();
+            response = inputReader.getResponse();
             if (response.equalsIgnoreCase("q")) {
                 loop = false;
                 break;
@@ -308,7 +313,7 @@ public class SimpleClient {
         }
         while (loop) {
             System.out.println("How many would you like to sell? (enter Q to exit)");
-            response = scanner.nextLine();
+            response = inputReader.getResponse();
             if (response.equalsIgnoreCase("q")) {
                 loop = false;
                 break;
@@ -322,10 +327,10 @@ public class SimpleClient {
         if(loop) {
             sendAnswer("Sell-Marketplace-" + username + "-" + resourceID + "-" + quantity);
         }
+        System.out.println(retrieveResponse());
     }
 
     private void buyItem() throws IOException {
-        Scanner scanner = new Scanner( System.in );
         sendAnswer("Inventory-Marketplace-" + username);
         String response = retrieveResponse();
         ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
@@ -342,7 +347,7 @@ public class SimpleClient {
                 i++;
             }
             System.out.println();
-            response = scanner.nextLine();
+            response = inputReader.getResponse();
             if (response.equalsIgnoreCase("q")) {
                 loop = false;
                 break;
@@ -355,7 +360,7 @@ public class SimpleClient {
         }
         while (loop) {
             System.out.println("How many would you like to buy? (enter Q to exit)");
-            response = scanner.nextLine();
+            response = inputReader.getResponse();
             if (response.equalsIgnoreCase("q")) {
                 loop = false;
                 break;
@@ -373,12 +378,11 @@ public class SimpleClient {
     }
 
     private boolean quitConfirmation(){
-        Scanner scanner = new Scanner(System.in);
         System.out.println();
 
         while(true){
             System.out.println("Are you sure you want to quit? (Y/N)");
-            String response = scanner.nextLine();
+            String response = inputReader.getResponse();
 
             switch(response.toUpperCase()) {
                 case "Y":
@@ -398,12 +402,15 @@ public class SimpleClient {
     private void quit(){
         sendAnswer("Quit-" + username);
         System.out.println(retrieveResponse());
+        exit();
+    }
+
+    private void exit(){
         endServerResponseQueue();
         System.exit(0);
     }
 
     private void confirmation(){
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Press enter to continue.");
         scanner.nextLine();
     }

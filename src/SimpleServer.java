@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 
-public class SimpleServer extends UnicastRemoteObject implements Runnable {
+public class SimpleServer implements Runnable {
 
     ServerSocket serverSocket;
 

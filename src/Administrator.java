@@ -5,17 +5,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Administrator implements Runnable {
+public class Administrator extends InputReader implements Runnable {
 
     Socket socket;
     PrintWriter printWriter;
     Scanner serverScanner;
+    InputReader inputReader;
     String username = "admin";
     String pw = "42b0307fc70d04e46e2c189eb011259c94998921fc6b394448f4a2705453cf698f749cb733226d80f40786cb12c857122d253a5e325cdbe91ad325e75b129ab8ba88008c10a5160035e21bc92993c3647fc10fb1307049d14a51789bdca7e436d5fee2b3b4dc5c3b7e611add83edf71284764d775bd049d286c23760765263f965559f20b77b794d6365678be2ae47f8572a4fd253cef295e0b1e4412245bb63";
     Administrator() throws IOException {
         socket = new Socket("127.0.0.1", 11000);
         printWriter = new PrintWriter(socket.getOutputStream(), true);
         serverScanner = new Scanner(socket.getInputStream());
+        inputReader = new InputReader();
     }
 
     public void mainMenu(){
@@ -48,7 +50,6 @@ public class Administrator implements Runnable {
 
     public void start() throws IOException {
         String response;
-        Scanner scanner = new Scanner( System.in );
         printWriter.println(pw);
         printWriter.println(pw);
 
@@ -65,7 +66,7 @@ public class Administrator implements Runnable {
             mainMenu();
             while (true) {
                 System.out.println("Please enter a number (1-6): ");
-                response = scanner.nextLine();
+                response = inputReader.getResponse();
                 if ((Integer.parseInt(response) > 0) && ((Integer.parseInt(response) < 7)))
                 {
                     break;
@@ -114,16 +115,16 @@ public class Administrator implements Runnable {
     }
 
     public void marketStart() throws IOException {
-        int response;
-
-        Scanner scanner = new Scanner( System.in );
+        String response;
+        int value;
         boolean running = true;
         while (running) {
             marketMenu();
             while (true) {
                 System.out.println("Please enter a number (1-4): ");
-                response = scanner.nextInt();
-                if ((response > 0) && (response < 5))
+                response = inputReader.getResponse();
+                value = Integer.parseInt(response);
+                if ((value > 0) && (value < 5))
                 {
                     break;
                 }
@@ -132,7 +133,7 @@ public class Administrator implements Runnable {
                     System.out.println("Invalid entry");
                 }
             }
-            switch (response) {
+            switch (value) {
                 case 1:
                     // View listings
                     printWriter.println("Inventory-Marketplace");
@@ -174,16 +175,15 @@ public class Administrator implements Runnable {
     }
 
     private void transferFunds() throws IOException {
-        Scanner scanner = new Scanner( System.in );
-
         System.out.println("Enter the username you would like to transfer from: ");
-        String source = scanner.nextLine();
+        String source = inputReader.getResponse();
 
         System.out.println("Enter the username you would like to transfer to: ");
-        String destination = scanner.nextLine();
+        String destination = inputReader.getResponse();
         
         System.out.println("Amount you want to transfer: ");
-        int amount = scanner.nextInt();
+        String response = inputReader.getResponse();
+        int amount = Integer.parseInt(response);
 
         printWriter.println("Transfer-" + source + "-" + destination + "-" + amount);
         System.out.println(serverScanner.nextLine());
@@ -191,7 +191,6 @@ public class Administrator implements Runnable {
     }
 
     public void confirmation(){
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Press enter to continue.");
         scanner.nextLine();
     }

@@ -21,11 +21,11 @@ public class User {
         this.status = false;
         ArrayList<Resource> defaultResources = new ArrayList<>();
         for (int i = 0; i < userResources.size();i++){
-            defaultResources.add(userResources.get(i));
-            defaultResources.get(i).setQuantity(0);
+            Resource r = new Resource(userResources.get(i).getId(),userResources.get(i).getCost(),0,userResources.get(i).getName(),userResources.get(i).getValue());
+            defaultResources.add(r);
         }
 
-        this.userResources = userResources;
+        this.userResources = defaultResources;
     }
 
     public User(String username, String password, ArrayList<Resource> userResources, int funds){

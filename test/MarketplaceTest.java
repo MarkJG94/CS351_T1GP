@@ -202,19 +202,19 @@ class MarketplaceTest {
     @Test
     void givenValidThenCalculateTotal() {
 
-        assertEquals(100, marketplace.calculateTotal(100, 1));
+        assertEquals(100, marketplace.calculateTotalCost(100, 1));
     }
 
     @Test
     void givenInvalidIDThenCalculateTotalReturnsError() {
 
-        assertEquals(-1, marketplace.calculateTotal(100, 5));
+        assertEquals(-1, marketplace.calculateTotalCost(100, 5));
     }
 
     @Test
     void givenInvalidQuantityThenCalculateTotalReturnsError() {
 
-        assertEquals(-1, marketplace.calculateTotal(-100, 1));
+        assertEquals(-1, marketplace.calculateTotalCost(-100, 1));
     }
 
     @Test
