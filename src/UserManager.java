@@ -30,12 +30,15 @@ public class UserManager {
     }
 
     public int addFunds(String username, int amount) {
-
+        Object lock;
+        lock=username;
         for(User u : userList){
             if(u.getUsername().equals(username))
             {
-                u.addFunds(amount);
-                return u.getFunds();
+                synchronized (lock) {
+                    u.addFunds(amount);
+                    return u.getFunds();
+                }    
             }
         }
         return -1;
@@ -43,12 +46,16 @@ public class UserManager {
 
 
     public int deductFunds(String username, int amount) {
+        Object lock;
+        lock=username;
         for(User u : userList){
             if(u.getUsername().equals(username))
             {
                 if(u.validateCurrency(amount)){
-                    u.deductFunds(amount);
-                    return u.getFunds();
+                    synchronized (lock){
+                        u.deductFunds(amount);
+                        return u.getFunds();
+                    }    
                 }
                 return -2;
             }
@@ -57,10 +64,17 @@ public class UserManager {
     }
 
     public int transferFunds(String source, String destination, int amount) throws IOException {
+        Object lock1, lock2;
+        lock1=source;
+        lock2 = destination;
         if(deductFunds(source,amount) >= 0){
+            synchronized (lock1){
+                synchronized (lock2){
             addFunds(destination,amount);
             notifyUser(source,destination,amount);
             return 1;
+                }
+            }    
         }
         return -1;
     }
@@ -85,18 +99,26 @@ public class UserManager {
     }
 
     public boolean addResource(int resourceID, int quantity, String username) {
+        Object lock;
+        lock=resourceID;
         if (quantity > 0){
-            User u = getUser(username);
-            u.addResource(resourceID,quantity);
-            return true;
-            }
+            synchronized (lock){
+                User u = getUser(username);
+                u.addResource(resourceID,quantity);
+                return true;
+            }    
+        }
         return false;
     }
 
     public boolean removeResource(int resourceID, int quantity, String username) {
+        Object lock;
+        lock=resourceID;
         if (quantity > 0){
-            User u = getUser(username);
-            return u.removeResource(resourceID,quantity);
+            synchronized (lock){
+                User u = getUser(username);
+                return u.removeResource(resourceID,quantity);
+            }
         }
         return false;
     }
