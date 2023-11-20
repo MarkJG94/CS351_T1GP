@@ -17,8 +17,8 @@ public class Server implements Runnable {
     private ArrayList<Resource> resources;
     private ArrayList<User> userList;
     private String filePath = new File("").getAbsolutePath();
-    private String userFilePath = filePath + "/src/UserDetails.csv";
-    private String resourceFilePath = filePath + "/src/MarketDetails.csv";
+    private String userFilePath = filePath + "/data/UserDetails.csv";
+    private String resourceFilePath = filePath + "/data/MarketDetails.csv";
     private Marketplace marketPlace;
     private UserManager userManager;
     private ArrayList<Socket> clients;

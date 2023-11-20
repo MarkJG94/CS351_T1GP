@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -128,7 +129,8 @@ public class Client extends InputReader{
                         break;
                     } else if(response.contains("IMPORTANT")) {
                         System.out.println();
-                        System.out.println(response.replace("IMPORTANT",""));
+                        System.out.println(response.replace("IMPORTANT","[SERVER]: "));
+                        System.out.print("  > ");
                     } else if(response.equals("heartbeat")) {
                         continue;
                     } else {
@@ -139,6 +141,12 @@ public class Client extends InputReader{
         };
         operator.start();
     }
+
+    public static void infoBox(String infoMessage, String titleBar)
+    {
+        JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
+    }
+
     private void endServerResponseQueue(){
         operator.interrupt();
     }
