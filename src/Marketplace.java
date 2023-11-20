@@ -25,6 +25,10 @@ public class Marketplace {
             /*Check for item already existing*/
             int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
+                if((marketResources.get(resourceIndex).getQuantity() - quantity) < 0)
+                {
+                    return false;
+                }
                 marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() - quantity);
                 return true;
             }

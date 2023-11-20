@@ -108,10 +108,11 @@ public class User {
     }
     
     public boolean removeResource(int resourceID, int quantity) {
-        if (getResourceIndex(resourceID) != -1 && (quantity > 0)){
+        int resourceIndex = getResourceIndex(resourceID);
+        if ( resourceIndex != -1 && (quantity > 0)){
             int currentQuantity = getResourceQuantity(resourceID);
             if(currentQuantity >= quantity) {
-                userResources.get(resourceID - 1).setQuantity(currentQuantity - quantity);
+                userResources.get(resourceIndex).setQuantity(currentQuantity - quantity);
                 return true;
             }
         }

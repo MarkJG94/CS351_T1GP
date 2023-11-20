@@ -3,10 +3,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.rmi.NotBoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
 public class Client extends InputReader{
     private final Socket socket;
@@ -123,7 +120,12 @@ public class Client extends InputReader{
         operator = new Thread() {
             public void run() {
                 while (!operator.isInterrupted() && socket.isConnected()) {
-                    String response = serverScanner.nextLine();
+                    String response;
+                    try{response = serverScanner.nextLine();}
+                    catch(NoSuchElementException e){
+                        messageQueue.add("Server Offline");
+                        break;
+                    }
                     if(response.equals("Logging out") || response.equals("Server Offline")){
                         messageQueue.add(response);
                         break;

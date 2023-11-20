@@ -40,9 +40,11 @@ public class Administrator extends InputReader implements Runnable {
         options.add("Marketplace Menu");
         options.add("Please select an option from the list below;");
         options.add("\t 1. View listings");
-        options.add("\t 2. Add Items");
-        options.add("\t 3. Remove Items");
-        options.add("\t 4. Main Menu");
+        options.add("\t 2. Add Items to Marketplace");
+        options.add("\t 3. Remove Items from Marketplace");
+        options.add("\t 4. Add Items to User");
+        options.add("\t 5. Remove Items from User");
+        options.add("\t 6. Main Menu");
         for(String s : options){
             System.out.println(s);
         }
@@ -121,10 +123,10 @@ public class Administrator extends InputReader implements Runnable {
         while (running) {
             marketMenu();
             while (true) {
-                System.out.println("Please enter a number (1-4): ");
+                System.out.println("Please enter a number (1-6): ");
                 response = inputReader.getResponse();
                 value = Integer.parseInt(response);
-                if ((value > 0) && (value < 5))
+                if ((value > 0) && (value < 7))
                 {
                     break;
                 }
@@ -146,14 +148,23 @@ public class Administrator extends InputReader implements Runnable {
                     break;
                 case 2:
                     // Buy item
-                    addItem();
+                    addItemMarket();
                     confirmation();
                     break;
                 case 3:
-                    removeItem();
+                    removeItemMarket();
                     confirmation();
                     break;
                 case 4:
+                    // Buy item
+                    addItemUser();
+                    confirmation();
+                    break;
+                case 5:
+                    removeItemUser();
+                    confirmation();
+                    break;
+                case 6:
                     running = false;
                     break;
             }
@@ -161,17 +172,114 @@ public class Administrator extends InputReader implements Runnable {
     }
 
     private void removeFunds() {
+        System.out.println("Enter the username you would like to remove funds from: ");
+        String source = inputReader.getResponse();
+
+        System.out.println("Amount you want to transfer: ");
+        String response = inputReader.getResponse();
+        int amount = Integer.parseInt(response);
+
+        printWriter.println("RemoveFunds-" + source + "-" + amount);
+        System.out.println(serverScanner.nextLine());
     }
 
     private void addFunds() {
+        System.out.println("Enter the username you would like to add funds to: ");
+        String source = inputReader.getResponse();
 
+        System.out.println("Amount you want to transfer: ");
+        String response = inputReader.getResponse();
+        int amount = Integer.parseInt(response);
+
+        printWriter.println("AddFunds-" + source + "-" + amount);
+        System.out.println(serverScanner.nextLine());
     }
 
-    private void addItem() {
+    private void addItemUser() {
+
+        printWriter.println("Inventory-Marketplace-" + username);
+        String response = serverScanner.nextLine();
+        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
+
+        boolean loop = true;
+        int resourceID = 0, quantity = 0;
+
+        System.out.println("Enter the username you would like to add resources to: ");
+        String source = inputReader.getResponse();
+
+        System.out.println("Enter the resource ID you'd like to add: ");
+
+        while (loop) {
+            int i = 1;
+            for (String s : data) {
+                System.out.print(s.split(":")[0] + " (" + i + ")    ");
+                i++;
+            }
+            System.out.println();
+            response = inputReader.getResponse();
+            if (response.equalsIgnoreCase("q")) {
+                loop = false;
+                break;
+            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
+                resourceID = Integer.parseInt(response);
+                break;
+            } else {
+                System.out.println("Invalid entry. Try again.");
+            }
+        }
+
+        System.out.println("Amount you want to transfer: ");
+        response = inputReader.getResponse();
+        int amount = Integer.parseInt(response);
+
+        printWriter.println("AddResource-" + source + "-" + resourceID + "-" + amount);
+        System.out.println(serverScanner.nextLine());
     }
 
-    private void removeItem() {
+    private void removeItemMarket() {
         
+    }
+
+    private void removeItemUser() {
+
+    }
+
+    private void addItemMarket() {
+
+        printWriter.println("Inventory-Marketplace-" + username);
+        String response = serverScanner.nextLine();
+        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
+
+        boolean loop = true;
+        int resourceID = 0, quantity = 0;
+
+        System.out.println("Enter the resource ID you'd like to add: ");
+
+        while (loop) {
+            int i = 1;
+            for (String s : data) {
+                System.out.print(s.split(":")[0] + " (" + i + ")    ");
+                i++;
+            }
+            System.out.println();
+            response = inputReader.getResponse();
+            if (response.equalsIgnoreCase("q")) {
+                loop = false;
+                break;
+            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
+                resourceID = Integer.parseInt(response);
+                break;
+            } else {
+                System.out.println("Invalid entry. Try again.");
+            }
+        }
+
+        System.out.println("Amount you want to transfer: ");
+        response = inputReader.getResponse();
+        int amount = Integer.parseInt(response);
+
+        printWriter.println("AddResource-Marketplace-" + resourceID + "-" + amount);
+        System.out.println(serverScanner.nextLine());
     }
 
     private void transferFunds() throws IOException {
