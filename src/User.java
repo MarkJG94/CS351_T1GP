@@ -14,11 +14,18 @@ public class User {
     int funds;
 
     public User(String username, String password, ArrayList<Resource> userResources){
+
         this.username = username.toLowerCase(Locale.ROOT);
         this.password = password;
-        this.userResources = userResources;
         funds = 1000;
         this.status = false;
+        ArrayList<Resource> defaultResources = new ArrayList<>();
+        for (int i = 0; i < userResources.size();i++){
+            defaultResources.add(userResources.get(i));
+            defaultResources.get(i).setQuantity(0);
+        }
+
+        this.userResources = userResources;
     }
 
     public User(String username, String password, ArrayList<Resource> userResources, int funds){
@@ -91,16 +98,22 @@ public class User {
     }
     
     public boolean addResource(int resourceID, int quantity) {
-        int currentQuantity = getResourceQuantity(resourceID);
-        userResources.get(resourceID - 1).setQuantity(currentQuantity + quantity);
-        return true;
+        int resourceIndex = getResourceIndex(resourceID);
+        if (resourceIndex != -1 && (quantity > 0)){
+            int currentQuantity = getResourceQuantity(resourceID);
+            userResources.get(resourceIndex).setQuantity(currentQuantity + quantity);
+            return true;
+        }
+        else return false;
     }
     
     public boolean removeResource(int resourceID, int quantity) {
-        int currentQuantity = getResourceQuantity(resourceID);
-        if(currentQuantity >= quantity) {
-            userResources.get(resourceID - 1).setQuantity(currentQuantity - quantity);
-            return true;
+        if (getResourceIndex(resourceID) != -1 && (quantity > 0)){
+            int currentQuantity = getResourceQuantity(resourceID);
+            if(currentQuantity >= quantity) {
+                userResources.get(resourceID - 1).setQuantity(currentQuantity - quantity);
+                return true;
+            }
         }
         return false;
     }

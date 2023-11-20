@@ -150,7 +150,11 @@ public class Marketplace {
     }
 
     public Resource getResourceDetails(int resourceID) {
-        return marketResources.get(resourceID - 1);
+        if(marketResources.size() > resourceID - 1){
+            return marketResources.get(resourceID - 1);
+        } else {
+            return null;
+        }
     }
     
     public int getFunds(String username) {
@@ -167,6 +171,10 @@ public class Marketplace {
             return null;
         }
         return userList.get(user_index).getUserInventory();
+    }
+
+    public ArrayList<Resource> getMarketResources(){
+        return marketResources;
     }
 
 //    public int addFunds(String destination_username, int amount) {
