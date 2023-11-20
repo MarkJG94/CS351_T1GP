@@ -24,6 +24,11 @@ public class UserManager {
         return null;
     }
 
+    public void addUser(String username, String password, ArrayList<Resource> resources){
+        User newUser = new User(username,password,resources);
+        userList.add(newUser);
+    }
+
     public int addFunds(String username, int amount) {
 
         for(User u : userList){

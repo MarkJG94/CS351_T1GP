@@ -62,17 +62,20 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
                         break;
                     }
                     // This should set a client to offline if the alt f4 but its not working
-                    for(Socket c : clients){
-                        if(c.isClosed() || !c.isConnected() || !c.isBound()) {
-                            for (Map.Entry<User, Socket> entry : userManager.socketUserMap.entrySet()) {
-                                if (entry.getValue() == c) {
-                                    entry.getKey().setOffline();
+                    for(int j = 0; j < clients.size(); j++){
+                        if(j > 0) {
+                            Socket c = clients.get(j);
+                            PrintWriter pw = new PrintWriter(c.getOutputStream(), true);
+                            pw.println("heartbeat");
+                            if (pw.checkError()) {
+                                for (Map.Entry<User, Socket> entry : userManager.socketUserMap.entrySet()) {
+                                    if (entry.getValue() == c) {
+                                        entry.getKey().setOffline();
+                                    }
                                 }
+                                clients.remove(c);
                             }
-                            clients.remove(c);
                         }
-
-
                     }
                 }
             }

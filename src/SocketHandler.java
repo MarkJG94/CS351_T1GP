@@ -35,20 +35,35 @@ public class SocketHandler implements Runnable{
 
             boolean userExists = false;
 
-                while (true) {
+            if(scanner.nextLine().equals("NewAccount")){
+                while(true) {
                     username = scanner.nextLine();
-                    if(username.equals(admin)) {
-                        printWriter.println("AdminAuth");
-                        break;
-                    }
                     user = userManager.getUser(username);
-
                     if (user == null) {
-                        printWriter.println("Username");
-                    } else {
+                        printWriter.println("password");
                         break;
+                    } else {
+                        printWriter.println("username");
                     }
                 }
+                String password = scanner.nextLine();
+                userManager.addUser(username,password,marketplace.marketResources);
+            }
+
+            while (true) {
+                username = scanner.nextLine();
+                if(username.equals(admin)) {
+                    printWriter.println("AdminAuth");
+                    break;
+                }
+                user = userManager.getUser(username);
+
+                if (user == null) {
+                    printWriter.println("Username");
+                } else {
+                    break;
+                }
+            }
             if(username.equals(admin)) {
                 userExists = true;
             } else

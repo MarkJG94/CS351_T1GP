@@ -14,11 +14,18 @@ public class User {
     int funds;
 
     public User(String username, String password, ArrayList<Resource> userResources){
+
         this.username = username.toLowerCase(Locale.ROOT);
         this.password = password;
-        this.userResources = userResources;
         funds = 1000;
         this.status = false;
+        ArrayList<Resource> defaultResources = new ArrayList<>();
+        for (int i = 0; i < userResources.size();i++){
+            defaultResources.add(userResources.get(i));
+            defaultResources.get(i).setQuantity(0);
+        }
+
+        this.userResources = userResources;
     }
 
     public User(String username, String password, ArrayList<Resource> userResources, int funds){
