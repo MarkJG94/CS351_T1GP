@@ -50,6 +50,7 @@ public class Administrator implements Runnable {
         String response;
         Scanner scanner = new Scanner( System.in );
         printWriter.println(pw);
+        printWriter.println(pw);
 
         boolean running = false;
         if(serverScanner.nextLine().equals("AdminAuth")) {

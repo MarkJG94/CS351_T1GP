@@ -20,20 +20,19 @@ public class SimpleClient {
     }
 
 
-    public void runClient() throws IOException, NotBoundException
-    {
+    public void runClient() throws IOException, NotBoundException {
         Scanner scanner = new Scanner(System.in);
         String response;
 
         startServerResponseQueue();
 
 
-        while(true) {
+        while (true) {
             System.out.println("Select an option:");
             System.out.println("Sign-in (1)     Create Account (2)");
 
             response = scanner.nextLine();
-            if (Integer.parseInt(response) != 1 || Integer.parseInt(response) != 2) {
+            if (Integer.parseInt(response) != 1 && Integer.parseInt(response) != 2) {
                 System.out.println("Invalid Entry, please try again");
                 System.out.println();
             } else {
@@ -41,71 +40,72 @@ public class SimpleClient {
             }
         }
 
-        if(Integer.parseInt(response) == 1) {
-            printWriter.println("Username");
-            while (true) {
-                System.out.println("Enter your username: ");
-                username = scanner.nextLine();
-
-                sendAnswer(username);
-
-                response = retrieveResponse();
-                if (response.equals("Password")) {
-                    break;
-                } else {
-                    System.out.println("Username not found. Please try again");
-                }
-            }
-
-            int passwordAttempts = 0;
-            while (true) {
-
-                if (passwordAttempts > 4) {
-                    break;
-                } else {
-                    System.out.println("Enter your password: ");
-                }
-
-                String password = scanner.nextLine();
-                sendAnswer(password);
-
-                while (messageQueue.size() == 0) {
-
-                }
-                response = messageQueue.pop();
-
-                if (response.equals("Login")) {
-                    break;
-                } else {
-                    System.out.println("Invalid Password! " + (3 - passwordAttempts) + " attempts remaining.");
-                    passwordAttempts++;
-                }
-            }
-
-            if (response.equals("Login")) {
-                start();
-            }
-        } else {
-
+        if(Integer.parseInt(response) == 2) {
             printWriter.println("NewAccount");
-            while(true) {
+            while (true) {
                 System.out.println("Please enter your username:");
                 username = scanner.nextLine();
                 printWriter.println(username);
-                if (retrieveResponse().equals("password")){
+                if (retrieveResponse().equals("password")) {
                     break;
+                } else {
+                    System.out.println("This username already exists.");
                 }
             }
-            while(true) {
+            while (true) {
                 System.out.println("Please enter your password:");
                 String password = scanner.nextLine();
                 printWriter.println(password);
-                if(password.contains(",")){
+                if (password.contains(",")) {
                     System.out.println("Password cannot contain ','. Please try again.");
-                } else if (retrieveResponse().equals("success")){
+                } else if (retrieveResponse().equals("success")) {
+                    System.out.println("User successfully created");
+                    break;
+                } else {
+                    System.out.println("Failed to create user account!");
                     break;
                 }
             }
+        }
+
+        while (true) {
+            System.out.println("Enter your username: ");
+            username = scanner.nextLine();
+
+            sendAnswer(username);
+
+            response = retrieveResponse();
+            if (response.equals("Password")) {
+                break;
+            } else {
+                System.out.println("Username not found. Please try again");
+            }
+        }
+
+        int passwordAttempts = 0;
+        while (true) {
+
+            if (passwordAttempts > 4) {
+                break;
+            } else {
+                System.out.println("Enter your password: ");
+            }
+
+            String password = scanner.nextLine();
+            sendAnswer(password);
+
+            response = retrieveResponse();
+
+            if (response.equals("Login")) {
+                break;
+            } else {
+                System.out.println("Invalid Password! " + (3 - passwordAttempts) + " attempts remaining.");
+                passwordAttempts++;
+            }
+        }
+
+        if (response.equals("Login")) {
+            start();
         }
         socket.close();
     }

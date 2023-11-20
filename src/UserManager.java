@@ -24,9 +24,14 @@ public class UserManager {
         return null;
     }
 
-    public void addUser(String username, String password, ArrayList<Resource> resources){
-        User newUser = new User(username,password,resources);
-        userList.add(newUser);
+    public boolean addUser(String username, String password, ArrayList<Resource> resources){
+        try {
+            User newUser = new User(username, password, resources);
+            userList.add(newUser);
+        } catch (Exception e){
+            return false;
+        }
+        return true;
     }
 
     public int addFunds(String username, int amount) {

@@ -35,7 +35,9 @@ public class SocketHandler implements Runnable{
 
             boolean userExists = false;
 
-            if(scanner.nextLine().equals("NewAccount")){
+            String command = scanner.nextLine();
+            if(command.equals(admin)) {
+            } else if(command.equals("NewAccount")){
                 while(true) {
                     username = scanner.nextLine();
                     user = userManager.getUser(username);
@@ -47,7 +49,11 @@ public class SocketHandler implements Runnable{
                     }
                 }
                 String password = scanner.nextLine();
-                userManager.addUser(username,password,marketplace.marketResources);
+                if(userManager.addUser(username,password,marketplace.marketResources)){
+                    printWriter.println("success");
+                } else {
+                    printWriter.println("fail");
+                }
             }
 
             while (true) {
@@ -87,7 +93,7 @@ public class SocketHandler implements Runnable{
                 }
                 boolean running = true;
                 while(running){
-                    String command = scanner.nextLine();
+                    command = scanner.nextLine();
                     ArrayList<String> data = new ArrayList<>(Arrays.asList(command.split("-")));
                     switch(data.get(0)){
                         case "Inventory":

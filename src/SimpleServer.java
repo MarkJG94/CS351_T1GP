@@ -68,12 +68,15 @@ public class SimpleServer extends UnicastRemoteObject implements Runnable {
                             PrintWriter pw = new PrintWriter(c.getOutputStream(), true);
                             pw.println("heartbeat");
                             if (pw.checkError()) {
+                                User offlineUser = null;
                                 for (Map.Entry<User, Socket> entry : userManager.socketUserMap.entrySet()) {
                                     if (entry.getValue() == c) {
+                                        offlineUser = entry.getKey(); 
                                         entry.getKey().setOffline();
                                     }
                                 }
                                 clients.remove(c);
+                                userManager.socketUserMap.remove(offlineUser);
                             }
                         }
                     }
