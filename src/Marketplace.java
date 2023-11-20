@@ -11,12 +11,16 @@ public class Marketplace {
     ArrayList<Resource> marketResources = new ArrayList<Resource>();
 
     public boolean addResourceToMarket(int resourceID, int quantity) {
+        Integer lock;
         if (quantity > 0) {
+            lock = resourceID;
             /*Check for item already existing*/
             int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
-                marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() + quantity);
-                return true;
+                synchronized (lock) {
+                    marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() + quantity);
+                    return true;
+                }    
             }
         }
         /*Can't add negative number*/
@@ -24,14 +28,18 @@ public class Marketplace {
     }
 
     public boolean addResourceToUser(int resourceID, int quantity, String userName) {
+        Object lock;
         if (quantity > 0) {
             if (userExists(userName)){
+                lock = userName;
                 int user_index = getUserIndex(userName);
                 int resourceIndex = getResourceIndex(resourceID);
                 if (resourceIndex != -1) {
-                    userList.get(user_index).addResource(resourceID, quantity);
+                    synchronized (lock) {
+                        userList.get(user_index).addResource(resourceID, quantity);
 
-                    return true;
+                        return true;
+                    }    
                 }
             }
             /*Can't add negative number*/
@@ -41,12 +49,16 @@ public class Marketplace {
     }
 
     public boolean removeResourceFromMarket(int resourceID, int quantity) {
+        Integer lock;
         if (quantity > 0) {
+            lock = resourceID;
             /*Check for item already existing*/
             int resourceIndex = getResourceIndex(resourceID);
             if (resourceIndex != -1){
-                marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() - quantity);
-                return true;
+                synchronized (lock) {
+                    marketResources.get(resourceIndex).setQuantity(marketResources.get(resourceIndex).getQuantity() - quantity);
+                    return true;
+                }    
             }
         }
         /*Can't add negative number*/
@@ -54,13 +66,17 @@ public class Marketplace {
     }
 
     public boolean removeResourceFromUser(int resourceID, int quantity, String userName) {
+        Object lock;
         if (quantity > 0) {
             if (userExists(userName)){
+                lock = userName
                 int user_index = getUserIndex(userName);
                 int resourceIndex = getResourceIndex(resourceID);
                 if (resourceIndex != -1) {
-                    userList.get(user_index).removeResource(resourceID, quantity);
-                    return true;
+                    synchronized (lock) {
+                        userList.get(user_index).removeResource(resourceID, quantity);
+                        return true;
+                    }    
                 }
                 /*Check for item already existing*/
             }
