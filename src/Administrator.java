@@ -237,11 +237,81 @@ public class Administrator extends InputReader implements Runnable {
     }
 
     private void removeItemMarket() {
+
+        printWriter.println("Inventory-Marketplace-" + username);
+        String response = serverScanner.nextLine();
+        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
+
+        boolean loop = true;
+        int resourceID = 0, quantity = 0;
+
+        System.out.println("Enter the resource ID you'd like to remove: ");
+
+        while (loop) {
+            int i = 1;
+            for (String s : data) {
+                System.out.print(s.split(":")[0] + " (" + i + ")    ");
+                i++;
+            }
+            System.out.println();
+            response = inputReader.getResponse();
+            if (response.equalsIgnoreCase("q")) {
+                loop = false;
+                break;
+            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
+                resourceID = Integer.parseInt(response);
+                break;
+            } else {
+                System.out.println("Invalid entry. Try again.");
+            }
+        }
+
+        System.out.println("Amount you want to remove: ");
+        response = inputReader.getResponse();
+        int amount = Integer.parseInt(response);
+
+        printWriter.println("RemoveResource-Marketplace-" + resourceID + "-" + amount);
+        System.out.println(serverScanner.nextLine());
         
     }
 
     private void removeItemUser() {
+        printWriter.println("Inventory-Marketplace-" + username);
+        String response = serverScanner.nextLine();
+        ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
 
+        boolean loop = true;
+        int resourceID = 0, quantity = 0;
+        System.out.println("Enter the username you would like to add resources to: ");
+        String source = inputReader.getResponse();
+
+        System.out.println("Enter the resource ID you'd like to remove: ");
+
+        while (loop) {
+            int i = 1;
+            for (String s : data) {
+                System.out.print(s.split(":")[0] + " (" + i + ")    ");
+                i++;
+            }
+            System.out.println();
+            response = inputReader.getResponse();
+            if (response.equalsIgnoreCase("q")) {
+                loop = false;
+                break;
+            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
+                resourceID = Integer.parseInt(response);
+                break;
+            } else {
+                System.out.println("Invalid entry. Try again.");
+            }
+        }
+
+        System.out.println("Amount you want to transfer: ");
+        response = inputReader.getResponse();
+        int amount = Integer.parseInt(response);
+
+        printWriter.println("RemoveResource-" + source + "-" + resourceID + "-" + amount);
+        System.out.println(serverScanner.nextLine());
     }
 
     private void addItemMarket() {

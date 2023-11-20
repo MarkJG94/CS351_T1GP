@@ -1,5 +1,5 @@
 Username,Password,Funds,Status,﻿Wood,Stone,Iron,Gold,Silver
-testuser1,password1,320,Offline,0,0,0,0,0
+testuser1,password1,220,Offline,5,0,0,0,0
 testuser2,password2,2040,Offline,0,2,0,0,0
 testuser3,password3,500,Offline,0,0,5,0,2
 Test,Test,500,Offline,50,100,30,5,20
