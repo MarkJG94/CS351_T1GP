@@ -33,23 +33,31 @@ public class UserManager {
     }
 
     public int addFunds(String username, int amount) {
-
-        for(User u : userList){
-            if(u.getUsername().equals(username))
+        Object lock0;
+        User u = getUser( username );
+        if (u != null)
+        {
+            lock0 = u;
+            synchronized ( lock0 )
             {
                 u.addFunds(amount);
-                return u.getFunds();
             }
+            return u.getFunds();
         }
         return -1;
     }
 
 
     public int deductFunds(String username, int amount) {
-        for(User u : userList){
-            if(u.getUsername().equals(username))
+        Object lock0;
+        User u = getUser( username );
+        if (u != null)
+        {
+            lock0 = u;
+            synchronized ( lock0 )
             {
-                if(u.validateCurrency(amount)){
+                if(u.validateCurrency(amount))
+                {
                     u.deductFunds(amount);
                     return u.getFunds();
                 }
@@ -63,6 +71,7 @@ public class UserManager {
         if(getUser(destination) == null){
             return -2;
         }
+        
         if(deductFunds(source,amount) >= 0){
             addFunds(destination,amount);
             notifyUser(source,destination,amount);
@@ -91,18 +100,28 @@ public class UserManager {
     }
 
     public boolean addResource(int resourceID, int quantity, String username) {
+        Object lock0;
         if (quantity > 0){
             User u = getUser(username);
-            u.addResource(resourceID,quantity);
+            lock0 = u;
+            synchronized ( lock0 )
+            {
+                u.addResource(resourceID,quantity);
+            }
             return true;
             }
         return false;
     }
 
     public boolean removeResource(int resourceID, int quantity, String username) {
+        Object lock0;
         if (quantity > 0){
             User u = getUser(username);
-            return u.removeResource(resourceID,quantity);
+            lock0 = u;
+            synchronized ( lock0 )
+            {
+                return u.removeResource(resourceID,quantity);
+            }
         }
         return false;
     }
