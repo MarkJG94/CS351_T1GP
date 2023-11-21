@@ -1,7 +1,5 @@
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,39 +26,72 @@ public class UserManager {
         return null;
     }
 
-    public void addUser(String username, String password, ArrayList<Resource> resources){
-        User newUser = new User(username,password,resources);
-        userList.add(newUser);
+    public boolean addUser(String username, String password, ArrayList<Resource> resources){
+        try {
+            User newUser = new User(username, password, resources);
+            userList.add(newUser);
+        } catch (Exception e){
+            return false;
+        }
+        return true;
     }
 
     public int addFunds(String username, int amount) {
-        List<User> userLists = new ArrayList<User>();
-        userLists = Collections.synchronizedList(userList);
-
-        for(User u : userList){
-            if(u.getUsername().equals(username))
+        Object lock0;
+        User u = getUser( username );
+        if (u != null)
+        {
+            lock0 = u;
+            synchronized ( lock0 )
             {
-                synchronized (userLists) {
-                    u.addFunds(amount);
-                    return u.getFunds();
+                u.addFunds(amount);
+            }
+            return u.getFunds();
+        }
+        return -1;
+    }
+
+    public int validateUser(String username) {
+        Object lock0;
+        User u = getUser( username );
+        if (u == null)
+        {
+            return -1;
+        }
+        return 0;
+    }
+
+    public int validateUserAndFunds(String username, int amount) {
+        Object lock0;
+        User u = getUser( username );
+        if (u != null)
+        {
+            lock0 = u;
+            synchronized ( lock0 )
+            {
+                if(u.validateCurrency(amount))
+                {
+                    return 0;
                 }
+                return -2;
             }
         }
         return -1;
     }
 
-
     public int deductFunds(String username, int amount) {
-        List<User> userLists = new ArrayList<User>();
-        userLists = Collections.synchronizedList(userList);
-        for(User u : userList){
-            if(u.getUsername().equals(username))
+        Object lock0;
+        User u = getUser( username );
+        if (u != null)
+        {
+            lock0 = u;
+            synchronized ( lock0 )
             {
-                if(u.validateCurrency(amount)){
-                    synchronized (userLists){
+                if(u.validateCurrency(amount))
+                {
                     u.deductFunds(amount);
                     return u.getFunds();
-                }}
+                }
                 return -2;
             }
         }
@@ -68,17 +99,15 @@ public class UserManager {
     }
 
     public int transferFunds(String source, String destination, int amount) throws IOException {
-        Object lock1, lock2;
-        lock1=source;
-        lock2 = destination;
-        if(deductFunds(source,amount) >= 0){
-            synchronized (lock1){
-                synchronized (lock2){
+        if(getUser(destination) == null){
+            return -2;
+        }
 
+        if(deductFunds(source,amount) >= 0){
             addFunds(destination,amount);
             notifyUser(source,destination,amount);
             return 1;
-        }}}
+        }
         return -1;
     }
 
@@ -102,25 +131,29 @@ public class UserManager {
     }
 
     public boolean addResource(int resourceID, int quantity, String username) {
-        List<Resource> resourceLists = new ArrayList<Resource>();
-        resourceLists = Collections.synchronizedList(marketResources);
+        Object lock0;
         if (quantity > 0){
-            synchronized (resourceLists){
             User u = getUser(username);
-            u.addResource(resourceID,quantity);
+            lock0 = u;
+            synchronized ( lock0 )
+            {
+                u.addResource(resourceID,quantity);
+            }
             return true;
-            }}
+            }
         return false;
     }
 
     public boolean removeResource(int resourceID, int quantity, String username) {
-        List<Resource> resourceLists = new ArrayList<Resource>();
-        resourceLists = Collections.synchronizedList(marketResources);
+        Object lock0;
         if (quantity > 0){
-            synchronized (resourceLists){
             User u = getUser(username);
-            return u.removeResource(resourceID,quantity);
-        }}
+            lock0 = u;
+            synchronized ( lock0 )
+            {
+                return u.removeResource(resourceID,quantity);
+            }
+        }
         return false;
     }
 
@@ -137,9 +170,16 @@ public class UserManager {
         if(socketUserMap.containsKey(u)){
             Socket s = socketUserMap.get(u);
             PrintWriter printWriter = new PrintWriter( s.getOutputStream(), true );
-            printWriter.println("IMPORTANT" + source + " has sent you " + amount);
+            printWriter.println("IMPORTANT" + source + " has sent you " + amount + " Funds");
         }
-
     }
 
+    public void notifyUser(String source, String destination, int amount, String resource) throws IOException {
+        User u = getUser(destination);
+        if(socketUserMap.containsKey(u)){
+            Socket s = socketUserMap.get(u);
+            PrintWriter printWriter = new PrintWriter( s.getOutputStream(), true );
+            printWriter.println("IMPORTANT" + source + " has sent you " + amount + " " + resource);
+        }
+    }
 }
