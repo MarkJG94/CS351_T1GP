@@ -202,7 +202,7 @@ public class Administrator extends InputReader implements Runnable {
         ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
 
         boolean loop = true;
-        int resourceID = 0, quantity = 0;
+        int resourceID = 0;
 
         System.out.println("Enter the username you would like to add resources to: ");
         String source = inputReader.getResponse();
@@ -243,7 +243,7 @@ public class Administrator extends InputReader implements Runnable {
         ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
 
         boolean loop = true;
-        int resourceID = 0, quantity = 0;
+        int resourceID = 0;
 
         System.out.println("Enter the resource ID you'd like to remove: ");
 
@@ -281,7 +281,7 @@ public class Administrator extends InputReader implements Runnable {
         ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
 
         boolean loop = true;
-        int resourceID = 0, quantity = 0;
+        int resourceID = 0;
         System.out.println("Enter the username you would like to add resources to: ");
         String source = inputReader.getResponse();
 
@@ -321,7 +321,7 @@ public class Administrator extends InputReader implements Runnable {
         ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
 
         boolean loop = true;
-        int resourceID = 0, quantity = 0;
+        int resourceID = 0;
 
         System.out.println("Enter the resource ID you'd like to add: ");
 

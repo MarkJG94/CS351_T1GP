@@ -23,8 +23,6 @@ public class SocketHandler implements Runnable{
         this.userExists = false;
     }
 
-
-
     @Override
     public void run() {
         try {
