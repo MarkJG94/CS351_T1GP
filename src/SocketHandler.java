@@ -94,9 +94,74 @@ public class SocketHandler implements Runnable{
         }
     }
 
-    public void runTest(String userName) throws IOException {
-        printWriter = new PrintWriter(socket.getOutputStream(), true);
-        this.username = userName;
+    public int runTest(String username, String password, String command) {
+        try {
+
+            scanner = new Scanner(socket.getInputStream());
+            printWriter = new PrintWriter(socket.getOutputStream(), true);
+
+//            String command = scanner.nextLine();
+            if(command.equals(admin)) {
+            } else if(command.equals("NewAccount")){
+                newAccountPrompt();
+            }
+
+            testLogin(username, password);
+
+            if (userExists)
+            {
+                if(!username.equals(admin)) {
+                    userManager.setUserStatus(username, true);
+                    userManager.assignToSocket(socket, username);
+                }
+                boolean running = true;
+                while(running){
+                    ArrayList<String> data = new ArrayList<>(Arrays.asList(command.split("-")));
+                    switch(data.get(0)){
+                        case "Inventory":
+                            return getInventory(data);
+                        case "Users":
+                            return getUsers(data);
+                        case "Transfer":
+                            transferFunds(data);
+                            break;
+                        case "Buy":
+                            return buyResource(data);
+                        case "Sell":
+                            sellResource(data);
+                            break;
+                        case "AddFunds":
+                            addFunds(data);
+                            break;
+                        case "RemoveFunds":
+                            removeFunds(data);
+                            break;
+                        case "AddResource":
+                            addResource(data);
+                            break;
+                        case "RemoveResource":
+                            removeResource(data);
+                            break;
+                        case "Quit":
+                            quit();
+                            running = false;
+                            break;
+                    }
+                    System.out.println("Error");
+                    System.out.println("Invalid Command in command string");
+                    return -1;
+                }
+            }
+            else
+            {
+                printWriter.println("Denied");
+                socket.close();
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     private void newAccountPrompt(){
@@ -152,7 +217,38 @@ public class SocketHandler implements Runnable{
         }
     }
 
-    public boolean getInventory(ArrayList<String> data) throws IOException {
+    private void testLogin(String username, String password){
+        User user = null;
+        while (true) {
+            if(username.equals(admin)) {
+                printWriter.println("AdminAuth");
+                break;
+            }
+            user = userManager.getUser(username);
+
+            if (user == null) {
+                printWriter.println("Username");
+            } else {
+                break;
+            }
+        }
+        if(username.equals(admin)) {
+            userExists = true;
+        } else
+        {
+            printWriter.println("Password");
+            while (!userExists) {
+                if (user.getPassword().equals(password)) {
+                    userExists = true;
+                    printWriter.println("Login");
+                } else {
+                    printWriter.println("Password");
+                }
+            }
+        }
+    }
+
+    public int getInventory(ArrayList<String> data) throws IOException {
         if(data.get(1).equals("Marketplace")){
             StringBuilder s = new StringBuilder();
             for(int i = 1; i<6;i++) {
@@ -161,8 +257,8 @@ public class SocketHandler implements Runnable{
             }
             String t = s.toString();
             printWriter.println(t);
-            return true;
-        } else {
+            return 0;
+        } else if (userManager.getUser(data.get(1)) != null){
             User u = userManager.getUser(data.get(1));
             ArrayList<Resource> rl = u.getUserInventory();
             StringBuilder s = new StringBuilder();
@@ -172,11 +268,12 @@ public class SocketHandler implements Runnable{
             }
             String t = s.toString();
             printWriter.println(t);
+            return 0;
         }
-        return false;
+        return -1;
     }
 
-    private void getUsers(ArrayList<String> data) throws IOException {
+    private int getUsers(ArrayList<String> data) throws IOException {
         StringBuilder str = new StringBuilder();
         int count = 0;
         for( String s : userManager.getOnlineUsers()){
@@ -187,9 +284,11 @@ public class SocketHandler implements Runnable{
         }
         if(count == 0){
             printWriter.println("You are currently the only logged on user.");
+            return count;
         } else {
             str = str.deleteCharAt(str.length()-2);
             printWriter.println(str.toString());
+            return count;
         }
     }
 
@@ -212,31 +311,38 @@ public class SocketHandler implements Runnable{
         }
     }
 
-    private void buyResource(ArrayList<String> data) throws IOException {
+    private int buyResource(ArrayList<String> data) throws IOException {
         String username = data.get(2);
         int resourceID = Integer.parseInt(data.get(3));
         int quantity = Integer.parseInt(data.get(4));
         int cost = marketplace.calculateTotalCost(quantity, resourceID);
-        boolean marketResponse = marketplace.removeResourceFromMarket(resourceID, quantity);
-        if(marketResponse){
-            int userResponse = userManager.deductFunds(username,cost);
-            switch(userResponse){
-                case -2:
-                    printWriter.println("You do not have enough funds for this transaction!");
-                    break;
-                case -1:
-                    printWriter.println(username + " doesn't exist.");
-                    break;
-                default:
-                    userManager.addResource(resourceID, quantity, username);
-                    printWriter.println("You have bought " + quantity + " " + marketplace.getResourceDetails(resourceID).getName() + " for " + cost);
-                    break;
-
-            }
+        if (cost == -1) {
+            System.out.println("Error");
+            System.out.println("Invalid market resource id provided");
+            return -1;
+        }
+        int userResponse = userManager.validateUserAndFunds(username, cost);
+        if (userResponse == -2) {
+            printWriter.println("You do not have enough funds for this transaction!");
+            return -1;
+        } else if (userResponse == -1){
+            printWriter.println(username + " doesn't exist.");
+            return -1;
         } else {
-            printWriter.println("The Marketplace does not have that much " + marketplace.getResourceDetails(resourceID).getName() +"!");
+            boolean marketResponse = marketplace.removeResourceFromMarket(resourceID, quantity);
+            if (marketResponse){
+                userManager.deductFunds(username, cost);
+                userManager.addResource(resourceID, quantity, username);
+                printWriter.println("You have bought " + quantity + " " + marketplace.getResourceDetails(resourceID).getName() + " for " + cost);
+                return 0;
+            } else {
+                printWriter.println("The Marketplace does not have that much " + marketplace.getResourceDetails(resourceID).getName() +"!");
+                return  -1;
+            }
         }
     }
+
+
 
     private void sellResource(ArrayList<String> data) throws IOException {
         String username = data.get(2);

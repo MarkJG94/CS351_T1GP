@@ -48,6 +48,24 @@ public class UserManager {
     }
 
 
+    public int validateUserAndFunds(String username, int amount) {
+        Object lock0;
+        User u = getUser( username );
+        if (u != null)
+        {
+            lock0 = u;
+            synchronized ( lock0 )
+            {
+                if(u.validateCurrency(amount))
+                {
+                    return 0;
+                }
+                return -2;
+            }
+        }
+        return -1;
+    }
+
     public int deductFunds(String username, int amount) {
         Object lock0;
         User u = getUser( username );

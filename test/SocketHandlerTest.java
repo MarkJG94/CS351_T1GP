@@ -71,30 +71,31 @@ public class SocketHandlerTest {
         socketHandler = new SocketHandler(socket, userManager, marketplace);
         printWriter = new PrintWriter( socket.getOutputStream(), true );
 
-        socketHandler.runTest(userOne);
+
+    }
+
+    @Test
+    public void givenInvalidCommandThenMenuReturnsFalse() throws IOException {
+        assertEquals(-1, socketHandler.runTest("User One", "password", "Invenztttory-Marketplace"));
 
     }
 
     @Test
     public void givenValidCommandThenGetUserInventory() throws IOException {
-        command.add(inventory);
-        command.add(marketPlace);
+        assertEquals(0, socketHandler.runTest("User One", "password", "Inventory-User One"));
 
-        assertEquals(true, socketHandler.getInventory(command));
+        assertEquals(1000, userManager.getUser("User One").userResources.get(0).getQuantity());
+        assertEquals(100, userManager.getUser("User One").userResources.get(1).getQuantity());
+        assertEquals(10, userManager.getUser("User One").userResources.get(2).getQuantity());
+        assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
+        assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
 
-        assertEquals(1000, userList.get(0).userResources.get(0).getQuantity());
-        assertEquals(100, userList.get(0).userResources.get(1).getQuantity());
-        assertEquals(10, userList.get(0).userResources.get(2).getQuantity());
-        assertEquals(5, userList.get(0).userResources.get(3).getQuantity());
-        assertEquals(1, userList.get(0).userResources.get(4).getQuantity());
     }
 
     @Test
     public void givenValidCommandThenGetMarketInventory() throws IOException {
-        command.add(inventory);
-        command.add(marketPlace);
+        assertEquals(0, socketHandler.runTest("User One", "password", "Inventory-Marketplace"));
 
-        assertEquals(true, socketHandler.getInventory(command));
 
         assertEquals(10000, marketplace.getResourceDetails(1).getQuantity());
         assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
@@ -102,31 +103,108 @@ public class SocketHandlerTest {
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
-//
-//    @Test
-//    public void givenInvalidCommandThenParseCommandReturnsFalse() {
-//        String command = "Inventorry-Marketplace";
-//
-//        assertEquals(false, socketHandler.parseCommand("User One", printWriter, command));
-//    }
-//
-//    @Test
-//    public void givenValidCommandThenGetBuyItems() {
-//        String command = "Buy-Marketplace-10-4";
-//
-//        assertEquals(true, socketHandler.parseCommand("User One", printWriter, command));
-//
-//        assertEquals(1000, userList.get(0).userResources.get(0).getQuantity());
-//        assertEquals(100, userList.get(0).userResources.get(1).getQuantity());
-//        assertEquals(10, userList.get(0).userResources.get(2).getQuantity());
-//        assertEquals(11, userList.get(0).userResources.get(3).getQuantity());
-//        assertEquals(4900, userList.get(0).getFunds());
-//
-//        assertEquals(2000, marketplace.getResourceDetails(1).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(3).getQuantity());
-//        assertEquals(990, marketplace.getResourceDetails(4).getQuantity());
-//    }
+
+    @Test
+    public void givenValidCommandThenReturnOtherOnlineUsers() throws IOException {
+        assertEquals(0, socketHandler.runTest("User One", "password", "Users-User One"));
+
+    }
+
+    @Test
+    public void givenMultipleOnlineUsersThenReturnOtherOnlineUsers() throws IOException {
+        socketHandler.runTest("User Two", "password", "Users-User One");
+        socketHandler.runTest("User Three", "password", "Users-User One");
+        assertEquals(2, socketHandler.runTest("User One", "password", "Users-User One"));
+
+    }
+
+    @Test
+    public void givenValidCommandThenBuyItems() {
+        String command = "Buy-Marketplace-User One-2-10";
+
+        assertEquals(0, socketHandler.runTest("User One", "password", command));
+
+        assertEquals(1000, userManager.getUser("User One").userResources.get(0).getQuantity());
+        assertEquals(110, userManager.getUser("User One").userResources.get(1).getQuantity());
+        assertEquals(10, userManager.getUser("User One").userResources.get(2).getQuantity());
+        assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
+        assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
+        assertEquals(4980, userManager.getUser("User One").getFunds());
+
+
+        assertEquals(10000, marketplace.getResourceDetails(1).getQuantity());
+        assertEquals(990, marketplace.getResourceDetails(2).getQuantity());
+        assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
+        assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
+        assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+    }
+
+    @Test
+    public void givenInValidResourceIdThenBuyItemsReturnsError() {
+        String command = "Buy-Marketplace-User One-8-10";
+
+        assertEquals(-1, socketHandler.runTest("User One", "password", command));
+
+        assertEquals(1000, userManager.getUser("User One").userResources.get(0).getQuantity());
+        assertEquals(100, userManager.getUser("User One").userResources.get(1).getQuantity());
+        assertEquals(10, userManager.getUser("User One").userResources.get(2).getQuantity());
+        assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
+        assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
+        assertEquals(5000, userManager.getUser("User One").getFunds());
+
+
+        assertEquals(10000, marketplace.getResourceDetails(1).getQuantity());
+        assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
+        assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
+        assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
+        assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+    }
+
+    @Test
+    public void givenInsufficientResourceQuantityThenBuyItemsReturnsError() {
+        String command = "Buy-Marketplace-User One-2-1100";
+
+        assertEquals(-1, socketHandler.runTest("User One", "password", command));
+
+        assertEquals(1000, userManager.getUser("User One").userResources.get(0).getQuantity());
+        assertEquals(100, userManager.getUser("User One").userResources.get(1).getQuantity());
+        assertEquals(10, userManager.getUser("User One").userResources.get(2).getQuantity());
+        assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
+        assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
+        assertEquals(5000, userManager.getUser("User One").getFunds());
+
+
+        assertEquals(10000, marketplace.getResourceDetails(1).getQuantity());
+        assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
+        assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
+        assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
+        assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+    }
+
+    @Test
+    public void givenInsufficientUserFundsThenBuyItemsReturnsError() {
+        String command = "Buy-Marketplace-User Two-1-200";
+
+        assertEquals(-1, socketHandler.runTest("User Two", "password", command));
+
+        assertEquals(1000, userManager.getUser("User Two").userResources.get(0).getQuantity());
+        assertEquals(100, userManager.getUser("User Two").userResources.get(1).getQuantity());
+        assertEquals(10, userManager.getUser("User Two").userResources.get(2).getQuantity());
+        assertEquals(5, userManager.getUser("User Two").userResources.get(3).getQuantity());
+        assertEquals(1, userManager.getUser("User Two").userResources.get(4).getQuantity());
+        assertEquals(100, userManager.getUser("User Two").getFunds());
+
+
+        assertEquals(10000, marketplace.getResourceDetails(1).getQuantity());
+        assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
+        assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
+        assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
+        assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+    }
+
+
+
+
 //
 //    @Test
 //    public void givenInvalidCommandThenGetBuyItemsReturnsFalse() {
@@ -145,60 +223,9 @@ public class SocketHandlerTest {
 //        assertEquals(1000, marketplace.getResourceDetails(3).getQuantity());
 //        assertEquals(1000, marketplace.getResourceDetails(4).getQuantity());
 //    }
-//
-//    @Test
-//    public void givenInvalidResourceIdThenGetBuyItemsReturnsFalse() {
-//        String command = "Buy-Marketplace-10-9";
-//
-//        assertEquals(false, socketHandler.parseCommand("User One", printWriter, command));
-//
-//        assertEquals(1000, userList.get(0).userResources.get(0).getQuantity());
-//        assertEquals(100, userList.get(0).userResources.get(1).getQuantity());
-//        assertEquals(10, userList.get(0).userResources.get(2).getQuantity());
-//        assertEquals(1, userList.get(0).userResources.get(3).getQuantity());
-//        assertEquals(5000, userList.get(0).getFunds());
-//
-//        assertEquals(2000, marketplace.getResourceDetails(1).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(3).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(4).getQuantity());
-//    }
-//
-//    @Test
-//    public void givenInsufficientResourcesThenGetBuyItemsReturnsFalse() {
-//        String command = "Buy-Marketplace-1001-2";
-//
-//        assertEquals(false, socketHandler.parseCommand("User One", printWriter, command));
-//
-//        assertEquals(1000, userList.get(0).userResources.get(0).getQuantity());
-//        assertEquals(100, userList.get(0).userResources.get(1).getQuantity());
-//        assertEquals(10, userList.get(0).userResources.get(2).getQuantity());
-//        assertEquals(1, userList.get(0).userResources.get(3).getQuantity());
-//        assertEquals(5000, userList.get(0).getFunds());
-//
-//        assertEquals(2000, marketplace.getResourceDetails(1).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(3).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(4).getQuantity());
-//    }
-//
-//    @Test
-//    public void givenInsufficientCurrencyThenGetBuyItemsReturnsFalse() {
-//        String command = "Buy-Marketplace-999-4";
-//
-//        assertEquals(false, socketHandler.parseCommand("User One", printWriter, command));
-//
-//        assertEquals(1000, userList.get(0).userResources.get(0).getQuantity());
-//        assertEquals(100, userList.get(0).userResources.get(1).getQuantity());
-//        assertEquals(10, userList.get(0).userResources.get(2).getQuantity());
-//        assertEquals(1, userList.get(0).userResources.get(3).getQuantity());
-//        assertEquals(5000, userList.get(0).getFunds());
-//
-//        assertEquals(2000, marketplace.getResourceDetails(1).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(3).getQuantity());
-//        assertEquals(1000, marketplace.getResourceDetails(4).getQuantity());
-//    }
+
+
+
 //
 //    @Test
 //    public void givenValidCommandThenParseCommandTransfersCurrency() {

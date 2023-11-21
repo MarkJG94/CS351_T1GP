@@ -45,7 +45,7 @@ public class Marketplace
                 lock0 = r;
                 synchronized ( lock0 )
                 {
-                    if ( ( r.getQuantity() - quantity ) < 0 )
+                    if ( ( r.getQuantity() < quantity ) )
                     {
                         return false;
                     }
@@ -87,7 +87,7 @@ public class Marketplace
     
     public int getResourceIndex( int resourceID )
     {
-        if ( ( resourceID - 1 ) >= 0 )
+        if ( ( resourceID - 1 ) >= 0 && resourceID -1 <= marketResources.size() )
         {
             return resourceID - 1;
         }
