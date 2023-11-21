@@ -76,7 +76,7 @@ public class Marketplace
         if ( quantity > 0 )
         {
             int resourceIndex = getResourceIndex( resourceID );
-            if ( resourceIndex == -1 )
+            if ( resourceIndex == -1)
             {
                 return -1;
             }
