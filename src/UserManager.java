@@ -2,15 +2,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 public class UserManager {
     private ArrayList<User> userList;
     public HashMap<User,Socket> socketUserMap;
+    ArrayList<Resource> marketResources = new ArrayList<Resource>();
 
     UserManager(ArrayList<User> ul){
         this.userList = ul;
         socketUserMap = new HashMap<>();
+
     }
 
     public User getUser(String username){
@@ -98,7 +102,7 @@ public class UserManager {
         if(getUser(destination) == null){
             return -2;
         }
-        
+
         if(deductFunds(source,amount) >= 0){
             addFunds(destination,amount);
             notifyUser(source,destination,amount);

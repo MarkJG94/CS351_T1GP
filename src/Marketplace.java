@@ -2,14 +2,14 @@ import java.util.ArrayList;
 
 public class Marketplace
 {
-    
+
     ArrayList<Resource> marketResources;
-    
+
     public Marketplace( ArrayList<Resource> resourceList )
     {
         this.marketResources = resourceList;
     }
-    
+
     public boolean addResourceToMarket( int resourceID, int quantity )
     {
         Object lock0;
@@ -31,7 +31,7 @@ public class Marketplace
         /*Can't add negative number*/
         return false;
     }
-    
+
     public boolean removeResourceFromMarket( int resourceID, int quantity )
     {
         Object lock0;
@@ -56,7 +56,7 @@ public class Marketplace
         }
         return false;
     }
-    
+
     public int calculateTotalCost( int quantity, int resourceID )
     {
         if ( quantity > 0 )
@@ -70,7 +70,7 @@ public class Marketplace
         }
         return -1;
     }
-    
+
     public int calculateTotalValue( int quantity, int resourceID )
     {
         if ( quantity > 0 )
@@ -84,7 +84,7 @@ public class Marketplace
         }
         return -1;
     }
-    
+
     public int getResourceIndex( int resourceID )
     {
         if ( ( resourceID - 1 ) >= 0 && resourceID -1 <= marketResources.size() )
@@ -93,7 +93,7 @@ public class Marketplace
         }
         return -1;
     }
-    
+
     public int getResourceQuantity( int resourceID )
     {
         Object lock0;
@@ -110,7 +110,7 @@ public class Marketplace
         }
         return -1;
     }
-    
+
     public Resource getResourceDetails( int resourceID )
     {
         int resourceIndex = getResourceIndex( resourceID );
@@ -123,13 +123,13 @@ public class Marketplace
             return null;
         }
     }
-    
+
     public ArrayList<Resource> getMarketResources()
     {
-        
+
         return marketResources;
     }
-    
+
     public Resource getResource( int resourceIndex )
     {
         Resource r = marketResources.get( resourceIndex );
@@ -140,4 +140,3 @@ public class Marketplace
         return null;
     }
 }
-
