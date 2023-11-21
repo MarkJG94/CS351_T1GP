@@ -1,11 +1,18 @@
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Array;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class UserManager {
     private ArrayList<User> userList;
+    public HashMap<User,Socket> socketUserMap;
 
     UserManager(ArrayList<User> ul){
         this.userList = ul;
+        socketUserMap = new HashMap<>();
     }
 
     public User getUser(String username){
@@ -15,6 +22,16 @@ public class UserManager {
             }
         }
         return null;
+    }
+
+    public boolean addUser(String username, String password, ArrayList<Resource> resources){
+        try {
+            User newUser = new User(username, password, resources);
+            userList.add(newUser);
+        } catch (Exception e){
+            return false;
+        }
+        return true;
     }
 
     public int addFunds(String username, int amount) {
@@ -44,9 +61,13 @@ public class UserManager {
         return -1;
     }
 
-    public int transferFunds(String source, String destination, int amount){
+    public int transferFunds(String source, String destination, int amount) throws IOException {
+        if(getUser(destination) == null){
+            return -2;
+        }
         if(deductFunds(source,amount) >= 0){
             addFunds(destination,amount);
+            notifyUser(source,destination,amount);
             return 1;
         }
         return -1;
@@ -88,4 +109,29 @@ public class UserManager {
         return false;
     }
 
+    public ArrayList<User> getUserList() {
+        return userList;
+    }
+
+    public void assignToSocket(Socket s, String u){
+        socketUserMap.put(getUser(u), s);
+    }
+
+    public void notifyUser(String source, String destination, int amount) throws IOException {
+        User u = getUser(destination);
+        if(socketUserMap.containsKey(u)){
+            Socket s = socketUserMap.get(u);
+            PrintWriter printWriter = new PrintWriter( s.getOutputStream(), true );
+            printWriter.println("IMPORTANT" + source + " has sent you " + amount + " Funds");
+        }
+    }
+
+    public void notifyUser(String source, String destination, int amount, String resource) throws IOException {
+        User u = getUser(destination);
+        if(socketUserMap.containsKey(u)){
+            Socket s = socketUserMap.get(u);
+            PrintWriter printWriter = new PrintWriter( s.getOutputStream(), true );
+            printWriter.println("IMPORTANT" + source + " has sent you " + amount + " " + resource);
+        }
+    }
 }

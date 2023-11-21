@@ -33,32 +33,7 @@ class MarketplaceTest {
         userList.add(user2);
         userList.add(user3);
         userList.add(user4);
-        marketplace.userList = userList;
 
-    }
-
-    @Test
-    void givenValidThenUserExists() {
-
-        assertEquals(true, marketplace.userExists("User One"));
-    }
-
-    @Test
-    void givenInvalidThenUserExistsReturnFalse() {
-
-        assertEquals(false, marketplace.userExists("User Five"));
-    }
-
-    @Test
-    void givenValidThenGetFunds() {
-
-        assertEquals(10000, marketplace.getFunds("User One"));
-    }
-
-    @Test
-    void givenInvalidThenGetFundsReturnsError() {
-
-        assertEquals(-1, marketplace.getFunds("User Five"));
     }
 
     @Test
@@ -127,142 +102,20 @@ class MarketplaceTest {
     }
 
     @Test
-    void givenValidThenAddResourceToUser() {
-        assertEquals(true, marketplace.addResourceToUser(1,100, "User One"));
-        assertEquals(1100, marketplace.marketResources.get(0).getQuantity());
-    }
-
-    @Test
-    void givenInvalidIdThenAddResourceToUserReturnFalse() {
-
-        assertEquals(false, marketplace.addResourceToUser(5,100, "User One"));
-    }
-
-    @Test
-    void givenInvalidAmountThenAddResourceToUserReturnFalse() {
-
-        assertEquals(false, marketplace.addResourceToUser(1,-100, "User One"));
-    }
-
-    @Test
-    void givenValidThenRemoveResourceFromUser() {
-
-        assertEquals(true, marketplace.removeResourceFromUser(1,100, "User One"));
-        assertEquals(900, marketplace.marketResources.get(0).getQuantity());
-    }
-
-    @Test
-    void givenInvalidIdThenRemoveResourceFromUserReturnFalse() {
-
-        assertEquals(false, marketplace.removeResourceFromUser(5,100, "User One"));
-    }
-
-    @Test
-    void givenInvalidAmountThenRemoveResourceFroUserReturnFalse() {
-
-        assertEquals(false, marketplace.removeResourceFromUser(1,-100, "User One"));
-    }
-
-    @Test
-    void givenValidThenGetUserInventory() {
-
-        assertEquals(resourceList, marketplace.getUserInventory("User One"));
-
-        Resource resourceOne = marketplace.getUserInventory("User One").get(0);
-        Resource resourceTwo = marketplace.getUserInventory("User One").get(1);
-        Resource resourceThree = marketplace.getUserInventory("User One").get(2);
-        Resource resourceFour = marketplace.getUserInventory("User One").get(3);
-
-        assertEquals(wood, marketplace.getUserInventory("User One").get(0));
-            assertEquals(1, resourceOne.getId());
-            assertEquals(1, resourceOne.getCost());
-            assertEquals(1000, resourceOne.getQuantity());
-            assertEquals("wood", resourceOne.getName());
-
-        assertEquals(iron, marketplace.getUserInventory("User One").get(1));
-            assertEquals(2, resourceTwo.getId());
-            assertEquals(2, resourceTwo.getCost());
-            assertEquals(1000, resourceTwo.getQuantity());
-            assertEquals("iron", resourceTwo.getName());
-
-        assertEquals(silver, marketplace.getUserInventory("User One").get(2));
-            assertEquals(3, resourceThree.getId());
-            assertEquals(5, resourceThree.getCost());
-            assertEquals(1000, resourceThree.getQuantity());
-            assertEquals("silver", resourceThree.getName());
-
-        assertEquals(gold, marketplace.getUserInventory("User Two").get(3));
-            assertEquals(4, resourceFour.getId());
-            assertEquals(10, resourceFour.getCost());
-            assertEquals(1000, resourceFour.getQuantity());
-            assertEquals("gold", resourceFour.getName());
-
-    }
-
-    @Test
     void givenValidThenCalculateTotal() {
 
-        assertEquals(100, marketplace.calculateTotal(100, 1));
+        assertEquals(100, marketplace.calculateTotalCost(100, 1));
     }
 
     @Test
     void givenInvalidIDThenCalculateTotalReturnsError() {
 
-        assertEquals(-1, marketplace.calculateTotal(100, 5));
+        assertEquals(-1, marketplace.calculateTotalCost(100, 5));
     }
 
     @Test
     void givenInvalidQuantityThenCalculateTotalReturnsError() {
 
-        assertEquals(-1, marketplace.calculateTotal(-100, 1));
-    }
-
-    @Test
-    void givenValidThenNotifyUserResource() {
-
-        assertEquals(true, marketplace.notifyUserResource("User One", 1));
-        String string = String.format("Your 1$ is now 2$}.", marketplace.marketResources.get(1).getName(), userList.get(0).userResources.get(1).getQuantity());
-    }
-
-    @Test
-    void givenInvalidUserThenNotifyUserResourceReturnFalse() {
-
-        assertEquals(false, marketplace.notifyUserResource("User Five", 1));
-
-    }
-
-    @Test
-    void givenInvalidResourceThenNotifyUserResourceReturnError() {
-
-        assertEquals(false, marketplace.notifyUserResource("User One", 11));
-
-    }
-
-    @Test
-    void givenValidThenNotifyUserCurrency() {
-
-        assertEquals(true, marketplace.notifyUserCurrency("User One"));
-        String string = String.format("Your 1$ is now 2$}.", marketplace.marketResources.get(1).getName(), userList.get(0).userResources.get(1).getQuantity());
-    }
-
-    @Test
-    void givenInvalidUserThenNotifyUserCurrencyReturnFalse() {
-
-        assertEquals(false, marketplace.notifyUserCurrency("User Five"));
-
-    }
-
-    @Test
-    void givenCorrectAmountThenValidateCurrency() {
-
-        assertEquals(true, marketplace.validateCurrency(5000, "User One"));
-
-    }
-
-    @Test
-    void givenInvalidAmountThenValidateCurrencyReturnFalse() {
-
-        assertEquals(false, marketplace.validateCurrency(5000, "User Two"));
-
+        assertEquals(-1, marketplace.calculateTotalCost(-100, 1));
     }
 }

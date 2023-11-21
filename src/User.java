@@ -14,11 +14,18 @@ public class User {
     int funds;
 
     public User(String username, String password, ArrayList<Resource> userResources){
+
         this.username = username.toLowerCase(Locale.ROOT);
         this.password = password;
-        this.userResources = userResources;
         funds = 1000;
         this.status = false;
+        ArrayList<Resource> defaultResources = new ArrayList<>();
+        for (int i = 0; i < userResources.size();i++){
+            Resource r = new Resource(userResources.get(i).getId(),userResources.get(i).getCost(),0,userResources.get(i).getName(),userResources.get(i).getValue());
+            defaultResources.add(r);
+        }
+
+        this.userResources = defaultResources;
     }
 
     public User(String username, String password, ArrayList<Resource> userResources, int funds){
@@ -91,19 +98,21 @@ public class User {
     }
     
     public boolean addResource(int resourceID, int quantity) {
-        if (getResourceIndex(resourceID) != -1 && (quantity > 0)){
+        int resourceIndex = getResourceIndex(resourceID);
+        if (resourceIndex != -1 && (quantity > 0)){
             int currentQuantity = getResourceQuantity(resourceID);
-            userResources.get(resourceID - 1).setQuantity(currentQuantity + quantity);
+            userResources.get(resourceIndex).setQuantity(currentQuantity + quantity);
             return true;
         }
         else return false;
     }
     
     public boolean removeResource(int resourceID, int quantity) {
-        if (getResourceIndex(resourceID) != -1 && (quantity > 0)){
+        int resourceIndex = getResourceIndex(resourceID);
+        if ( resourceIndex != -1 && (quantity > 0)){
             int currentQuantity = getResourceQuantity(resourceID);
             if(currentQuantity >= quantity) {
-                userResources.get(resourceID - 1).setQuantity(currentQuantity - quantity);
+                userResources.get(resourceIndex).setQuantity(currentQuantity - quantity);
                 return true;
             }
         }
