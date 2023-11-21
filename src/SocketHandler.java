@@ -123,8 +123,7 @@ public class SocketHandler implements Runnable{
                         case "Users":
                             return getUsers(data);
                         case "Transfer":
-                            transferFunds(data);
-                            break;
+                            return transferFunds(data);
                         case "Buy":
                             return buyResource(data);
                         case "Sell":
@@ -134,11 +133,9 @@ public class SocketHandler implements Runnable{
                         case "RemoveFunds":
                             return removeFunds(data);
                         case "AddResource":
-                            addResource(data);
-                            break;
+                            return addResource(data);
                         case "RemoveResource":
-                            removeResource(data);
-                            break;
+                            return removeResource(data);
                         case "Quit":
                             quit();
                             running = false;
@@ -289,7 +286,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
-    private void transferFunds(ArrayList<String> data) throws IOException {
+    private int transferFunds(ArrayList<String> data) throws IOException {
         String senderUsername = data.get(1);
         String receiverUsername = data.get(2);
         int amount = Integer.parseInt(data.get(3));
@@ -298,13 +295,13 @@ public class SocketHandler implements Runnable{
         switch(serverResponse){
             case -2:
                 printWriter.println(receiverUsername + " doesn't exist.");
-                break;
+                return -1;
             case -1:
                 printWriter.println("You do not have enough funds!");
-                break;
+                return -1;
             default:
                 printWriter.println(amount + " transferred successfully to " + receiverUsername);
-                break;
+                return 0;
         }
     }
 
@@ -398,9 +395,14 @@ public class SocketHandler implements Runnable{
         }
     }
 
-    private void addResource(ArrayList<String> data) throws IOException {
+    private int addResource(ArrayList<String> data) throws IOException {
         String username = data.get(1);
         int resourceID = Integer.parseInt(data.get(2));
+        if(resourceID == -1 || resourceID > marketplace.marketResources.size()){
+            System.out.println("ERROR");
+            System.out.println("Invalid resource id provided");
+            return -1;
+        }
         int quantity = Integer.parseInt(data.get(3));
 
         if(username.equals("Marketplace")){
@@ -408,24 +410,39 @@ public class SocketHandler implements Runnable{
             if(serverResponse){
                 String resourceName = marketplace.getResourceDetails(resourceID).getName();
                 printWriter.println("You have add " + quantity + " " + resourceName + " to the Marketplace");
+                return 0;
             } else {
                 printWriter.println("Unable to add resource!");
+                return -1;
             }
         } else {
+            if(userManager.getUser(username) == null){
+                System.out.println("ERROR");
+                System.out.println("Invalid username provided in command string");
+                return -1;
+            }
+
             boolean serverResponse = userManager.addResource(resourceID, quantity, username);
             if (serverResponse) {
                 String resourceName = marketplace.getResourceDetails(resourceID).getName();
                 userManager.notifyUser("Admin", username, quantity, resourceName);
                 printWriter.println("You have given " + username + " " + quantity + " " + resourceName);
+                return 0;
             } else {
                 printWriter.println(username + " does not exist!");
+                return -1;
             }
         }
     }
 
-    private void removeResource(ArrayList<String> data) throws IOException {
+    private int removeResource(ArrayList<String> data) throws IOException {
         String username = data.get(1);
         int resourceID = Integer.parseInt(data.get(2));
+        if(resourceID == -1 || resourceID > marketplace.marketResources.size()){
+            System.out.println("ERROR");
+            System.out.println("Invalid resource id provided");
+            return -1;
+        }
         int quantity = Integer.parseInt(data.get(3));
         String resourceName = marketplace.getResourceDetails(resourceID).getName();
 
@@ -433,16 +450,25 @@ public class SocketHandler implements Runnable{
             boolean serverResponse = marketplace.removeResourceFromMarket(resourceID, quantity);
             if(serverResponse){
                 printWriter.println("You have removed " + quantity + " " + resourceName + " from the Marketplace");
+                return 0;
             } else {
                 printWriter.println("You cannot remove that much " + resourceName);
+                return -1;
             }
         } else {
+            if(userManager.getUser(username) == null){
+                System.out.println("ERROR");
+                System.out.println("Invalid username provided in command string");
+                return -1;
+            }
             boolean serverResponse = userManager.removeResource(resourceID, quantity, username);
             if (serverResponse) {
                 userManager.notifyUser("Admin", username, (quantity * -1), resourceName);
                 printWriter.println("Removed " + quantity + " " + resourceName + " from " + username);
+                return 0;
             } else {
                 printWriter.println(username + " does not exist!");
+                return -1;
             }
         }
     }
@@ -457,143 +483,3 @@ public class SocketHandler implements Runnable{
         }
     }
 }
-
-
-
-////My STUFF!!!!
-//
-//
-//
-//            if (userExists)
-//                    {
-//                    userManager.setUserStatus(username,true);
-//                    while(true){
-//                    String command = scanner.nextLine();
-//                    parseCommand(username, printWriter, command);
-//                    }
-//                    }
-//                    else
-//                    {
-//                    printWriter.println("Denied");
-//                    socket.close();
-//                    }
-//                    } catch (IOException e)
-//                    {
-//                    e.printStackTrace();
-//                    }
-//                    }
-//
-//
-//public boolean parseCommand(String username, PrintWriter printWriter, String command){
-//        ArrayList<String> data = new ArrayList<>(Arrays.asList(command.split("-")));
-//        switch(data.get(0)){
-//        case "Inventory":
-//        if(data.get(1).equals("Marketplace")){
-//        StringBuilder s = new StringBuilder();
-//        for (Resource resource:marketplace.marketResources) {
-//        s.append(resource.getName()).append(": ").append(resource.getQuantity()).append("`");
-//        }
-//        String t = s.toString();
-//        printWriter.println(t);
-//        return true;
-//        } else if (marketplace.userExists(data.get(1))){
-//        User u = userManager.getUser(data.get(1));
-//        ArrayList<Resource> rl = u.getUserInventory();
-//        StringBuilder s = new StringBuilder();
-//        s.append("Currency: ").append(u.getFunds()).append("`");
-//        for(Resource r:rl){
-//        s.append(r.getName()).append(": ").append(r.getQuantity()).append("`");
-//        }
-//        String t = s.toString();
-//        printWriter.println(t);
-//        return true;
-//        } else {
-//        System.out.println("Invalid command passed.  Please check and try again");
-//        System.out.println("Invalid source given");
-//        return false;
-//        }
-//        case "Buy":
-//        if(data.get(1).equals("Marketplace")){
-//        //if resource ID is in marketResources
-//        if(Integer.parseInt(data.get(3)) <= marketplace.marketResources.size()){
-//        int amount = Integer.parseInt(data.get(2));
-//        int resourceId = Integer.parseInt(data.get(3));
-//        int total = marketplace.getResourceDetails(resourceId).getCost() * amount;
-//        //If marketplace contains enough of the resource to sell
-//        if(Integer.parseInt(data.get(2)) <= marketplace.getResourceQuantity(resourceId)){
-//        //if User has enough money
-//        if(userManager.getUser(username).getFunds() >= total){
-//        marketplace.removeResourceFromMarket(resourceId, amount);
-//        userManager.addResource(resourceId, amount, username);
-//
-//        userManager.deductFunds(username, total);
-//        return true;
-//        } else {
-//        System.out.println("Invalid command passed.  Please check and try again");
-//        System.out.println("Invalid currency available in user account");
-//        return false;
-//        }
-//        } else {
-//        System.out.println("Invalid command passed.  Please check and try again");
-//        System.out.println("Invalid resource amount available");
-//        return false;
-//        }
-//
-//        } else {
-//        System.out.println("Invalid command passed.  Please check and try again");
-//        System.out.println("Invalid resourceId given");
-//        return false;
-//        }
-//
-//        } else {
-//        System.out.println("Invalid command passed.  Please check and try again");
-//        System.out.println("Invalid source given");
-//        return false;
-//        }
-//        case "Sell":
-//        break;
-//        case "Transfer":
-//        User sender = userManager.getUser(data.get(1));
-//        User receiver = userManager.getUser(data.get(2));
-//
-//        if(receiver == null){
-//        printWriter.println("Invalid recipient!  Please check destination user and try again");
-//        return false;
-//        }
-//        int amount = Integer.parseInt(data.get(3));
-//        if(sender.validateCurrency(amount)){
-//        if(userManager.transferFunds(sender.getUsername(),receiver.getUsername(),amount) < 1){
-//        printWriter.println("An error has occurred");
-//        return false;
-//        } else {
-//        printWriter.println(amount + " transferred successfully to " + receiver.getUsername());
-//        printWriter.println("Your currency is now " + sender.getFunds());
-//        return true;
-//        }
-//        } else {
-//        printWriter.println("You do not have enough funds!");
-//        return false;
-//        }
-//        case "Users":
-//        StringBuilder str = new StringBuilder();
-//        int count = 0;
-//        for( String s : userManager.getOnlineUsers()){
-//        if(!s.equals(data.get(1))){
-//        str.append(s).append(", ");
-//        count++;
-//        }
-//        }
-//        if(count == 0){
-//        printWriter.println("You are currently the only logged on user.");
-//        return true;
-//        } else {
-//        str = str.deleteCharAt(str.length()-2);
-//        printWriter.println(str.toString());
-//        }
-//        break;
-//        case "Quit":
-//        userManager.setUserStatus(username,false);
-//        break;
-//        }
-//        return false;
-

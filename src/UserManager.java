@@ -47,6 +47,15 @@ public class UserManager {
         return -1;
     }
 
+    public int validateUser(String username) {
+        Object lock0;
+        User u = getUser( username );
+        if (u == null)
+        {
+            return -1;
+        }
+        return 0;
+    }
 
     public int validateUserAndFunds(String username, int amount) {
         Object lock0;
