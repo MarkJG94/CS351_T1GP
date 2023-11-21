@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -19,12 +18,10 @@ public class Client extends InputReader{
         inputReader = new InputReader();
     }
 
-
     public void runClient() throws IOException, NotBoundException {
         String response;
 
         startServerResponseQueue();
-
 
         while (true) {
             System.out.println("Select an option:");
@@ -61,6 +58,8 @@ public class Client extends InputReader{
                 printWriter.println(password);
                 if (password.contains(",")) {
                     System.out.println("Password cannot contain ','. Please try again.");
+                } else if (password.equalsIgnoreCase("marketplace")) {
+                    System.out.println("Invalid password. Please try again.");
                 } else if (retrieveResponse().equals("success")) {
                     System.out.println("User successfully created");
                     break;
