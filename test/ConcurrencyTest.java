@@ -384,55 +384,62 @@ public class ConcurrencyTest
         serverThread.start();
         Thread thread1 = new Thread( () ->
                                      {
-                                         String command = "Sell-Marketplace-UserOne-1-10";
-                                         ArrayList<String> data =
-                                                 new ArrayList<>( Arrays.asList( command.split( "-" ) ) );
-                                         try
-                                         {
-                                             socketHandler.sellResource( data );
-                                         }
-                                         catch ( IOException e )
-                                         {
-                                             throw new RuntimeException( e );
-                                         }
+                                         userManager.removeResource( 1, 10, userOne );
+                                         marketplace.addResourceToMarket( 1, 10 );
+                                         userManager.addFunds( userOne, 10 );
                                          count.countDown();
                                      } );
         thread1.start();
         
-//        Thread thread2 = new Thread( () ->
-//                                     {
-//                                         userManager.removeResource( 2, 5, userTwo );
-//                                         count.countDown();
-//                                     } );
-//        thread2.start();
-//
-//        Thread thread3 = new Thread( () ->
-//                                     {
-//                                         userManager.removeResource( 3, 1, userThree );
-//                                         count.countDown();
-//                                     } );
-//        thread3.start();
+        Thread thread2 = new Thread( () ->
+                                     {
+                                         userManager.removeResource( 1, 15, userTwo );
+                                         marketplace.addResourceToMarket( 1, 15 );
+                                         userManager.addFunds( userTwo, 15 );
+                                         count.countDown();
+                                     } );
+        thread2.start();
+
+        Thread thread3 = new Thread( () ->
+                                     {
+                                         userManager.removeResource( 2, 10, userThree );
+                                         marketplace.addResourceToMarket( 2, 10 );
+                                         userManager.addFunds( userThree, 20 );
+                                         count.countDown();
+                                     } );
+        thread3.start();
         
         try
         {
             count.await();
             //User One
-            assertEquals( 4990, userManager.getUser( userOne ).getFunds() );
-            assertEquals( 1010, userManager.getUser( userOne ).getResourceQuantity( 1 ) );
+            assertEquals( 5010, userManager.getUser( userOne ).getFunds() );
+            assertEquals( 990, userManager.getUser( userOne ).getResourceQuantity( 1 ) );
+            
+            //User Two
+            assertEquals( 115, userManager.getUser( userTwo ).getFunds() );
+            assertEquals( 985, userManager.getUser( userTwo ).getResourceQuantity( 1 ) );
+            
+            //User Three
+            assertEquals( 10020, userManager.getUser( userThree ).getFunds() );
+            assertEquals( 90, userManager.getUser( userThree ).getResourceQuantity( 2 ) );
+            
             //Marketplace assertions
-            assertEquals( 10010, marketplace.getResourceQuantity( 1 ) );
+            assertEquals( 10025, marketplace.getResourceQuantity( 1 ) );
+            assertEquals( 1010, marketplace.getResourceQuantity( 2 ) );
         }
         catch ( InterruptedException e )
         {
             e.printStackTrace();
         }
         
+        
         // stop all threads
         server.serverSocket.close();
         serverThread.interrupt();
         thread1.interrupt();
-        //thread2.interrupt();
-        //thread3.interrupt();
+        thread2.interrupt();
+        thread3.interrupt();
     }
     
     
