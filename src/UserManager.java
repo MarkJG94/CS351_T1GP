@@ -9,7 +9,7 @@ import java.util.List;
 public class UserManager {
     private ArrayList<User> userList;
     public HashMap<User,Socket> socketUserMap;
-
+    
     UserManager(ArrayList<User> ul){
         this.userList = ul;
         socketUserMap = new HashMap<>();
@@ -133,9 +133,11 @@ public class UserManager {
 
     public boolean addResource(int resourceID, int quantity, String username) {
         Object lock0;
+        
         if (quantity > 0){
             User u = getUser(username);
             lock0 = u;
+            
             synchronized ( lock0 )
             {
                 u.addResource(resourceID,quantity);
@@ -147,7 +149,7 @@ public class UserManager {
 
     public boolean removeResource(int resourceID, int quantity, String username) {
         Object lock0;
-        if (quantity > 0){
+        if (quantity > 0 ){
             User u = getUser(username);
             lock0 = u;
             synchronized ( lock0 )
@@ -158,6 +160,8 @@ public class UserManager {
         return false;
     }
 
+    
+    
     public ArrayList<User> getUserList() {
         return userList;
     }
