@@ -23,6 +23,10 @@ public class Server implements Runnable {
     private UserManager userManager;
     private ArrayList<Socket> clients;
 
+    Administrator administrator;
+    Thread adminThread;
+    Thread server;
+
     Server() throws IOException
     {
         serverSocket = new ServerSocket(11000);
@@ -45,10 +49,10 @@ public class Server implements Runnable {
         try {
             System.out.println("server running");
             System.out.println();
-            Administrator administrator = new Administrator();
-            Thread adminThread = new Thread(administrator);
+            administrator = new Administrator();
+            adminThread = new Thread(administrator);
             threadpool.submit(adminThread);
-            Thread server = new Thread(this::runServer);
+            server = new Thread(this::runServer);
             server.start();
             while(true){
                 sleep(1000);
@@ -90,15 +94,13 @@ public class Server implements Runnable {
             for(Socket s : clients){
                 if(!s.isClosed()){
                     PrintWriter pw =  new PrintWriter(s.getOutputStream(), true);
+                    pw.println("IMPORTANTServer is now Offline");
                     pw.println("Server Offline");
                 }
             }
             sleep(1000);
 
-            adminThread.interrupt();
-            server.interrupt();
-            threadpool.shutdown();
-            System.out.print("Goodbye");
+            quit(0);
             saveMarketFile();
             saveUserFile();
 
@@ -106,7 +108,16 @@ public class Server implements Runnable {
         }catch (IOException e){
             e.printStackTrace();
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            quit(-1);
+        }
+    }
+
+    private void quit(int i){
+        adminThread.interrupt();
+        server.interrupt();
+        threadpool.shutdown();
+        if(i == 0) {
+            System.out.print("Goodbye");
         }
     }
 
@@ -118,7 +129,7 @@ public class Server implements Runnable {
                 //create socket handler and pass to thread pool
                 threadpool.submit(new SocketHandler(client, userManager,marketPlace));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                quit(-1);
             }
         }
     }

@@ -163,20 +163,22 @@ public class ConcurrencyTest
                                          userManager.deductFunds(userTwo , 25 );
                                          count.countDown();
                                      } );
-        thread1.start();
+
         
         Thread thread2 = new Thread( () ->
                                      {
                                          userManager.deductFunds(userTwo , 25 );
                                          count.countDown();
                                      } );
-        thread2.start();
+
         
         Thread thread3 = new Thread( () ->
                                      {
                                          userManager.deductFunds(userTwo , 25 );
                                          count.countDown();
                                      } );
+        thread1.start();
+        thread2.start();
         thread3.start();
         
         try
@@ -207,20 +209,21 @@ public class ConcurrencyTest
                                          userManager.deductFunds(userTwo , 50 );
                                          count.countDown();
                                      } );
-        thread1.start();
         
         Thread thread2 = new Thread( () ->
                                      {
                                          userManager.deductFunds(userTwo , 50 );
                                          count.countDown();
                                      } );
-        thread2.start();
+
         
         Thread thread3 = new Thread( () ->
                                      {
                                          userManager.deductFunds(userTwo , 50 );
                                          count.countDown();
                                      } );
+        thread1.start();
+        thread2.start();
         thread3.start();
         
         try
@@ -234,11 +237,12 @@ public class ConcurrencyTest
         }
         
         // stop all threads
-        server.serverSocket.close();
+
         serverThread.interrupt();
         thread1.interrupt();
         thread2.interrupt();
         thread3.interrupt();
+        server.serverSocket.close();
     }
     
     // Test that the transferFunds method in UserManager is thread safe

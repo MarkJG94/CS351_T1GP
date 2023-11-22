@@ -100,7 +100,7 @@ public class UserManager {
     }
 
     public int transferFunds(String source, String destination, int amount) throws IOException {
-        if(validateUser(destination) == 0){
+        if(validateUser(destination) != 0){
             return -2;
         }
 

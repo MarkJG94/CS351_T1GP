@@ -125,9 +125,12 @@ public class Client extends InputReader{
                         messageQueue.add("Server Offline");
                         break;
                     }
-                    if(response.equals("Logging out") || response.equals("Server Offline")){
+
+                    if(response.equals("Logging out")) {
                         messageQueue.add(response);
                         break;
+                    } else if(response.equals("Server Offline")){
+                        System.exit(0);
                     } else if(response.contains("IMPORTANT")) {
                         System.out.println();
                         System.out.println(response.replace("IMPORTANT","[SERVER]: "));
@@ -426,11 +429,6 @@ public class Client extends InputReader{
 
     private String retrieveResponse(){
         while(messageQueue.size() == 0){
-        }
-        if(messageQueue.peek().equals("Server Offline")){
-            System.out.println("The server is now Offline");
-            System.out.println("Goodbye.");
-            System.exit(0);
         }
         return messageQueue.pop();
     }
