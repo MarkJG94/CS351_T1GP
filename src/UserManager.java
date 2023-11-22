@@ -44,9 +44,9 @@ public class UserManager {
             lock0 = u;
             synchronized ( lock0 )
             {
-                u.addFunds(amount);
+                u.addFunds( amount );
+                return u.getFunds();
             }
-            return u.getFunds();
         }
         return -1;
     }

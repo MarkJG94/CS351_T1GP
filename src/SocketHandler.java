@@ -336,7 +336,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
-    private int sellResource(ArrayList<String> data) throws IOException {
+    public int sellResource(ArrayList<String> data) throws IOException {
         String username = data.get(2);
         int resourceID = Integer.parseInt(data.get(3));
         int quantity = Integer.parseInt(data.get(4));
@@ -356,7 +356,14 @@ public class SocketHandler implements Runnable{
         if(serverResponse){
             marketplace.addResourceToMarket(resourceID, quantity);
             userManager.addFunds(username, value);
-            printWriter.println("You have sold " + quantity + " " + marketplace.getResourceDetails(resourceID).getName() + " for " + value);
+            try
+            {
+                printWriter.println("You have sold " + quantity + " " + marketplace.getResourceDetails(resourceID).getName() + " for " + value);
+                
+            } catch (NullPointerException e)
+            {
+            
+            }
             return 0;
         } else {
             printWriter.println("You do not have enough " + marketplace.getResourceDetails(resourceID).getName() + " for this transaction!");

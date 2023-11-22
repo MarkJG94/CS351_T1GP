@@ -58,8 +58,7 @@ public class User {
         return userResources.get(getResourceIndex( resourceID )).getQuantity();
     }
     
-    public int addFunds(int amount) {
-        
+    public synchronized int addFunds(int amount) {
         if (amount > 0 && username.equals( this.username ))
         {
             funds = funds + amount;
@@ -67,6 +66,7 @@ public class User {
         }
         return -1;
     }
+
 
     public int deductFunds(int amount) {
         if (amount > 0 && username.equals( this.username ) && validateCurrency( amount ))
