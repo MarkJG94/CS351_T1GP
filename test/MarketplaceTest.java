@@ -61,7 +61,7 @@ class MarketplaceTest {
     @Test
     void givenInvalidThenGetResourceDetailsReturnsError() {
 
-        assertEquals(-1, marketplace.getResourceQuantity(5));
+        assertEquals(-1, marketplace.getResourceQuantity(6));
     }
 
     @Test
@@ -73,7 +73,7 @@ class MarketplaceTest {
     @Test
     void givenInvalidIdThenAddResourceToMarketReturnFalse() {
 
-        assertEquals(false, marketplace.addResourceToMarket(5,100));
+        assertEquals(false, marketplace.addResourceToMarket(6,100));
     }
 
     @Test
@@ -92,7 +92,7 @@ class MarketplaceTest {
     @Test
     void givenInvalidIdThenRemoveResourceFromMarketReturnFalse() {
 
-        assertEquals(false, marketplace.removeResourceFromMarket(5,100));
+        assertEquals(false, marketplace.removeResourceFromMarket(6,100));
     }
 
     @Test
@@ -110,7 +110,7 @@ class MarketplaceTest {
     @Test
     void givenInvalidIDThenCalculateTotalReturnsError() {
 
-        assertEquals(-1, marketplace.calculateTotalCost(100, 5));
+        assertEquals(-1, marketplace.calculateTotalCost(100, 6));
     }
 
     @Test

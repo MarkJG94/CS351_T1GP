@@ -9,7 +9,6 @@ import java.util.List;
 public class UserManager {
     private ArrayList<User> userList;
     public HashMap<User,Socket> socketUserMap;
-    ArrayList<Resource> marketResources = new ArrayList<Resource>();
 
     UserManager(ArrayList<User> ul){
         this.userList = ul;
@@ -38,9 +37,10 @@ public class UserManager {
 
     public int addFunds(String username, int amount) {
         Object lock0;
-        User u = getUser( username );
-        if (u != null)
+
+        if (validateUser(username) == 0)
         {
+            User u = getUser( username );
             lock0 = u;
             synchronized ( lock0 )
             {
@@ -63,9 +63,9 @@ public class UserManager {
 
     public int validateUserAndFunds(String username, int amount) {
         Object lock0;
-        User u = getUser( username );
-        if (u != null)
+        if(validateUser(username) == 0)
         {
+            User u = getUser( username );
             lock0 = u;
             synchronized ( lock0 )
             {
@@ -81,9 +81,10 @@ public class UserManager {
 
     public int deductFunds(String username, int amount) {
         Object lock0;
-        User u = getUser( username );
-        if (u != null)
+
+        if (validateUser(username) == 0)
         {
+            User u = getUser( username );
             lock0 = u;
             synchronized ( lock0 )
             {
@@ -99,7 +100,7 @@ public class UserManager {
     }
 
     public int transferFunds(String source, String destination, int amount) throws IOException {
-        if(getUser(destination) == null){
+        if(validateUser(destination) == 0){
             return -2;
         }
 
@@ -159,6 +160,17 @@ public class UserManager {
 
     public ArrayList<User> getUserList() {
         return userList;
+    }
+    public ArrayList<Resource> getUserInventory(String username){
+        Object lock0;
+        User u = getUser(username);
+        if(u != null){
+            lock0 = u;
+            synchronized (lock0) {
+                return u.getUserInventory();
+            }
+        }
+        return null;
     }
 
     public void assignToSocket(Socket s, String u){
