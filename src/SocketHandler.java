@@ -252,17 +252,19 @@ public class SocketHandler implements Runnable{
             String t = s.toString();
             printWriter.println(t);
             return 0;
-        } else if (userManager.getUser(data.get(1)) != null){
-            User u = userManager.getUser(data.get(1));
-            ArrayList<Resource> rl = u.getUserInventory();
-            StringBuilder s = new StringBuilder();
-            s.append("Currency: ").append(u.getFunds()).append("`");
-            for(Resource r:rl){
-                s.append(r.getName()).append(": ").append(r.getQuantity()).append("`");
+        } else if (userManager.getUser(data.get(1)) != null) {
+            String username = data.get(1);
+            ArrayList<Resource> rl = userManager.getUserInventory(username);
+            if (rl != null) {
+                StringBuilder s = new StringBuilder();
+                s.append("Currency: ").append(userManager.getUser(username).getFunds()).append("`");
+                for (Resource r : rl) {
+                    s.append(r.getName()).append(": ").append(r.getQuantity()).append("`");
+                }
+                String t = s.toString();
+                printWriter.println(t);
+                return 0;
             }
-            String t = s.toString();
-            printWriter.println(t);
-            return 0;
         }
         return -1;
     }
