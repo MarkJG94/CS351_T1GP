@@ -16,6 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConcurrencyTest
@@ -101,15 +102,11 @@ public class ConcurrencyTest
         User user1 = new User("UserOne", "password", resourceList, 5000);
         User user2 = new User("UserTwo", "password", resourceList, 100);
         User user3 = new User("UserThree", "password", resourceList, 10000);
-        User user4 = new User("UserFour", "password", resourceList, 1);
-        User user5 = new User("UserFive", "password", resourceList, 0);
 
         userList.clear();
         userList.add(user1);
         userList.add(user2);
         userList.add(user3);
-        userList.add(user4);
-        userList.add(user5);
 
     }
     // Test that the addFunds method in UserManager is thread safe
@@ -142,6 +139,58 @@ public class ConcurrencyTest
         {
             count.await();
             assertEquals( 5300, userManager.getUser( userOne ).getFunds() );
+        }
+        catch ( InterruptedException e )
+        {
+            e.printStackTrace();
+        }
+        
+        // stop all threads
+        server.serverSocket.close();
+        serverThread.interrupt();
+        thread1.interrupt();
+        thread2.interrupt();
+        thread3.interrupt();
+    }
+    
+    @Test
+    public void testBulkAddFundsConcurrency() throws InterruptedException, IOException
+    {
+        serverThread.start();
+        Thread thread1 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 1000; i++)
+                                         {
+                                             userManager.addFunds( userOne, 10 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread1.start();
+        
+        Thread thread2 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 1000; i++)
+                                         {
+                                             userManager.addFunds( userOne, 25 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread2.start();
+        
+        Thread thread3 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 5000; i++)
+                                         {
+                                             userManager.addFunds( userOne, 1 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread3.start();
+        
+        try
+        {
+            count.await();
+            assertEquals( 45000, userManager.getUser( userOne ).getFunds() );
         }
         catch ( InterruptedException e )
         {
@@ -202,6 +251,59 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    @Test
+    public void testBulkDeductFundsConcurrency() throws InterruptedException, IOException
+    {
+        serverThread.start();
+        userManager.addFunds( userOne, 10000 );
+        Thread thread1 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 1000; i++)
+                                         {
+                                             userManager.deductFunds( userOne, 2 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread1.start();
+        
+        Thread thread2 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 1500; i++)
+                                         {
+                                             userManager.deductFunds( userOne, 1 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread2.start();
+        
+        Thread thread3 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 500; i++)
+                                         {
+                                             userManager.deductFunds( userOne, 10 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread3.start();
+        
+        try
+        {
+            count.await();
+            assertEquals( 6500, userManager.getUser( userOne ).getFunds() );
+        }
+        catch ( InterruptedException e )
+        {
+            e.printStackTrace();
+        }
+        
+        // stop all threads
+        server.serverSocket.close();
+        serverThread.interrupt();
+        thread1.interrupt();
+        thread2.interrupt();
+        thread3.interrupt();
+    }
+    
     // Test that deductFunds method in user is thread safe when funds are insufficient to deduct
     @Test
     public void testDeductInsufficientFundsConcurrency() throws InterruptedException, IOException
@@ -239,6 +341,59 @@ public class ConcurrencyTest
         
         // stop all threads
 
+        serverThread.interrupt();
+        thread1.interrupt();
+        thread2.interrupt();
+        thread3.interrupt();
+        server.serverSocket.close();
+    }
+    
+    @Test
+    public void testBulkDeductInsufficientFundsConcurrency() throws InterruptedException, IOException
+    {
+        serverThread.start();
+        userManager.addFunds( userOne, 100000 );
+        Thread thread1 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 1000; i++)
+                                         {
+                                             userManager.deductFunds( userOne, 10 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread1.start();
+        Thread thread2 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 1500; i++)
+                                         {
+                                             userManager.deductFunds( userOne, 25 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread2.start();
+        
+        Thread thread3 = new Thread( () ->
+                                     {
+                                         for (int i = 0; i < 500; i++)
+                                         {
+                                             userManager.deductFunds( userOne, 100 );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread3.start();
+        
+        try
+        {
+            count.await();
+            assertEquals( 7500, userManager.getUser( userOne ).getFunds() );
+        }
+        catch ( InterruptedException e )
+        {
+            e.printStackTrace();
+        }
+        
+        // stop all threads
+        
         serverThread.interrupt();
         thread1.interrupt();
         thread2.interrupt();
@@ -451,6 +606,81 @@ public class ConcurrencyTest
             e.printStackTrace();
         }
 
+        // stop all threads
+        server.serverSocket.close();
+        serverThread.interrupt();
+        thread1.interrupt();
+        thread2.interrupt();
+        thread3.interrupt();
+    }
+    
+    @Test
+    public void testBulkTransferInsufficientFundsConcurrency() throws InterruptedException, IOException
+    {
+        serverThread.start();
+        Thread thread1 = new Thread( () ->
+                                     {
+                                         try
+                                         {
+                                             for (int i = 0; i < 1000; i++)
+                                             {
+                                                 userManager.transferFunds( userOne, userTwo, 1 );
+                                             }
+                                         }
+                                         catch ( IOException e )
+                                         {
+                                             throw new RuntimeException( e );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread1.start();
+        
+        Thread thread2 = new Thread( () ->
+                                     {
+                                         try
+                                         {
+                                             for (int i = 0; i < 1000 ; i++)
+                                             {
+                                                 userManager.transferFunds( userTwo, userThree, 1500 );
+                                             }
+                                         }
+                                         catch ( IOException e )
+                                         {
+                                             throw new RuntimeException( e );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread2.start();
+        
+        Thread thread3 = new Thread( () ->
+                                     {
+                                         try
+                                         {
+                                             for (int i = 0; i < 2500; i++)
+                                             {
+                                                 userManager.transferFunds( userThree, userOne, 2 );
+                                             }
+                                         }
+                                         catch ( IOException e )
+                                         {
+                                             throw new RuntimeException( e );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread3.start();
+        
+        try
+        {
+            count.await();
+            assertEquals( 9000, userManager.getUser( userOne ).getFunds() );
+            assertEquals( 1100, userManager.getUser( userTwo ).getFunds() );
+            assertEquals( 5000, userManager.getUser( userThree ).getFunds() );
+        }
+        catch ( InterruptedException e )
+        {
+            e.printStackTrace();
+        }
+        
         // stop all threads
         server.serverSocket.close();
         serverThread.interrupt();
@@ -741,6 +971,77 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
-    
+    @Test
+    public void testMultipleUsersBulkBuyInsufficientResources() throws InterruptedException, IOException,
+                                                                         IndexOutOfBoundsException
+    {
+        serverThread.start();
+        Thread thread1 = new Thread( () ->
+                                     {
+                                         userManager.addFunds( userOne, 10000 );
+                                         for (int i = 0; i < 5000; i++)
+                                         {
+                                             userManager.deductFunds( userOne, 1 );
+                                             marketplace.removeResourceFromMarket( 1, 10 );
+                                             userManager.addResource( 1, 1, userOne );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread1.start();
+        
+        Thread thread2 = new Thread( () ->
+                                     {
+                                         userManager.addFunds( userTwo, 10000 );
+                                         for (int i = 0; i < 5000; i++)
+                                         {
+                                             userManager.deductFunds( userTwo, 1 );
+                                             marketplace.removeResourceFromMarket( 1, 1 );
+                                             userManager.addResource( 1, 1, userTwo );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread2.start();
+        
+        Thread thread3 = new Thread( () ->
+                                     {
+                                         userManager.addFunds( userThree, 10000 );
+                                         for (int i = 0; i < 5000; i++)
+                                         {
+                                             userManager.deductFunds( userThree, 1 );
+                                             marketplace.removeResourceFromMarket( 1, 1 );
+                                             userManager.addResource( 1, 1, userThree );
+                                         }
+                                         count.countDown();
+                                     } );
+        thread3.start();
+        
+        try
+        {
+            count.await();
+            //User One
+            assertNotEquals( 5000, userManager.getUser( userOne ).getResourceQuantity( 1 ) );
+            
+            //User Two
+            assertNotEquals( 5000, userManager.getUser( userTwo ).getResourceQuantity( 1 ) );
+            
+            //User Three
+            assertNotEquals( 5000, userManager.getUser( userThree ).getResourceQuantity( 1 ) );
+            
+            //Marketplace assertions
+            assertEquals( 0, marketplace.getResourceQuantity( 1 ) );
+        }
+        catch ( InterruptedException e )
+        {
+            e.printStackTrace();
+        }
+        
+        
+        // stop all threads
+        server.serverSocket.close();
+        serverThread.interrupt();
+        thread1.interrupt();
+        thread2.interrupt();
+        thread3.interrupt();
+    }
 }
 
