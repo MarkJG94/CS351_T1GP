@@ -42,8 +42,6 @@ public class Server implements Runnable {
         importUserDetails();
 
         marketPlace = new Marketplace(resources);
-
-
     }
     Server() throws IOException
     {
@@ -121,7 +119,9 @@ public class Server implements Runnable {
     }
 
     private void quit(int i){
-        adminThread.interrupt();
+        if(runMode == 0) {
+            adminThread.interrupt();
+        }
         server.interrupt();
         threadpool.shutdown();
         if(i == 0) {

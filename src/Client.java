@@ -20,7 +20,7 @@ public class Client extends InputReader{
 
     public void runClient() throws IOException, NotBoundException {
         String response;
-
+        int val;
         startServerResponseQueue();
 
         while (true) {
@@ -29,18 +29,18 @@ public class Client extends InputReader{
             System.out.println("    2. Create Account");
             System.out.println("    3. Exit");
 
-            response = inputReader.getResponse();
-            if (Integer.parseInt(response) != 1 && Integer.parseInt(response) != 2 && Integer.parseInt(response) != 3) {
+            val = inputReader.getNumericResponse();
+            if (val > 0 && val < 4) {
+                break;
+            } else {
                 System.out.println("Invalid Entry, please try again");
                 System.out.println();
-            } else {
-                break;
             }
         }
-        if(Integer.parseInt(response) == 3) {
+        if(val == 3) {
             exit();
         } else
-        if(Integer.parseInt(response) == 2) {
+        if(val == 2) {
             printWriter.println("NewAccount");
             while (true) {
                 System.out.println("Please enter your username:");
@@ -152,13 +152,14 @@ public class Client extends InputReader{
 
     public void start() throws IOException {
         String response;
+        int val;
         boolean running = true;
         while (running) {
             mainMenu();
             while (true) {
                 System.out.println("Please enter a number (1-5): ");
-                response = inputReader.getResponse();
-                if ((Integer.parseInt(response) > 0) && ((Integer.parseInt(response) < 6)))
+                val = inputReader.getNumericResponse();
+                if (val > 0 && (val < 6))
                 {
                     break;
                 }
@@ -167,7 +168,7 @@ public class Client extends InputReader{
                     System.out.println("Invalid entry");
                 }
             }
-            switch (Integer.parseInt(response)) {
+            switch (val) {
                 case 1:
                     // View inventory
                     sendAnswer("Inventory-" + username);
@@ -204,16 +205,15 @@ public class Client extends InputReader{
     }
 
     public void marketStart() throws IOException {
-        int reply;
+        int val;
         String response;
         boolean running = true;
         while (running) {
             marketMenu();
             while (true) {
                 System.out.println("Please enter a number (1-4): ");
-                response = inputReader.getResponse();
-                reply = Integer.parseInt(response);
-                if ((reply > 0) && (reply < 5))
+                val = inputReader.getNumericResponse();
+                if ((val > 0) && (val < 5))
                 {
                     break;
                 }
@@ -222,7 +222,7 @@ public class Client extends InputReader{
                     System.out.println("Invalid entry");
                 }
             }
-            switch (reply) {
+            switch (val) {
                 case 1:
                     // View listings
                     sendAnswer("Inventory-Marketplace");
@@ -280,12 +280,14 @@ public class Client extends InputReader{
     private void transferFunds() throws IOException {
         System.out.println("Enter the username you would like to transfer to: ");
         String response;
+        int val;
         String input = inputReader.getResponse();
 
         System.out.println("Amount you want to transfer: ");
-        response = inputReader.getResponse();
-        int amount = Integer.parseInt(response);
-        if(amount > 0) {
+        val = inputReader.getNumericResponse();
+
+        int amount = val;
+        if (amount > 0) {
             sendAnswer("Transfer-" + username + "-" + input + "-" + amount);
             System.out.println(retrieveResponse());
         } else {
@@ -298,22 +300,24 @@ public class Client extends InputReader{
         String response = retrieveResponse();
         ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
 
+        int val;
         boolean loop = true;
         int resourceID = 0, quantity = 0;
 
         while (loop) {
+            System.out.println("Which item would you like to sell? (enter Q to exit)");
             int i = 1;
             for(String s : data){
                 System.out.print(s.split(":")[0] + " (" + i + ")    ");
                 i++;
             }
             System.out.println();
-            response = inputReader.getResponse();
-            if (response.equalsIgnoreCase("q")) {
+            val = inputReader.getNumericResponse();
+            if (val == -2) {
                 loop = false;
                 break;
-            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
-                resourceID = Integer.parseInt(response);
+            } else if (val > 0 && val <= data.size()) {
+                resourceID = val;
                 break;
             } else {
                 System.out.println("Invalid entry. Try again.");
@@ -321,12 +325,12 @@ public class Client extends InputReader{
         }
         while (loop) {
             System.out.println("How many would you like to sell? (enter Q to exit)");
-            response = inputReader.getResponse();
-            if (response.equalsIgnoreCase("q")) {
+            val = inputReader.getNumericResponse();
+            if (val == -2) {
                 loop = false;
                 break;
-            } else if (Integer.parseInt(response) > 0) {
-                quantity = Integer.parseInt(response);
+            } else if (val > 0) {
+                quantity = val;
                 break;
             } else {
                 System.out.println("Invalid entry. Try again.");
@@ -334,15 +338,16 @@ public class Client extends InputReader{
         }
         if(loop) {
             sendAnswer("Sell-Marketplace-" + username + "-" + resourceID + "-" + quantity);
+            System.out.println(retrieveResponse());
         }
-        System.out.println(retrieveResponse());
+
     }
 
     private void buyItem() throws IOException {
         sendAnswer("Inventory-Marketplace-" + username);
         String response = retrieveResponse();
         ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
-
+        int val;
         boolean loop = true;
         int resourceID = 0, quantity = 0;
 
@@ -355,12 +360,12 @@ public class Client extends InputReader{
                 i++;
             }
             System.out.println();
-            response = inputReader.getResponse();
-            if (response.equalsIgnoreCase("q")) {
+            val = inputReader.getNumericResponse();
+            if (val == -2) {
                 loop = false;
                 break;
-            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
-                resourceID = Integer.parseInt(response);
+            } else if (val > 0 && val <= data.size()) {
+                resourceID = val;
                 break;
             } else {
                 System.out.println("Invalid entry. Try again.");
@@ -368,12 +373,12 @@ public class Client extends InputReader{
         }
         while (loop) {
             System.out.println("How many would you like to buy? (enter Q to exit)");
-            response = inputReader.getResponse();
-            if (response.equalsIgnoreCase("q")) {
+            val = inputReader.getNumericResponse();
+            if (val == -2) {
                 loop = false;
                 break;
-            } else if (Integer.parseInt(response) > 0) {
-                quantity = Integer.parseInt(response);
+            } else if (val > 0) {
+                quantity = val;
                 break;
             } else {
                 System.out.println("Invalid entry. Try again.");
@@ -381,8 +386,9 @@ public class Client extends InputReader{
         }
         if(loop) {
             sendAnswer("Buy-Marketplace-" + username + "-" + resourceID + "-" + quantity);
+            System.out.println(retrieveResponse());
         }
-        System.out.println(retrieveResponse());
+
     }
 
     private boolean quitConfirmation(){

@@ -52,6 +52,7 @@ public class Administrator extends InputReader implements Runnable {
 
     public void start() throws IOException {
         String response;
+        int val;
         printWriter.println(pw);
         printWriter.println(pw);
 
@@ -68,8 +69,8 @@ public class Administrator extends InputReader implements Runnable {
             mainMenu();
             while (true) {
                 System.out.println("Please enter a number (1-6): ");
-                response = inputReader.getResponse();
-                if ((Integer.parseInt(response) > 0) && ((Integer.parseInt(response) < 7)))
+                val = inputReader.getNumericResponse();
+                if (val > 0 && (val < 7))
                 {
                     break;
                 }
@@ -78,7 +79,7 @@ public class Administrator extends InputReader implements Runnable {
                     System.out.println("Invalid entry");
                 }
             }
-            switch (Integer.parseInt(response)) {
+            switch (val) {
                 case 1:
                     // view logged in users
                     printWriter.println("Users-" + username);
@@ -118,15 +119,14 @@ public class Administrator extends InputReader implements Runnable {
 
     public void marketStart() throws IOException {
         String response;
-        int value;
+        int val;
         boolean running = true;
         while (running) {
             marketMenu();
             while (true) {
                 System.out.println("Please enter a number (1-6): ");
-                response = inputReader.getResponse();
-                value = Integer.parseInt(response);
-                if ((value > 0) && (value < 7))
+                val = inputReader.getNumericResponse();
+                if ((val > 0) && (val < 7))
                 {
                     break;
                 }
@@ -135,7 +135,7 @@ public class Administrator extends InputReader implements Runnable {
                     System.out.println("Invalid entry");
                 }
             }
-            switch (value) {
+            switch (val) {
                 case 1:
                     // View listings
                     printWriter.println("Inventory-Marketplace");
@@ -176,11 +176,15 @@ public class Administrator extends InputReader implements Runnable {
         String source = inputReader.getResponse();
 
         System.out.println("Amount you want to transfer: ");
-        String response = inputReader.getResponse();
-        int amount = Integer.parseInt(response);
+        int val = inputReader.getNumericResponse();
+        if(val > 0 ) {
+            int amount = val;
 
-        printWriter.println("RemoveFunds-" + source + "-" + amount);
-        System.out.println(serverScanner.nextLine());
+            printWriter.println("RemoveFunds-" + source + "-" + amount);
+            System.out.println(serverScanner.nextLine());
+        } else {
+            System.out.println("Invalid entry.");
+        }
     }
 
     private void addFunds() {
@@ -188,11 +192,15 @@ public class Administrator extends InputReader implements Runnable {
         String source = inputReader.getResponse();
 
         System.out.println("Amount you want to transfer: ");
-        String response = inputReader.getResponse();
-        int amount = Integer.parseInt(response);
+        int val = inputReader.getNumericResponse();
+        if(val > 0) {
+            int amount = val;
 
-        printWriter.println("AddFunds-" + source + "-" + amount);
-        System.out.println(serverScanner.nextLine());
+            printWriter.println("AddFunds-" + source + "-" + amount);
+            System.out.println(serverScanner.nextLine());
+        } else {
+            System.out.println("Invalid entry.");
+        }
     }
 
     private void addItemUser() {
@@ -216,24 +224,28 @@ public class Administrator extends InputReader implements Runnable {
                 i++;
             }
             System.out.println();
-            response = inputReader.getResponse();
-            if (response.equalsIgnoreCase("q")) {
+            int val = inputReader.getNumericResponse();
+            if (val == -2) {
                 loop = false;
                 break;
-            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
-                resourceID = Integer.parseInt(response);
+            } else if (val > 0 && val <= data.size()) {
+                resourceID = val;
                 break;
             } else {
                 System.out.println("Invalid entry. Try again.");
             }
         }
-
-        System.out.println("Amount you want to transfer: ");
-        response = inputReader.getResponse();
-        int amount = Integer.parseInt(response);
-
-        printWriter.println("AddResource-" + source + "-" + resourceID + "-" + amount);
-        System.out.println(serverScanner.nextLine());
+        if(loop) {
+            System.out.println("Amount you want to transfer: ");
+            int val = inputReader.getNumericResponse();
+            if (val > 0) {
+                int amount = Integer.parseInt(response);
+                printWriter.println("AddResource-" + source + "-" + resourceID + "-" + amount);
+                System.out.println(serverScanner.nextLine());
+            } else {
+                System.out.println("Invalid entry.");
+            }
+        }
     }
 
     private void removeItemMarket() {
@@ -254,25 +266,31 @@ public class Administrator extends InputReader implements Runnable {
                 i++;
             }
             System.out.println();
-            response = inputReader.getResponse();
-            if (response.equalsIgnoreCase("q")) {
+            int val = inputReader.getNumericResponse();
+            if (val == -2) {
                 loop = false;
                 break;
-            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
-                resourceID = Integer.parseInt(response);
+            } else if (val > 0 && val <= data.size()) {
+                resourceID = val;
                 break;
             } else {
                 System.out.println("Invalid entry. Try again.");
             }
         }
+        if(loop) {
 
-        System.out.println("Amount you want to remove: ");
-        response = inputReader.getResponse();
-        int amount = Integer.parseInt(response);
+            System.out.println("Amount you want to remove: ");
+            int val = inputReader.getNumericResponse();
+            if(val > 0) {
+                int amount = Integer.parseInt(response);
 
-        printWriter.println("RemoveResource-Marketplace-" + resourceID + "-" + amount);
-        System.out.println(serverScanner.nextLine());
-        
+                printWriter.println("RemoveResource-Marketplace-" + resourceID + "-" + amount);
+                System.out.println(serverScanner.nextLine());
+            } else {
+                System.out.println("Invalid entry.");
+            }
+
+        }
     }
 
     private void removeItemUser() {
@@ -294,24 +312,29 @@ public class Administrator extends InputReader implements Runnable {
                 i++;
             }
             System.out.println();
-            response = inputReader.getResponse();
-            if (response.equalsIgnoreCase("q")) {
+            int val = inputReader.getNumericResponse();
+            if (val == -2) {
                 loop = false;
                 break;
-            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
-                resourceID = Integer.parseInt(response);
+            } else if (val > 0 && val <= data.size()) {
+                resourceID = val;
                 break;
             } else {
                 System.out.println("Invalid entry. Try again.");
             }
         }
+        if(loop) {
+            System.out.println("Amount you want to transfer: ");
+            int val = inputReader.getNumericResponse();
+            if(val > 0) {
+                int amount = Integer.parseInt(response);
 
-        System.out.println("Amount you want to transfer: ");
-        response = inputReader.getResponse();
-        int amount = Integer.parseInt(response);
-
-        printWriter.println("RemoveResource-" + source + "-" + resourceID + "-" + amount);
-        System.out.println(serverScanner.nextLine());
+                printWriter.println("RemoveResource-" + source + "-" + resourceID + "-" + amount);
+                System.out.println(serverScanner.nextLine());
+            } else {
+                System.out.println("Invalid entry.");
+            }
+        }
     }
 
     private void addItemMarket() {
@@ -332,24 +355,30 @@ public class Administrator extends InputReader implements Runnable {
                 i++;
             }
             System.out.println();
-            response = inputReader.getResponse();
-            if (response.equalsIgnoreCase("q")) {
+            int val = inputReader.getNumericResponse();
+            if (val == -2) {
                 loop = false;
                 break;
-            } else if (Integer.parseInt(response) > 0 && Integer.parseInt(response) <= data.size()) {
-                resourceID = Integer.parseInt(response);
+            } else if (val > 0 && val <= data.size()) {
+                resourceID = val;
                 break;
             } else {
                 System.out.println("Invalid entry. Try again.");
             }
         }
 
-        System.out.println("Amount you want to transfer: ");
-        response = inputReader.getResponse();
-        int amount = Integer.parseInt(response);
+        if(loop) {
+            System.out.println("Amount you want to transfer: ");
+            int val = inputReader.getNumericResponse();
+            if (val > 0) {
+                int amount = Integer.parseInt(response);
 
-        printWriter.println("AddResource-Marketplace-" + resourceID + "-" + amount);
-        System.out.println(serverScanner.nextLine());
+                printWriter.println("AddResource-Marketplace-" + resourceID + "-" + amount);
+                System.out.println(serverScanner.nextLine());
+            } else {
+                System.out.println("Invalid entry.");
+            }
+        }
     }
 
     private void transferFunds() throws IOException {
@@ -360,11 +389,17 @@ public class Administrator extends InputReader implements Runnable {
         String destination = inputReader.getResponse();
         
         System.out.println("Amount you want to transfer: ");
-        String response = inputReader.getResponse();
-        int amount = Integer.parseInt(response);
+        int val = inputReader.getNumericResponse();
+        if(val == -2){
 
-        printWriter.println("Transfer-" + source + "-" + destination + "-" + amount);
-        System.out.println(serverScanner.nextLine());
+        } else if(val > 0) {
+            int amount = val;
+
+            printWriter.println("Transfer-" + source + "-" + destination + "-" + amount);
+            System.out.println(serverScanner.nextLine());
+        } else {
+            System.out.println("Invalid entry.");
+        }
 
     }
 

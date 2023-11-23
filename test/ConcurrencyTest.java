@@ -83,13 +83,15 @@ public class ConcurrencyTest
 //        } catch ( IOException | NotBoundException e) {
 //            e.printStackTrace();
 //        }
-        
+
+        resourceList.clear();
         resourceList.add(wood);
         resourceList.add(iron);
         resourceList.add(steel);
         resourceList.add(silver);
         resourceList.add(gold);
-        
+
+        marketResources.clear();
         marketResources.add(wood1);
         marketResources.add(iron1);
         marketResources.add(steel1);
@@ -101,7 +103,8 @@ public class ConcurrencyTest
         User user3 = new User("UserThree", "password", resourceList, 10000);
         User user4 = new User("UserFour", "password", resourceList, 1);
         User user5 = new User("UserFive", "password", resourceList, 0);
-        
+
+        userList.clear();
         userList.add(user1);
         userList.add(user2);
         userList.add(user3);
@@ -255,21 +258,19 @@ public class ConcurrencyTest
                                          userManager.deductFunds(userTwo , 50 );
                                          count.countDown();
                                      } );
-        
+        thread1.start();
         Thread thread2 = new Thread( () ->
                                      {
                                          userManager.deductFunds(userTwo , 50 );
                                          count.countDown();
                                      } );
-
+        thread2.start();
         
         Thread thread3 = new Thread( () ->
                                      {
                                          userManager.deductFunds(userTwo , 50 );
                                          count.countDown();
                                      } );
-        thread1.start();
-        thread2.start();
         thread3.start();
         
         try
