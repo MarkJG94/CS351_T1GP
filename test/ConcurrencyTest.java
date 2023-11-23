@@ -60,6 +60,10 @@ public class ConcurrencyTest
     public ConcurrencyTest() throws IOException
     {
         socket = new Socket("127.0.0.1", 11000);
+        userManager = new UserManager(userList);
+        marketplace = new Marketplace(marketResources);
+        socketHandler = new SocketHandler(socket, userManager, marketplace);
+        printWriter = new PrintWriter( socket.getOutputStream(), true );
     }
     
     @Before
@@ -102,11 +106,6 @@ public class ConcurrencyTest
         userList.add(user3);
         userList.add(user4);
         userList.add(user5);
-
-        userManager = new UserManager(userList);
-        marketplace = new Marketplace(marketResources);
-        socketHandler = new SocketHandler(socket, userManager, marketplace);
-        printWriter = new PrintWriter( socket.getOutputStream(), true );
 
     }
     
