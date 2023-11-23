@@ -45,8 +45,8 @@ public class UserManager {
             synchronized ( lock0 )
             {
                 u.addFunds( amount );
-                return u.getFunds();
             }
+            return u.getFunds();
         }
         return -1;
     }
@@ -86,15 +86,13 @@ public class UserManager {
         {
             User u = getUser( username );
             lock0 = u;
-            synchronized ( lock0 )
-            {
-                if(u.validateCurrency(amount))
-                {
+            if(u.validateCurrency(amount)) {
+                synchronized (lock0) {
                     u.deductFunds(amount);
-                    return u.getFunds();
                 }
-                return -2;
+                return 0;
             }
+            return -2;
         }
         return -1;
     }

@@ -13,13 +13,14 @@ import java.rmi.NotBoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConcurrencyTest
 {
-    Server server = new Server();
+    Server server = new Server(1);
     Thread serverThread = new Thread( server);
     Client client1 = new Client();
     Client client2 = new Client();
@@ -106,6 +107,51 @@ public class ConcurrencyTest
         userList.add(user3);
         userList.add(user4);
         userList.add(user5);
+
+    }
+
+    @Test
+    public void transferConcurrencyTest(){
+        serverThread.start();
+        Thread thread1 = new Thread( () ->
+        {
+            try
+            {
+                for(int i = 0; i < 1000; i++){
+                    userManager.transferFunds( userOne, userTwo, 1 );
+                }
+                count.countDown();
+            }
+            catch ( IOException e )
+            {
+                throw new RuntimeException( e );
+            }
+        } );
+        thread1.start();
+        Thread thread2 = new Thread( () ->
+        {
+            try
+            {
+                for(int i = 0; i < 1000; i++){
+                    userManager.transferFunds( userTwo, userThree, 1 );
+                }
+                count.countDown();
+            }
+            catch ( IOException e )
+            {
+                throw new RuntimeException( e );
+            }
+        } );
+        thread2.start();
+
+        try {
+            count.await(100, TimeUnit.MILLISECONDS);
+            assertEquals( 4000, userManager.getUser( userOne ).getFunds() );
+            assertEquals( 100, userManager.getUser( userTwo ).getFunds() );
+            assertEquals( 11000, userManager.getUser( userThree ).getFunds() );
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
     }
     

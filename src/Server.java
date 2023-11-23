@@ -26,9 +26,10 @@ public class Server implements Runnable {
     Administrator administrator;
     Thread adminThread;
     Thread server;
+    int runMode;
 
-    Server() throws IOException
-    {
+    Server(int i) throws IOException {
+        runMode = i;
         serverSocket = new ServerSocket(11000);
         threadpool = Executors.newFixedThreadPool(20);
 
@@ -42,6 +43,11 @@ public class Server implements Runnable {
 
         marketPlace = new Marketplace(resources);
 
+
+    }
+    Server() throws IOException
+    {
+        this(0);
     }
     
     @Override
@@ -49,9 +55,11 @@ public class Server implements Runnable {
         try {
             System.out.println("server running");
             System.out.println();
-            administrator = new Administrator();
-            adminThread = new Thread(administrator);
-            threadpool.submit(adminThread);
+            if(runMode == 0){
+                administrator = new Administrator();
+                adminThread = new Thread(administrator);
+                threadpool.submit(adminThread);
+            }
             server = new Thread(this::runServer);
             server.start();
             while(true){
