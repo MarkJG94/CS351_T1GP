@@ -31,7 +31,12 @@ public class User {
     public User(String username, String password, ArrayList<Resource> userResources, int funds){
         this.username = username;
         this.password = password;
-        this.userResources = userResources;
+        ArrayList<Resource> defaultResources = new ArrayList<>();
+        for (int i = 0; i < userResources.size();i++){
+            Resource r = new Resource(userResources.get(i).getId(),userResources.get(i).getCost(),userResources.get(i).getQuantity(),userResources.get(i).getName(),userResources.get(i).getValue());
+            defaultResources.add(r);
+        }
+        this.userResources = defaultResources;
         this.funds = funds;
         this.status = false;
     }

@@ -45,12 +45,6 @@ public class ConcurrencyTest
     Resource gold1 = new Resource(5, 100, 1, "gold",80);
     
     ArrayList<User> userList = new ArrayList<User>();
-    User user1 = new User("UserOne", "password", resourceList, 5000);
-    User user2 = new User("UserTwo", "password", resourceList, 100);
-    User user3 = new User("UserThree", "password", resourceList, 10000);
-    User user4 = new User("UserFour", "password", resourceList, 1);
-    
-    User user5 = new User("UserFive", "password", resourceList, 0);
     
     ArrayList<String> command = new ArrayList<>();
     String inventory = "Inventory";
@@ -95,6 +89,13 @@ public class ConcurrencyTest
         marketResources.add(steel1);
         marketResources.add(silver1);
         marketResources.add(gold1);
+
+
+        User user1 = new User("UserOne", "password", resourceList, 5000);
+        User user2 = new User("UserTwo", "password", resourceList, 100);
+        User user3 = new User("UserThree", "password", resourceList, 10000);
+        User user4 = new User("UserFour", "password", resourceList, 1);
+        User user5 = new User("UserFive", "password", resourceList, 0);
         
         userList.add(user1);
         userList.add(user2);
@@ -445,7 +446,7 @@ public class ConcurrencyTest
         thread2.interrupt();
         thread3.interrupt();
     }
-    
-    
+
+
 }
 
