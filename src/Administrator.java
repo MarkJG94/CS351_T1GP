@@ -39,7 +39,7 @@ public class Administrator extends InputReader implements Runnable {
 
     // Method to print the main menu options to screen
     public void mainMenu(){
-        ArrayList<String> options = new ArrayList<String>();
+        ArrayList<String> options = new ArrayList<>();
         options.add("Server Administrator Menu");
         options.add("Please select an option from the list below;");
         options.add("\t 1. View logged on users");
@@ -55,7 +55,7 @@ public class Administrator extends InputReader implements Runnable {
 
     // Method to print the marketplace menu to screen
     public void marketMenu(){
-        ArrayList<String> options = new ArrayList<String>();
+        ArrayList<String> options = new ArrayList<>();
         options.add("Marketplace Menu");
         options.add("Please select an option from the list below;");
         options.add("\t 1. View listings");
@@ -140,7 +140,7 @@ public class Administrator extends InputReader implements Runnable {
     }
 
     // Looping method for the marketplace menu and its options
-    public void marketStart() throws IOException {
+    public void marketStart() {
         int val;
         boolean running = true;
         while (running) {
