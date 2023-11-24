@@ -4,30 +4,43 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import static java.lang.Thread.sleep;
 
+/*
+    This class is the main server that can be created in two modes;
+    1. In "server-only" mode to run the server and receive connections without the administrator menu
+    2. In "server + admin" mode to run a separate thread for the administrator menu(s)
+
+    This class imports the market resource list and user list on creation and overwrites files on close with any changes that have occurred since launch
+ */
 public class Server implements Runnable {
 
-    ServerSocket serverSocket;
+    public ServerSocket serverSocket;
 
     //thread pool
-    ExecutorService threadpool;
+    private final ExecutorService threadpool;
+    private final ArrayList<Resource> resources;
+    private final ArrayList<User> userList;
 
-    private ArrayList<Resource> resources;
-    private ArrayList<User> userList;
-    private String filePath = new File("").getAbsolutePath();
-    private String userFilePath = filePath + "/data/UserDetails.csv";
-    private String resourceFilePath = filePath + "/data/MarketDetails.csv";
-    private Marketplace marketPlace;
+    // Gets the dynamic file path to the current location
+    private final String filePath = new File("").getAbsolutePath();
+
+    // Appends the folder and file name for the user details CSV
+    private final String userFilePath = filePath + "/data/UserDetails.csv";
+
+    // Appends the folder and file name for the market resource CSV
+    private final String resourceFilePath = filePath + "/data/MarketDetails.csv";
+    private final Marketplace marketPlace;
     private UserManager userManager;
-    private ArrayList<Socket> clients;
-
+    private final ArrayList<Socket> clients;
     Administrator administrator;
     Thread adminThread;
     Thread server;
+
+    // Used to specify if the server will be in server-only mode (1) or server + admin (0)
     int runMode;
 
+    // Constructor that will instantiate the server and set the run mode to the provided value
     Server(int i) throws IOException {
         runMode = i;
         serverSocket = new ServerSocket(11000);
@@ -43,23 +56,28 @@ public class Server implements Runnable {
 
         marketPlace = new Marketplace(resources);
     }
+
+    // Constructor that calls the main constructor and provides a default value for the runMode
     Server() throws IOException
     {
         this(0);
     }
-    
+
+    // Run method that will verify the server is running and if the run mode is set to 0, instantiate the administrator object and assign it to a separate thread.
     @Override
     public void run() {
         try {
             System.out.println("server running");
             System.out.println();
             if(runMode == 0){
-                administrator = new Administrator();
+                administrator = new Administrator("42b0307fc70d04e46e2c189eb011259c94998921fc6b394448f4a2705453cf698f749cb733226d80f40786cb12c857122d253a5e325cdbe91ad325e75b129ab8ba88008c10a5160035e21bc92993c3647fc10fb1307049d14a51789bdca7e436d5fee2b3b4dc5c3b7e611add83edf71284764d775bd049d286c23760765263f965559f20b77b794d6365678be2ae47f8572a4fd253cef295e0b1e4412245bb63");
                 adminThread = new Thread(administrator);
                 threadpool.submit(adminThread);
             }
             server = new Thread(this::runServer);
             server.start();
+
+            // Main loop that will loop every second to see if users are still connected, to verify if the administrator is still running
             while(true){
                 sleep(1000);
                 if(clients.size() > 0) {
@@ -67,10 +85,15 @@ public class Server implements Runnable {
                         break;
                     }
                     for(int j = 0; j < clients.size(); j++){
+                        // Skips the first client (i.e. the administrator "client")
                         if(j > 0) {
+                            // Sends a "heartbeat" to each client to verify if they are still connected to the server.
                             Socket c = clients.get(j);
                             PrintWriter pw = new PrintWriter(c.getOutputStream(), true);
                             pw.println("heartbeat");
+
+                            // If the print writer returns an error, search the socket/user map to find the associated user and set their status to offline
+                            // Then deletes the client and removes them from the socket hashmap
                             if (pw.checkError()) {
                                 User offlineUser = null;
                                 for (Map.Entry<User, Socket> entry : userManager.socketUserMap.entrySet()) {
@@ -81,11 +104,16 @@ public class Server implements Runnable {
                                 }
                                 clients.remove(c);
                                 userManager.socketUserMap.remove(offlineUser);
+                                c.close();
                             }
                         }
                     }
                 }
             }
+
+            // If the loop ends, the administrator has indicated to shut down the server
+
+            // Loop through each socket and send a message to notify of the impending shutdown with the "IMPORTANT" keyword
             for(Socket s : clients){
                 if(!s.isClosed()){
                     PrintWriter pw =  new PrintWriter(s.getOutputStream(), true);
@@ -93,10 +121,20 @@ public class Server implements Runnable {
 
                 }
             }
+
+            // Prints a 10 second countdown to the server
             for(int i = 0; i < 10; i++) {
-                System.out.print(10 - i + "   ");
+                if ((10 - i) == 10){
+                    System.out.print(10 - i + "   ");
+                } else if((10 - i) < 6){
+                    System.out.print(10 - i + "   ");
+                }
+
+                // Wait 1 second before continuing the loop
                 sleep(1000);
             }
+
+            // After 10 seconds has elapsed, print an IMPORTANT message to each client and notify the client that the server is now offline
             for(Socket s : clients){
                 if(!s.isClosed()){
                     PrintWriter pw =  new PrintWriter(s.getOutputStream(), true);
@@ -104,6 +142,8 @@ public class Server implements Runnable {
                     pw.println("Server Offline");
                 }
             }
+
+            // Sleep for a further 1 second before quiting the server thread, saving the marketplace resource list and user list to CSV and close the application
             sleep(1000);
 
             quit(0);
@@ -114,10 +154,12 @@ public class Server implements Runnable {
         }catch (IOException e){
             e.printStackTrace();
         } catch (InterruptedException e) {
+            // If the server throws an interrupted exception, the server has ended abruptly in which case call the quit method with a -1 value
             quit(-1);
         }
     }
 
+    // Method to close the admin thread, close the server thread and shutdown the threadpool
     private void quit(int i){
         if(runMode == 0) {
             adminThread.interrupt();
@@ -129,6 +171,7 @@ public class Server implements Runnable {
         }
     }
 
+    // Method that will await a new client to connect and automatically accept the connection, create a new sockethandler object with the new client
     private void runServer() {
         while (true) {
             try {
@@ -142,6 +185,7 @@ public class Server implements Runnable {
         }
     }
 
+    // Method to import the marketplace resource list from file, or create a default file if one does not already exist
     private void importMarketDetails() throws IOException {
 
         List<List<String>> records = new ArrayList<>();
@@ -181,6 +225,7 @@ public class Server implements Runnable {
         }
     }
 
+    // Method to import the user list from file, or create a default file if one does not already exist
     private void importUserDetails() throws IOException {
         List<List<String>> records = new ArrayList<>();
         try (
@@ -244,6 +289,7 @@ public class Server implements Runnable {
         }
     }
 
+    // Method to save the current marketplace resource list to file, overwriting the file that currently exists
     private void saveMarketFile() throws IOException{
         File file = new File(resourceFilePath);
         FileWriter fw = new FileWriter(file);
@@ -259,6 +305,7 @@ public class Server implements Runnable {
         fw.close();
     }
 
+    // Method to save the current user list to file, overwriting the file that currently exists
     private void saveUserFile() throws IOException {
         File file = new File(userFilePath);
         FileWriter fw = new FileWriter(file, false);
@@ -288,6 +335,7 @@ public class Server implements Runnable {
         fw.close();
     }
 
+    // Driver method that will instantiate the server object and assign it to a thread
     public static void main(String[] args) {
 
         try {

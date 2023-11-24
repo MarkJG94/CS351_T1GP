@@ -31,8 +31,7 @@ public class SocketHandler implements Runnable{
             printWriter = new PrintWriter(socket.getOutputStream(), true);
 
             String command = scanner.nextLine();
-            if(command.equals(admin)) {
-            } else if(command.equals("NewAccount")){
+            if(command.equals("NewAccount")){
                 newAccountPrompt();
             }
 
@@ -90,7 +89,7 @@ public class SocketHandler implements Runnable{
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 
@@ -100,9 +99,7 @@ public class SocketHandler implements Runnable{
             scanner = new Scanner(socket.getInputStream());
             printWriter = new PrintWriter(socket.getOutputStream(), true);
 
-//            String command = scanner.nextLine();
-            if(command.equals(admin)) {
-            } else if(command.equals("NewAccount")){
+            if(command.equals("NewAccount")){
                 newAccountPrompt();
             }
 
@@ -137,8 +134,8 @@ public class SocketHandler implements Runnable{
                         case "RemoveResource":
                             return removeResource(data);
                         case "Quit":
-                            quit();
                             running = false;
+                            quit();
                             break;
                     }
                     System.out.println("Error");
@@ -153,7 +150,7 @@ public class SocketHandler implements Runnable{
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
+            System.out.println(e);
         }
         return 0;
     }
@@ -358,14 +355,7 @@ public class SocketHandler implements Runnable{
         if(serverResponse){
             marketplace.addResourceToMarket(resourceID, quantity);
             userManager.addFunds(username, value);
-            try
-            {
-                printWriter.println("You have sold " + quantity + " " + marketplace.getResourceDetails(resourceID).getName() + " for " + value);
-                
-            } catch (NullPointerException e)
-            {
-            
-            }
+            printWriter.println("You have sold " + quantity + " " + marketplace.getResourceDetails(resourceID).getName() + " for " + value);
             return 0;
         } else {
             printWriter.println("You do not have enough " + marketplace.getResourceDetails(resourceID).getName() + " for this transaction!");
@@ -381,7 +371,7 @@ public class SocketHandler implements Runnable{
             printWriter.println(username + " does not exist!");
             return -1;
         } else {
-            userManager.notifyUser("Admin", username, quantity);
+            userManager.notifyUser("Admin", username, quantity, 1);
             printWriter.println("You have given " + username + " " + quantity);
             return 0;
         }
@@ -399,7 +389,7 @@ public class SocketHandler implements Runnable{
             return -1;
         } else {
             printWriter.println("Removed " + quantity + " funds from " + username);
-            userManager.notifyUser("Admin", username, (quantity * -1));
+            userManager.notifyUser("Admin", username, quantity, 0);
             return 0;
         }
     }
@@ -434,7 +424,7 @@ public class SocketHandler implements Runnable{
             boolean serverResponse = userManager.addResource(resourceID, quantity, username);
             if (serverResponse) {
                 String resourceName = marketplace.getResourceDetails(resourceID).getName();
-                userManager.notifyUser("Admin", username, quantity, resourceName);
+                userManager.notifyUser("Admin", username, quantity, 1, resourceName);
                 printWriter.println("You have given " + username + " " + quantity + " " + resourceName);
                 return 0;
             } else {
@@ -472,7 +462,7 @@ public class SocketHandler implements Runnable{
             }
             boolean serverResponse = userManager.removeResource(resourceID, quantity, username);
             if (serverResponse) {
-                userManager.notifyUser("Admin", username, (quantity * -1), resourceName);
+                userManager.notifyUser("Admin", username, quantity,0, resourceName);
                 printWriter.println("Removed " + quantity + " " + resourceName + " from " + username);
                 return 0;
             } else {

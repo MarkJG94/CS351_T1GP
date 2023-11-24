@@ -2,12 +2,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 public class UserManager {
-    private ArrayList<User> userList;
+    private final ArrayList<User> userList;
     public HashMap<User,Socket> socketUserMap;
     
     UserManager(ArrayList<User> ul){
@@ -52,7 +50,6 @@ public class UserManager {
     }
 
     public int validateUser(String username) {
-        Object lock0;
         User u = getUser( username );
         if (u == null)
         {
@@ -104,7 +101,7 @@ public class UserManager {
 
         if(deductFunds(source,amount) >= 0){
             addFunds(destination,amount);
-            notifyUser(source,destination,amount);
+            notifyUser(source,destination,amount,1);
             return 1;
         }
         return -1;
@@ -179,21 +176,30 @@ public class UserManager {
         socketUserMap.put(getUser(u), s);
     }
 
-    public void notifyUser(String source, String destination, int amount) throws IOException {
+    public void notifyUser(String source, String destination, int amount, int mode) throws IOException {
         User u = getUser(destination);
         if(socketUserMap.containsKey(u)){
             Socket s = socketUserMap.get(u);
             PrintWriter printWriter = new PrintWriter( s.getOutputStream(), true );
-            printWriter.println("IMPORTANT" + source + " has sent you " + amount + " Funds");
+            if(mode == 1){
+                printWriter.println("IMPORTANT" + source + " has sent you " + amount + " Funds");
+            } else {
+                printWriter.println("IMPORTANT" + source + " has taken " + amount + " Funds");
+            }
+
         }
     }
 
-    public void notifyUser(String source, String destination, int amount, String resource) throws IOException {
+    public void notifyUser(String source, String destination, int amount, int mode, String resource) throws IOException {
         User u = getUser(destination);
         if(socketUserMap.containsKey(u)){
             Socket s = socketUserMap.get(u);
             PrintWriter printWriter = new PrintWriter( s.getOutputStream(), true );
-            printWriter.println("IMPORTANT" + source + " has sent you " + amount + " " + resource);
+            if(mode == 1){
+                printWriter.println("IMPORTANT" + source + " has sent you " + amount + " " + resource);
+            } else {
+                printWriter.println("IMPORTANT" + source + " has taken " + amount + " " + resource);
+            }
         }
     }
 }

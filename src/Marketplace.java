@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/*
+    Class to contain the list of resources owned by the "Marketplace".
+    There should only be one instance and contained within the server class
+ */
 public class Marketplace
 {
 
@@ -10,6 +14,7 @@ public class Marketplace
         this.marketResources = resourceList;
     }
 
+    // Method to add resources to the marketplace resource list
     public boolean addResourceToMarket( int resourceID, int quantity )
     {
         Object lock0;
@@ -32,6 +37,7 @@ public class Marketplace
         return false;
     }
 
+    // Method to remove resources from the marketplace resource list
     public boolean removeResourceFromMarket( int resourceID, int quantity )
     {
         Object lock0;
@@ -57,6 +63,7 @@ public class Marketplace
         return false;
     }
 
+    // Method to calculate the total cost when provided an ResourceID and a quantity
     public int calculateTotalCost( int quantity, int resourceID )
     {
         if ( quantity > 0 )
@@ -71,6 +78,7 @@ public class Marketplace
         return -1;
     }
 
+    // Method to calculate the total value when provided an ResourceID and a quantity
     public int calculateTotalValue( int quantity, int resourceID )
     {
         if ( quantity > 0 )
@@ -85,6 +93,7 @@ public class Marketplace
         return -1;
     }
 
+    // Method to return the index integer of a given resourceID, or -1 if the resource ID does not exist
     public int getResourceIndex( int resourceID )
     {
         if ( ( resourceID - 1 ) >= 0 && resourceID -1 <= marketResources.size() )
@@ -94,6 +103,7 @@ public class Marketplace
         return -1;
     }
 
+    // Method to return the quantity of a provided resource when given the resources ID
     public int getResourceQuantity( int resourceID )
     {
         Object lock0;
@@ -111,6 +121,7 @@ public class Marketplace
         return -1;
     }
 
+    // Method to get return a resource when provided a ResourceID, or null if the resource does not exist
     public Resource getResourceDetails( int resourceID )
     {
         int resourceIndex = getResourceIndex( resourceID );
@@ -124,12 +135,14 @@ public class Marketplace
         }
     }
 
+    // Returns the arraylist of resources
     public ArrayList<Resource> getMarketResources()
     {
 
         return marketResources;
     }
 
+    // Method to return a resource when given the resource index within the resource arraylist
     public Resource getResource( int resourceIndex )
     {
         Resource r = marketResources.get( resourceIndex );

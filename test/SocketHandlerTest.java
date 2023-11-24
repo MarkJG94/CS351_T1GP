@@ -1,19 +1,12 @@
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Timeout;
 
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.rmi.NotBoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 
 import static org.junit.Assert.assertNotEquals;
@@ -23,8 +16,6 @@ public class SocketHandlerTest
 {
     Server server = new Server(1);
     Thread serverThread = new Thread( server);
-    Client client1 = new Client();
-    Client client2 = new Client();
     SocketHandler socketHandler;
     Socket socket = new Socket();
     UserManager userManager;
@@ -35,27 +26,21 @@ public class SocketHandlerTest
     ArrayList<Resource> resourceList = new ArrayList<Resource>();
     Resource wood = new Resource(1, 1, 1000, "wood", 1);
     Resource iron = new Resource(2, 2, 100, "iron", 1);
-    Resource steel = new Resource(3, 5, 10, "steel",4);
+    Resource stone = new Resource(3, 5, 10, "stone",4);
     Resource silver = new Resource(4, 10, 5, "silver",8);
     Resource gold = new Resource(5, 100, 1, "gold",80);
     
     ArrayList<Resource> marketResources = new ArrayList<Resource>();
     Resource wood1 = new Resource(1, 1, 10000, "wood", 1);
     Resource iron1 = new Resource(2, 2, 1000, "iron", 1);
-    Resource steel1 = new Resource(3, 5, 100, "steel",4);
+    Resource stone1 = new Resource(3, 5, 100, "stone",4);
     Resource silver1 = new Resource(4, 10, 10, "silver",8);
     Resource gold1 = new Resource(5, 100, 1, "gold",80);
     
     ArrayList<User> userList = new ArrayList<User>();
-    
-    ArrayList<String> command = new ArrayList<>();
-    String inventory = "Inventory";
-    String buy = "Buy";
-    String sell = "Sell";
     String userOne = "UserOne";
     String userTwo = "UserTwo";
     String userThree = "UserThree";
-    String marketPlace = "Marketplace";
     CountDownLatch count = new CountDownLatch( 3 );
     
     
@@ -74,14 +59,14 @@ public class SocketHandlerTest
         resourceList.clear();
         resourceList.add(wood);
         resourceList.add(iron);
-        resourceList.add(steel);
+        resourceList.add(stone);
         resourceList.add(silver);
         resourceList.add(gold);
         
         marketResources.clear();
         marketResources.add(wood1);
         marketResources.add(iron1);
-        marketResources.add(steel1);
+        marketResources.add(stone1);
         marketResources.add(silver1);
         marketResources.add(gold1);
         

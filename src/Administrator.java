@@ -5,6 +5,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/*
+    This class is used as the front-end to run the administrator command line from the server and can be used to;
+    - Deduct funds from a user
+    - Add funds to a user
+    - Deduct resources to a user
+    - Add resources to a user
+    - Remove resources from a Marketplace
+    - Add resources to a the Marketplace
+    - Transfer funds between users
+    - Save the Marketplace and Userlist to CSV
+    - Close the server
+ */
 public class Administrator extends InputReader implements Runnable {
 
     Socket socket;
@@ -12,14 +24,20 @@ public class Administrator extends InputReader implements Runnable {
     Scanner serverScanner;
     InputReader inputReader;
     String username = "admin";
-    String pw = "42b0307fc70d04e46e2c189eb011259c94998921fc6b394448f4a2705453cf698f749cb733226d80f40786cb12c857122d253a5e325cdbe91ad325e75b129ab8ba88008c10a5160035e21bc92993c3647fc10fb1307049d14a51789bdca7e436d5fee2b3b4dc5c3b7e611add83edf71284764d775bd049d286c23760765263f965559f20b77b794d6365678be2ae47f8572a4fd253cef295e0b1e4412245bb63";
-    Administrator() throws IOException {
+
+    // Stores the password used to authenticate an admin
+    String pw;
+
+    Administrator(String pw) throws IOException {
         socket = new Socket("127.0.0.1", 11000);
         printWriter = new PrintWriter(socket.getOutputStream(), true);
         serverScanner = new Scanner(socket.getInputStream());
         inputReader = new InputReader();
+        scanner = new Scanner(System.in);
+        this.pw = pw;
     }
 
+    // Method to print the main menu options to screen
     public void mainMenu(){
         ArrayList<String> options = new ArrayList<String>();
         options.add("Server Administrator Menu");
@@ -35,6 +53,7 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // Method to print the marketplace menu to screen
     public void marketMenu(){
         ArrayList<String> options = new ArrayList<String>();
         options.add("Marketplace Menu");
@@ -50,21 +69,21 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // start method for the thread which acts as the main driver for the Administrator class
     public void start() throws IOException {
-        String response;
         int val;
         printWriter.println(pw);
         printWriter.println(pw);
 
         boolean running = false;
         if(serverScanner.nextLine().equals("AdminAuth")) {
-            System.out.println("Authentication Successful!");
-            System.out.println();
             running = true;
         } else
         {
             System.out.println("Error validating administrator!");
         }
+
+        // Main while loop
         while (running) {
             mainMenu();
             while (true) {
@@ -79,9 +98,11 @@ public class Administrator extends InputReader implements Runnable {
                     System.out.println("Invalid entry");
                 }
             }
+
+            // Switch case for the main menu user input
             switch (val) {
                 case 1:
-                    // view logged in users
+                    // View logged in users
                     printWriter.println("Users-" + username);
                     System.out.println("Online Users:");
                     System.out.println(serverScanner.nextLine());
@@ -89,20 +110,21 @@ public class Administrator extends InputReader implements Runnable {
                     confirmation();
                     break;
                 case 2:
+                    // Launch marketplace menu
                     marketStart();
                     break;
                 case 3:
-                    // transferFunds
+                    // Transfer funds between users
                     transferFunds();
                     confirmation();
                     break;
                 case 4:
-                    // transferFunds
+                    // Add funds to user
                     addFunds();
                     confirmation();
                     break;
                 case 5:
-                    // transferFunds
+                    // Remove funds from user
                     removeFunds();
                     confirmation();
                     break;
@@ -117,8 +139,8 @@ public class Administrator extends InputReader implements Runnable {
         socket.close();
     }
 
+    // Looping method for the marketplace menu and its options
     public void marketStart() throws IOException {
-        String response;
         int val;
         boolean running = true;
         while (running) {
@@ -135,9 +157,11 @@ public class Administrator extends InputReader implements Runnable {
                     System.out.println("Invalid entry");
                 }
             }
+
+            // Switch case for each available option
             switch (val) {
                 case 1:
-                    // View listings
+                    // View Marketplace resouces
                     printWriter.println("Inventory-Marketplace");
                     ArrayList<String> data = new ArrayList<>(Arrays.asList(serverScanner.nextLine().split("`")));
                     for(String s : data){
@@ -147,30 +171,34 @@ public class Administrator extends InputReader implements Runnable {
                     confirmation();
                     break;
                 case 2:
-                    // Buy item
+                    // Add an item to the marketplace
                     addItemMarket();
                     confirmation();
                     break;
                 case 3:
+                    // Remove an item from the marketplace
                     removeItemMarket();
                     confirmation();
                     break;
                 case 4:
-                    // Buy item
+                    // Add an item to a user
                     addItemUser();
                     confirmation();
                     break;
                 case 5:
+                    // Remove an item from a user
                     removeItemUser();
                     confirmation();
                     break;
                 case 6:
+                    // Return to main menu loop
                     running = false;
                     break;
             }
         }
     }
 
+    // Method to remove funds from a targeted user
     private void removeFunds() {
         System.out.println("Enter the username you would like to remove funds from: ");
         String source = inputReader.getResponse();
@@ -187,6 +215,7 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // Method to add funds to a targeted user
     private void addFunds() {
         System.out.println("Enter the username you would like to add funds to: ");
         String source = inputReader.getResponse();
@@ -203,6 +232,7 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // Method to add a resource to a user
     private void addItemUser() {
 
         printWriter.println("Inventory-Marketplace-" + username);
@@ -248,6 +278,7 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // Method to remove an item from the Marketplace
     private void removeItemMarket() {
 
         printWriter.println("Inventory-Marketplace-" + username);
@@ -293,6 +324,7 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // Method to remove a resource from a user
     private void removeItemUser() {
         printWriter.println("Inventory-Marketplace-" + username);
         String response = serverScanner.nextLine();
@@ -337,8 +369,8 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // Method to add a resource to the Marketplace
     private void addItemMarket() {
-
         printWriter.println("Inventory-Marketplace-" + username);
         String response = serverScanner.nextLine();
         ArrayList<String> data = new ArrayList<>(Arrays.asList(response.split("`")));
@@ -381,6 +413,7 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // Method to transfer funds between two users
     private void transferFunds() throws IOException {
         System.out.println("Enter the username you would like to transfer from: ");
         String source = inputReader.getResponse();
@@ -403,11 +436,13 @@ public class Administrator extends InputReader implements Runnable {
 
     }
 
+    // Confirmation method that will await any user input before continuing
     public void confirmation(){
         System.out.println("Press enter to continue.");
         scanner.nextLine();
     }
 
+    // Run method that will call the start method
     @Override
     public void run() {
         try {

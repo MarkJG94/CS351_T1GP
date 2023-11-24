@@ -1,10 +1,14 @@
+/*
+    Resource class containing the cost, value, name, id and quantity of a single resource
+ */
 public class Resource {
-    private int cost;
-    private int value;
+    private int cost; // Cost is the whole number that it costs to purchase a resource
+    private int value; // Value is the whole number value to sell a resource
     private String name;
     private int id;
     private int quantity;
 
+    // Constructor to create a resource when provided an ID, cost, quantity, name and value
     public Resource(int id, int cost, int quantity, String name, int value){
         this.id = id;
         this.cost = cost;
@@ -13,6 +17,9 @@ public class Resource {
         this.value = value;
     }
 
+    public String getName() {
+        return name;
+    }
     public int getId() {
         return id;
     }
@@ -20,36 +27,15 @@ public class Resource {
     public int getCost() {
         return cost;
     }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setCost(int cost) {
-        this.cost = cost;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getValue() {
         return value;
     }
 
-    public void setValue(int value) {
-        this.value = value;
+    public int getQuantity() {
+        return quantity;
     }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
 }

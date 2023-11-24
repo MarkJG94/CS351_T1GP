@@ -4,13 +4,30 @@ import java.net.Socket;
 import java.rmi.NotBoundException;
 import java.util.*;
 
+/*
+    This class is used by clients to allow them to connect and send/receive communications from a server.
+    Used to;
+    - Create an account
+    - Sign in
+    - Buy resources from the marketplace
+    - Sell resources to the marketplace
+    - Transfer funds to another user
+    - View a users inventory
+    - View all other logged in users (excluding the signed-in user)
+ */
 public class Client extends InputReader{
     private final Socket socket;
     private String username;
     InputReader inputReader;
+
+    // Stack used to share server responses between the user input thread and the server response thread
     private final Stack<String> messageQueue;
+
+    // Operator thread used to continually search for server responses
     Thread operator;
     PrintWriter printWriter;
+
+    // Constructor method to initiate the server, stack and print writer to transmit messages to the server
     Client() throws IOException {
         socket = new Socket("127.0.0.1", 11000);
         printWriter = new PrintWriter(socket.getOutputStream(), true);
@@ -18,6 +35,7 @@ public class Client extends InputReader{
         inputReader = new InputReader();
     }
 
+    // Starting method that initialises variables and allows users to create an account and sign in
     public void runClient() throws IOException, NotBoundException {
         String response;
         int val;
@@ -39,12 +57,18 @@ public class Client extends InputReader{
         }
         if(val == 3) {
             exit();
-        } else
-        if(val == 2) {
+        } else if(val == 2) {
+            // Functions to create a new user account
+
             printWriter.println("NewAccount");
             while (true) {
                 System.out.println("Please enter your username:");
                 username = inputReader.getResponse();
+                if (username.contains(",")) {
+                    System.out.println("Username cannot contain ','. Please try again.");
+                } else if (username.equalsIgnoreCase("marketplace")) {
+                    System.out.println("Invalid username. Please try again.");
+                }
                 printWriter.println(username);
                 if (retrieveResponse().equals("password")) {
                     break;
@@ -72,6 +96,7 @@ public class Client extends InputReader{
             printWriter.println("Username");
         }
 
+        // Login options
         while (true) {
             System.out.println("Enter your username: ");
             username = inputReader.getResponse();
@@ -102,10 +127,12 @@ public class Client extends InputReader{
 
             if (response.equals("Login")) {
                 break;
-            } else {
+            } else if(passwordAttempts < 4){
                 System.out.println("Invalid Password! " + (3 - passwordAttempts) + " attempts remaining.");
-                passwordAttempts++;
+            } else {
+                System.out.println("Too many failed attempts. Closing application.");
             }
+            passwordAttempts++;
         }
 
         if (response.equals("Login")) {
@@ -114,6 +141,7 @@ public class Client extends InputReader{
         socket.close();
     }
 
+    // Method that will initialise the operator thread and constantly scan for server response and add them to the stack
     private void startServerResponseQueue() throws IOException {
         Scanner serverScanner = new Scanner(socket.getInputStream());
         operator = new Thread() {
@@ -146,10 +174,12 @@ public class Client extends InputReader{
         operator.start();
     }
 
+    // Method to end the operator thread
     private void endServerResponseQueue(){
         operator.interrupt();
     }
 
+    // method that will start the main menu options with the core client functionality
     public void start() throws IOException {
         String response;
         int val;
@@ -168,6 +198,8 @@ public class Client extends InputReader{
                     System.out.println("Invalid entry");
                 }
             }
+
+            // Main menu input switch case
             switch (val) {
                 case 1:
                     // View inventory
@@ -204,6 +236,7 @@ public class Client extends InputReader{
         }
     }
 
+    // Method for the marketplace menu and its functions
     public void marketStart() throws IOException {
         int val;
         String response;
@@ -250,6 +283,7 @@ public class Client extends InputReader{
         }
     }
 
+    // Method to print the main menu options
     public void mainMenu(){
         ArrayList<String> options = new ArrayList<String>();
         options.add("Welcome to the Application");
@@ -264,6 +298,7 @@ public class Client extends InputReader{
         }
     }
 
+    // Method to print the marketplace menu options
     public void marketMenu(){
         ArrayList<String> options = new ArrayList<String>();
         options.add("Marketplace Menu");
@@ -277,6 +312,7 @@ public class Client extends InputReader{
         }
     }
 
+    // Method to allow users to transfer to another user
     private void transferFunds() throws IOException {
         System.out.println("Enter the username you would like to transfer to: ");
         String response;
@@ -295,6 +331,7 @@ public class Client extends InputReader{
         }
     }
 
+    // Method to sell a user resource to the marketplace
     private void sellItem() throws IOException {
         sendAnswer("Inventory-Marketplace-" + username);
         String response = retrieveResponse();
@@ -343,6 +380,7 @@ public class Client extends InputReader{
 
     }
 
+    // Method to buy a resource from the marketplace
     private void buyItem() throws IOException {
         sendAnswer("Inventory-Marketplace-" + username);
         String response = retrieveResponse();
@@ -391,6 +429,7 @@ public class Client extends InputReader{
 
     }
 
+    // Method to confirm if a user would like to quit the application
     private boolean quitConfirmation(){
         System.out.println();
 
@@ -413,32 +452,38 @@ public class Client extends InputReader{
         }
     }
 
+    // Method to sign-out of the server and exit the application
     private void quit(){
         sendAnswer("Quit-" + username);
         System.out.println(retrieveResponse());
         exit();
     }
 
+    // Exit method to close the application
     private void exit(){
         endServerResponseQueue();
         System.exit(0);
     }
 
+    // Confirmation method that will await any user input before continuing
     private void confirmation(){
         System.out.println("Press enter to continue.");
         scanner.nextLine();
     }
 
+    // Method used to transmit messages to the server
     private void sendAnswer(String s){
         printWriter.println(s);
     }
 
+    // Method used to wait until there is a message in the stack and then return the first message added
     private String retrieveResponse(){
         while(messageQueue.size() == 0){
         }
         return messageQueue.pop();
     }
 
+    // Driver method.
     public static void main(String[] args) throws IOException {
         Client client = new Client();
         try {

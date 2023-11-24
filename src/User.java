@@ -1,10 +1,5 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.*;
 
-//get online users
 public class User {
 
     ArrayList<Resource> userResources;
@@ -20,8 +15,8 @@ public class User {
         funds = 1000;
         this.status = false;
         ArrayList<Resource> defaultResources = new ArrayList<>();
-        for (int i = 0; i < userResources.size();i++){
-            Resource r = new Resource(userResources.get(i).getId(),userResources.get(i).getCost(),0,userResources.get(i).getName(),userResources.get(i).getValue());
+        for (Resource userResource : userResources) {
+            Resource r = new Resource(userResource.getId(), userResource.getCost(), 0, userResource.getName(), userResource.getValue());
             defaultResources.add(r);
         }
 
@@ -32,8 +27,8 @@ public class User {
         this.username = username;
         this.password = password;
         ArrayList<Resource> defaultResources = new ArrayList<>();
-        for (int i = 0; i < userResources.size();i++){
-            Resource r = new Resource(userResources.get(i).getId(),userResources.get(i).getCost(),userResources.get(i).getQuantity(),userResources.get(i).getName(),userResources.get(i).getValue());
+        for (Resource userResource : userResources) {
+            Resource r = new Resource(userResource.getId(), userResource.getCost(), userResource.getQuantity(), userResource.getName(), userResource.getValue());
             defaultResources.add(r);
         }
         this.userResources = defaultResources;
@@ -64,7 +59,7 @@ public class User {
     }
     
     public synchronized int addFunds(int amount) {
-        if (amount > 0 && username.equals( this.username ))
+        if (amount > 0)
         {
             funds = funds + amount;
             return funds;
@@ -74,7 +69,7 @@ public class User {
 
 
     public int deductFunds(int amount) {
-        if (amount > 0 && username.equals( this.username ) && validateCurrency( amount ))
+        if (amount > 0 && validateCurrency( amount ))
         {
             funds = funds - amount;
             return funds;
@@ -83,10 +78,7 @@ public class User {
     }
     
     public boolean validateCurrency(int amount) {
-        if (funds >= amount){
-            return true;
-        }
-        return false;
+        return funds >= amount;
     }
     
     public int getFunds() {
