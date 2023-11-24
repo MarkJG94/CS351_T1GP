@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SocketHandlerTest {
+    Server server = new Server(1);
     SocketHandler socketHandler;
     Socket socket = new Socket();
     UserManager userManager;
@@ -44,6 +45,9 @@ public class SocketHandlerTest {
     String sell = "Sell";
     String userOne = "User One";
     String marketPlace = "Marketplace";
+
+    public SocketHandlerTest() throws IOException {
+    }
 
     @Before
     public void setup() throws IOException {
@@ -82,7 +86,7 @@ public class SocketHandlerTest {
     @Test
     public void givenInvalidCommandThenMenuReturnsFalse() throws IOException {
         assertEquals(-1, socketHandler.runTest("User One", "password", "Invenztttory-Marketplace"));
-
+        server.serverSocket.close();
     }
 
     @Test
@@ -94,7 +98,7 @@ public class SocketHandlerTest {
         assertEquals(10, userManager.getUser("User One").userResources.get(2).getQuantity());
         assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
-
+        server.serverSocket.close();
     }
 
     @Test
@@ -107,11 +111,13 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
     public void givenValidCommandThenReturnOtherOnlineUsers() throws IOException {
         assertEquals(0, socketHandler.runTest("User One", "password", "Users-User One"));
+        server.serverSocket.close();
 
     }
 
@@ -120,61 +126,61 @@ public class SocketHandlerTest {
         socketHandler.runTest("User Two", "password", "Users-User One");
         socketHandler.runTest("User Three", "password", "Users-User One");
         assertEquals(2, socketHandler.runTest("User One", "password", "Users-User One"));
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenValidCommandThenParseCommandTransfersCurrency() {
+    public void givenValidCommandThenParseCommandTransfersCurrency() throws IOException {
         String command = "Transfer-User One-User Two-1000";
 
         assertEquals(0, socketHandler.runTest("User One", "password", command));
         assertEquals(4000, userList.get(0).getFunds());
         assertEquals(1100, userList.get(1).getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInvalidSourceThenParseCommandReturnsFalse() {
+    public void givenInvalidSourceThenParseCommandReturnsFalse() throws IOException {
         String command = "Transfer-User Nine-User Two-1000";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
         assertEquals(5000, userList.get(0).getFunds());
         assertEquals(100, userList.get(1).getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInvalidDestinationThenParseCommandReturnsFalse() {
+    public void givenInvalidDestinationThenParseCommandReturnsFalse() throws IOException {
         String command = "Transfer-User One-User Nine-1000";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
         assertEquals(5000, userList.get(0).getFunds());
         assertEquals(100, userList.get(1).getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInvalidSourceAndDestinationThenParseCommandReturnsFalse() {
+    public void givenInvalidSourceAndDestinationThenParseCommandReturnsFalse() throws IOException {
         String command = "Transfer-User Nine-User Ninety-1000";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
         assertEquals(5000, userList.get(0).getFunds());
         assertEquals(100, userList.get(1).getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInsufficientFundsThenParseCommandReturnsFalse() {
+    public void givenInsufficientFundsThenParseCommandReturnsFalse() throws IOException {
         String command = "Transfer-User One-User Two-10000";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
         assertEquals(5000, userList.get(0).getFunds());
         assertEquals(100, userList.get(1).getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenValidCommandThenBuyItems() {
+    public void givenValidCommandThenBuyItems() throws IOException {
         String command = "Buy-Marketplace-User One-2-10";
 
         assertEquals(0, socketHandler.runTest("User One", "password", command));
@@ -186,16 +192,16 @@ public class SocketHandlerTest {
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
         assertEquals(4980, userManager.getUser("User One").getFunds());
 
-
         assertEquals(10000, marketplace.getResourceDetails(1).getQuantity());
         assertEquals(990, marketplace.getResourceDetails(2).getQuantity());
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInValidResourceIdThenBuyItemsReturnsError() {
+    public void givenInValidResourceIdThenBuyItemsReturnsError() throws IOException {
         String command = "Buy-Marketplace-User One-8-10";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -213,10 +219,11 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInValidUsernameThenBuyItemsReturnsError() {
+    public void givenInValidUsernameThenBuyItemsReturnsError() throws IOException {
         String command = "Buy-Marketplace-User Nnine-1-10";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -228,16 +235,16 @@ public class SocketHandlerTest {
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
         assertEquals(5000, userManager.getUser("User One").getFunds());
 
-
         assertEquals(10000, marketplace.getResourceDetails(1).getQuantity());
         assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInsufficientResourceQuantityThenBuyItemsReturnsError() {
+    public void givenInsufficientResourceQuantityThenBuyItemsReturnsError() throws IOException {
         String command = "Buy-Marketplace-User One-2-1100";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -249,16 +256,16 @@ public class SocketHandlerTest {
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
         assertEquals(5000, userManager.getUser("User One").getFunds());
 
-
         assertEquals(10000, marketplace.getResourceDetails(1).getQuantity());
         assertEquals(1000, marketplace.getResourceDetails(2).getQuantity());
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInsufficientUserFundsThenBuyItemsReturnsError() {
+    public void givenInsufficientUserFundsThenBuyItemsReturnsError() throws IOException {
         String command = "Buy-Marketplace-User Two-1-200";
 
         assertEquals(-1, socketHandler.runTest("User Two", "password", command));
@@ -276,10 +283,11 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenValidCommandThenSellItems() {
+    public void givenValidCommandThenSellItems() throws IOException {
         String command = "Sell-Marketplace-User One-2-10";
 
         assertEquals(0, socketHandler.runTest("User One", "password", command));
@@ -297,10 +305,11 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInValidResourceIdThenSellItemsReturnsError() {
+    public void givenInValidResourceIdThenSellItemsReturnsError() throws IOException {
         String command = "Sell-Marketplace-User One-8-10";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -318,10 +327,11 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInValidUsernameThenSellItemsReturnsError() {
+    public void givenInValidUsernameThenSellItemsReturnsError() throws IOException {
         String command = "Sell-Marketplace-User Nnine-1-10";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -339,10 +349,11 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInsufficientResourceQuantityThenSellItemsReturnsError() {
+    public void givenInsufficientResourceQuantityThenSellItemsReturnsError() throws IOException {
         String command = "Sell-Marketplace-User One-2-200";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -360,55 +371,57 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenValidCommandThenAddFunds() {
+    public void givenValidCommandThenAddFunds() throws IOException {
         String command = "AddFunds-User One-200";
 
         assertEquals(0, socketHandler.runTest("User One", "password", command));
         assertEquals(5200, userManager.getUser("User One").getFunds());
+        server.serverSocket.close();
 
     }
 
     @Test
-    public void givenInvalidUsernameThenAddFundsReturnsError() {
+    public void givenInvalidUsernameThenAddFundsReturnsError() throws IOException {
         String command = "AddFunds-User Nine-200";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
         assertEquals(5000, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenValidCommandThenRemoveFunds() {
+    public void givenValidCommandThenRemoveFunds() throws IOException {
         String command = "RemoveFunds-User One-200";
 
         assertEquals(0, socketHandler.runTest("User One", "password", command));
         assertEquals(4800, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInvalidUsernameThenRemoveFundsReturnsError() {
+    public void givenInvalidUsernameThenRemoveFundsReturnsError() throws IOException {
         String command = "RemoveFunds-User Nine-200";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
         assertEquals(5000, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInsufficientFundsThenRemoveFundsReturnsError() {
+    public void givenInsufficientFundsThenRemoveFundsReturnsError() throws IOException {
         String command = "RemoveFunds-User One-10000";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
         assertEquals(5000, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenValidCommandThenAddResourceToUser() {
+    public void givenValidCommandThenAddResourceToUser() throws IOException {
         String command = "AddResource-User One-2-100";
 
         assertEquals(0, socketHandler.runTest("User One", "password", command));
@@ -419,12 +432,12 @@ public class SocketHandlerTest {
         assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
         assertEquals(5000, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
 
     }
 
     @Test
-    public void givenInvalidUsernameThenAddResourceToUserReturnsError() {
+    public void givenInvalidUsernameThenAddResourceToUserReturnsError() throws IOException {
         String command = "AddResource-User Nine-2-100";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -435,12 +448,12 @@ public class SocketHandlerTest {
         assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
         assertEquals(5000, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
 
     }
 
     @Test
-    public void givenInvalidResourceIdThenAddResourceToUserReturnsError() {
+    public void givenInvalidResourceIdThenAddResourceToUserReturnsError() throws IOException {
         String command = "AddResource-User One-6-100";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -451,11 +464,11 @@ public class SocketHandlerTest {
         assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
         assertEquals(5000, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenValidCommandThenRemoveResourceFromUser() {
+    public void givenValidCommandThenRemoveResourceFromUser() throws IOException {
         String command = "RemoveResource-User One-2-100";
 
         assertEquals(0, socketHandler.runTest("User One", "password", command));
@@ -466,11 +479,11 @@ public class SocketHandlerTest {
         assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
         assertEquals(5000, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInvalidUsernameThenRemoveResourceFromUserReturnsError() {
+    public void givenInvalidUsernameThenRemoveResourceFromUserReturnsError() throws IOException {
         String command = "RemoveResource-User Nine-2-100";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -481,12 +494,12 @@ public class SocketHandlerTest {
         assertEquals(5, userManager.getUser("User One").userResources.get(3).getQuantity());
         assertEquals(1, userManager.getUser("User One").userResources.get(4).getQuantity());
         assertEquals(5000, userManager.getUser("User One").getFunds());
-
+        server.serverSocket.close();
 
     }
 
     @Test
-    public void givenInvalidResourceIdThenRemoveResourceFromUserReturnsError() {
+    public void givenInvalidResourceIdThenRemoveResourceFromUserReturnsError() throws IOException {
         String command = "RemoveResource-User One-9-100";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -503,10 +516,11 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
+        server.serverSocket.close();
     }
 
     @Test
-    public void givenInsufficientResourceQuantityThenRemoveResourceFromUserReturnsError() {
+    public void givenInsufficientResourceQuantityThenRemoveResourceFromUserReturnsError() throws IOException {
         String command = "RemoveResource-User Nine-5-100";
 
         assertEquals(-1, socketHandler.runTest("User One", "password", command));
@@ -523,15 +537,6 @@ public class SocketHandlerTest {
         assertEquals(100, marketplace.getResourceDetails(3).getQuantity());
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
-
+        server.serverSocket.close();
     }
-
-
-
-
-
-
-
-
-
 }
