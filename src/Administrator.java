@@ -239,7 +239,7 @@ public class Administrator extends InputReader implements Runnable {
             System.out.println("Amount you want to transfer: ");
             int val = inputReader.getNumericResponse();
             if (val > 0) {
-                int amount = Integer.parseInt(response);
+                int amount = val;
                 printWriter.println("AddResource-" + source + "-" + resourceID + "-" + amount);
                 System.out.println(serverScanner.nextLine());
             } else {
@@ -282,7 +282,7 @@ public class Administrator extends InputReader implements Runnable {
             System.out.println("Amount you want to remove: ");
             int val = inputReader.getNumericResponse();
             if(val > 0) {
-                int amount = Integer.parseInt(response);
+                int amount = val;
 
                 printWriter.println("RemoveResource-Marketplace-" + resourceID + "-" + amount);
                 System.out.println(serverScanner.nextLine());
@@ -327,7 +327,7 @@ public class Administrator extends InputReader implements Runnable {
             System.out.println("Amount you want to transfer: ");
             int val = inputReader.getNumericResponse();
             if(val > 0) {
-                int amount = Integer.parseInt(response);
+                int amount = val;
 
                 printWriter.println("RemoveResource-" + source + "-" + resourceID + "-" + amount);
                 System.out.println(serverScanner.nextLine());
@@ -371,7 +371,7 @@ public class Administrator extends InputReader implements Runnable {
             System.out.println("Amount you want to transfer: ");
             int val = inputReader.getNumericResponse();
             if (val > 0) {
-                int amount = Integer.parseInt(response);
+                int amount = val;
 
                 printWriter.println("AddResource-Marketplace-" + resourceID + "-" + amount);
                 System.out.println(serverScanner.nextLine());
