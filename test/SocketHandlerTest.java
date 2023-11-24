@@ -33,10 +33,10 @@ public class SocketHandlerTest {
     Resource gold1 = new Resource(5, 100, 1, "gold",80);
 
     ArrayList<User> userList = new ArrayList<User>();
-    User user1 = new User("User One", "password", resourceList, 5000);
-    User user2 = new User("User Two", "password", resourceList, 100);
-    User user3 = new User("User Three", "password", resourceList, 10000);
-    User user4 = new User("User Four", "password", resourceList, 1);
+    User user1;
+    User user2;
+    User user3;
+    User user4;
 
     ArrayList<String> command = new ArrayList<>();
     String inventory = "Inventory";
@@ -53,11 +53,16 @@ public class SocketHandlerTest {
         resourceList.add(silver);
         resourceList.add(gold);
 
-       marketResources.add(wood1);
-       marketResources.add(iron1);
-       marketResources.add(steel1);
-       marketResources.add(silver1);
-       marketResources.add(gold1);
+        marketResources.add(wood1);
+        marketResources.add(iron1);
+        marketResources.add(steel1);
+        marketResources.add(silver1);
+        marketResources.add(gold1);
+
+        user1 = new User("User One", "password", resourceList, 5000);
+        user2 = new User("User Two", "password", resourceList, 100);
+        user3 = new User("User Three", "password", resourceList, 10000);
+        user4 = new User("User Four", "password", resourceList, 1);
 
         userList.add(user1);
         userList.add(user2);
