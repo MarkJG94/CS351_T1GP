@@ -1,3 +1,4 @@
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -108,6 +109,12 @@ public class ConcurrencyTest
         userList.add(user2);
         userList.add(user3);
 
+    }
+
+    @After
+    public void deconstruct() throws IOException {
+        server.serverSocket.close();
+        serverThread.interrupt();
     }
     // Test that the addFunds method in UserManager is thread safe
     @Test
