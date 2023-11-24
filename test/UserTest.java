@@ -13,7 +13,7 @@ public class UserTest {
     Resource silver = new Resource(3, 5, 1000, "silver",5);
     Resource gold = new Resource(4, 10, 1000, "gold",10);
 
-    User user1 = new User("User One", "password", resourceList, 10000);
+    User user1;
 
     @Before
     public void setUp() throws Exception {
@@ -21,6 +21,8 @@ public class UserTest {
         resourceList.add(iron);
         resourceList.add(silver);
         resourceList.add(gold);
+
+        user1 = new User("User One", "password", resourceList, 10000);
     }
 
     @Test
