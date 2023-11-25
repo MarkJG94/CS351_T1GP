@@ -40,7 +40,8 @@ public class User {
         this.funds = funds;
         this.status = false;
     }
-    
+
+    //Simple get methods
     public ArrayList<Resource> getUserInventory() {
         return userResources;
 
@@ -62,7 +63,23 @@ public class User {
     public int getResourceQuantity(int resourceID) {
         return userResources.get(getResourceIndex( resourceID )).getQuantity();
     }
-    
+
+    public String getUsername(){
+        return username;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public int getFunds() {
+        return funds;
+    }
+
+    //These commands receive commands, validate, and execute them
+    //For individual user resource variables
+    //Returning a value to indicate their completion or rejection
     public synchronized int addFunds(int amount) {
         if (amount > 0 && username.equals( this.username ))
         {
@@ -71,7 +88,6 @@ public class User {
         }
         return -1;
     }
-
 
     public int deductFunds(int amount) {
         if (amount > 0 && username.equals( this.username ) && validateCurrency( amount ))
@@ -88,20 +104,7 @@ public class User {
         }
         return false;
     }
-    
-    public int getFunds() {
-        return funds;
-    }
 
-    public String getUsername(){
-        return username;
-    }
-    
-    public String getPassword()
-    {
-        return password;
-    }
-    
     public boolean addResource(int resourceID, int quantity) {
         int resourceIndex = getResourceIndex(resourceID);
         if (resourceIndex != -1 && (quantity > 0)){
@@ -124,6 +127,7 @@ public class User {
         return false;
     }
 
+    //These methods set the user status to off or online
     public void setOnline(){
         this.status = true;
     }

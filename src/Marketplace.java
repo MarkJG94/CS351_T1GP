@@ -10,8 +10,12 @@ public class Marketplace
         this.marketResources = resourceList;
     }
 
+    //These commands receive commands, validate, and execute them
+    //For market resource variables
+    //Returning a value to indicate their completion or rejection
     public boolean addResourceToMarket( int resourceID, int quantity )
     {
+        //locking the object to prevent synchronisation issues
         Object lock0;
         if ( quantity > 0 )
         {
@@ -57,6 +61,8 @@ public class Marketplace
         return false;
     }
 
+
+    //These methods calculate total costs for transactions
     public int calculateTotalCost( int quantity, int resourceID )
     {
         if ( quantity > 0 )
@@ -85,6 +91,8 @@ public class Marketplace
         return -1;
     }
 
+
+    //Simple get methods
     public int getResourceIndex( int resourceID )
     {
         if ( ( resourceID - 1 ) >= 0 && resourceID -1 <= marketResources.size() )

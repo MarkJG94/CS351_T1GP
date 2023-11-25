@@ -56,6 +56,7 @@ public class Administrator extends InputReader implements Runnable {
         printWriter.println(pw);
         printWriter.println(pw);
 
+        // Administrator Login
         boolean running = false;
         if(serverScanner.nextLine().equals("AdminAuth")) {
             System.out.println("Authentication Successful!");
@@ -65,6 +66,8 @@ public class Administrator extends InputReader implements Runnable {
         {
             System.out.println("Error validating administrator!");
         }
+
+        //Run main menu and get user response
         while (running) {
             mainMenu();
             while (true) {
@@ -89,6 +92,7 @@ public class Administrator extends InputReader implements Runnable {
                     confirmation();
                     break;
                 case 2:
+                    // view marketplace
                     marketStart();
                     break;
                 case 3:
@@ -122,6 +126,7 @@ public class Administrator extends InputReader implements Runnable {
         int val;
         boolean running = true;
         while (running) {
+            // Run main marketplace menu and get user response
             marketMenu();
             while (true) {
                 System.out.println("Please enter a number (1-6): ");
@@ -152,6 +157,7 @@ public class Administrator extends InputReader implements Runnable {
                     confirmation();
                     break;
                 case 3:
+                    // Remove item from market
                     removeItemMarket();
                     confirmation();
                     break;
@@ -161,6 +167,7 @@ public class Administrator extends InputReader implements Runnable {
                     confirmation();
                     break;
                 case 5:
+                    // Remove item from user
                     removeItemUser();
                     confirmation();
                     break;
@@ -171,6 +178,7 @@ public class Administrator extends InputReader implements Runnable {
         }
     }
 
+    // These methods write a command message to the PrintWriter to be received and executed
     private void removeFunds() {
         System.out.println("Enter the username you would like to remove funds from: ");
         String source = inputReader.getResponse();
@@ -408,6 +416,7 @@ public class Administrator extends InputReader implements Runnable {
         scanner.nextLine();
     }
 
+    // Main run command
     @Override
     public void run() {
         try {

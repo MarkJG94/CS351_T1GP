@@ -16,6 +16,7 @@ public class UserManager {
 
     }
 
+    //Get methods
     public User getUser(String username){
         for (User user : userList) {
             if (user.getUsername().equalsIgnoreCase(username)) {
@@ -25,6 +26,34 @@ public class UserManager {
         return null;
     }
 
+    public ArrayList<User> getUserList() {
+        return userList;
+    }
+
+    public ArrayList<Resource> getUserInventory(String username){
+        Object lock0;
+        User u = getUser(username);
+        if(u != null){
+            lock0 = u;
+            synchronized (lock0) {
+                return u.getUserInventory();
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<String> getOnlineUsers(){
+        ArrayList<String> ul = new ArrayList<>();
+        for(User u : userList){
+            if(u.getStatus()){
+                ul.add(u.getUsername());
+            }
+        }
+        return ul;
+    }
+
+
+    //Adding a new user to the userlist
     public boolean addUser(String username, String password, ArrayList<Resource> resources){
         try {
             User newUser = new User(username, password, resources);
@@ -35,6 +64,8 @@ public class UserManager {
         return true;
     }
 
+    //Validates user and requests user to add, remove, or transfer funds or resources if appropriate
+    //Locks and synchronises the user to prevent synchronisation issues
     public int addFunds(String username, int amount) {
         Object lock0;
 
@@ -47,34 +78,6 @@ public class UserManager {
                 u.addFunds( amount );
             }
             return u.getFunds();
-        }
-        return -1;
-    }
-
-    public int validateUser(String username) {
-        Object lock0;
-        User u = getUser( username );
-        if (u == null)
-        {
-            return -1;
-        }
-        return 0;
-    }
-
-    public int validateUserAndFunds(String username, int amount) {
-        Object lock0;
-        if(validateUser(username) == 0)
-        {
-            User u = getUser( username );
-            lock0 = u;
-            synchronized ( lock0 )
-            {
-                if(u.validateCurrency(amount))
-                {
-                    return 0;
-                }
-                return -2;
-            }
         }
         return -1;
     }
@@ -110,38 +113,19 @@ public class UserManager {
         return -1;
     }
 
-    public void setUserStatus(String username, boolean s){
-        if(s){
-            getUser(username).setOnline();
-        } else {
-            getUser(username).setOffline();
-        }
-
-    }
-
-    public ArrayList<String> getOnlineUsers(){
-        ArrayList<String> ul = new ArrayList<>();
-        for(User u : userList){
-            if(u.getStatus()){
-                ul.add(u.getUsername());
-            }
-        }
-        return ul;
-    }
-
     public boolean addResource(int resourceID, int quantity, String username) {
         Object lock0;
-        
+
         if (quantity > 0){
             User u = getUser(username);
             lock0 = u;
-            
+
             synchronized ( lock0 )
             {
                 u.addResource(resourceID,quantity);
             }
             return true;
-            }
+        }
         return false;
     }
 
@@ -158,27 +142,53 @@ public class UserManager {
         return false;
     }
 
-    
-    
-    public ArrayList<User> getUserList() {
-        return userList;
-    }
-    public ArrayList<Resource> getUserInventory(String username){
+
+    //Validates user and user funds
+    public int validateUser(String username) {
         Object lock0;
-        User u = getUser(username);
-        if(u != null){
-            lock0 = u;
-            synchronized (lock0) {
-                return u.getUserInventory();
-            }
+        User u = getUser( username );
+        if (u == null)
+        {
+            return -1;
         }
-        return null;
+        return 0;
     }
 
+    public int validateUserAndFunds(String username, int amount) {
+        Object lock0;
+        if(validateUser(username) == 0)
+        {
+            User u = getUser( username );
+            lock0 = u;
+            synchronized ( lock0 )
+            {
+                if(u.validateCurrency(amount))
+                {
+                    return 0;
+                }
+                return -2;
+            }
+        }
+        return -1;
+    }
+
+
+    // Request user to set appropriate user status
+    public void setUserStatus(String username, boolean s){
+        if(s){
+            getUser(username).setOnline();
+        } else {
+            getUser(username).setOffline();
+        }
+
+    }
+
+    //Assigns a user to a socket to facilitate safe communication
     public void assignToSocket(Socket s, String u){
         socketUserMap.put(getUser(u), s);
     }
 
+    // Validate user connection and send notifications to user
     public void notifyUser(String source, String destination, int amount) throws IOException {
         User u = getUser(destination);
         if(socketUserMap.containsKey(u)){

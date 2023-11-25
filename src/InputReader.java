@@ -8,6 +8,7 @@ public class InputReader {
         scanner = new Scanner(System.in);
     }
 
+    //These methods validate responses and return user choice
     public String getResponse(){
         System.out.print("  > ");
         return scanner.nextLine();

@@ -94,6 +94,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    //Dummy methods to allow for running tests on an invalid server
     public int runTest(String username, String password, String command) {
         try {
 
@@ -242,6 +243,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    //Get methods
     public int getInventory(ArrayList<String> data) throws IOException {
         if(data.get(1).equals("Marketplace")){
             StringBuilder s = new StringBuilder();
@@ -288,6 +290,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    //These methods parse the command, and send the appropriate parameters to the userManager to execute
     private int transferFunds(ArrayList<String> data) throws IOException {
         String senderUsername = data.get(1);
         String receiverUsername = data.get(2);

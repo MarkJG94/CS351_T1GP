@@ -18,11 +18,13 @@ public class Client extends InputReader{
         inputReader = new InputReader();
     }
 
+    // Run by main method
     public void runClient() throws IOException, NotBoundException {
         String response;
         int val;
         startServerResponseQueue();
 
+        // User login or create account
         while (true) {
             System.out.println("Select an option:");
             System.out.println("    1. Sign-in");
@@ -40,6 +42,7 @@ public class Client extends InputReader{
         if(val == 3) {
             exit();
         } else
+            //Create Account
         if(val == 2) {
             printWriter.println("NewAccount");
             while (true) {
@@ -68,10 +71,11 @@ public class Client extends InputReader{
                     break;
                 }
             }
+        //Login
         } else {
             printWriter.println("Username");
         }
-
+        //Authenticate password
         while (true) {
             System.out.println("Enter your username: ");
             username = inputReader.getResponse();
@@ -108,12 +112,14 @@ public class Client extends InputReader{
             }
         }
 
+        //Start if login authenticates
         if (response.equals("Login")) {
             start();
         }
         socket.close();
     }
 
+    // Queue to store messages from server
     private void startServerResponseQueue() throws IOException {
         Scanner serverScanner = new Scanner(socket.getInputStream());
         operator = new Thread() {
@@ -150,6 +156,7 @@ public class Client extends InputReader{
         operator.interrupt();
     }
 
+    //Run main or market menu system abd get user choice
     public void start() throws IOException {
         String response;
         int val;
@@ -189,6 +196,7 @@ public class Client extends InputReader{
                     confirmation();
                     break;
                 case 3:
+                    //Run market menu
                     marketStart();
                     break;
                 case 4:
@@ -277,6 +285,7 @@ public class Client extends InputReader{
         }
     }
 
+    //These methods determine the viability of the user requests and return a response
     private void transferFunds() throws IOException {
         System.out.println("Enter the username you would like to transfer to: ");
         String response;
@@ -391,6 +400,7 @@ public class Client extends InputReader{
 
     }
 
+    //Quitting the program
     private boolean quitConfirmation(){
         System.out.println();
 
@@ -429,10 +439,12 @@ public class Client extends InputReader{
         scanner.nextLine();
     }
 
+    //To send the answer
     private void sendAnswer(String s){
         printWriter.println(s);
     }
 
+    //Retrieve a response and add it to the message queue
     private String retrieveResponse(){
         while(messageQueue.size() == 0){
         }

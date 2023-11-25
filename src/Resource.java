@@ -13,6 +13,7 @@ public class Resource {
         this.value = value;
     }
 
+    //Getters and setters for the resource
     public int getId() {
         return id;
     }

@@ -129,6 +129,7 @@ public class Server implements Runnable {
         }
     }
 
+    //Creation of receiving socket and threadpool for each client
     private void runServer() {
         while (true) {
             try {
@@ -142,6 +143,7 @@ public class Server implements Runnable {
         }
     }
 
+    //These methods read details from the csv and save it to the central resource variables
     private void importMarketDetails() throws IOException {
 
         List<List<String>> records = new ArrayList<>();
@@ -244,6 +246,7 @@ public class Server implements Runnable {
         }
     }
 
+    //These methods take the details from the central resource variables and save them to csv
     private void saveMarketFile() throws IOException{
         File file = new File(resourceFilePath);
         FileWriter fw = new FileWriter(file);
