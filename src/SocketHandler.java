@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/*
+    This class is will facilitate the connection between the server and the client.
+    It contains all commands and logic to parse incoming requests from clients and administrators
+ */
 public class SocketHandler implements Runnable{
     Socket socket;
     String username;
@@ -12,10 +16,12 @@ public class SocketHandler implements Runnable{
     PrintWriter printWriter;
     Scanner scanner;
     boolean userExists;
+
+    // Administrator string, used to authenticate an administrator
     String admin = "42b0307fc70d04e46e2c189eb011259c94998921fc6b394448f4a2705453cf698f749cb733226d80f40786cb12c857122d253a5e325cdbe91ad325e75b129ab8ba88008c10a5160035e21bc92993c3647fc10fb1307049d14a51789bdca7e436d5fee2b3b4dc5c3b7e611add83edf71284764d775bd049d286c23760765263f965559f20b77b794d6365678be2ae47f8572a4fd253cef295e0b1e4412245bb63";
 
-    SocketHandler(Socket socket, UserManager userManager, Marketplace marketplace)
-    {
+    // Constructor which sets up the class with the appropriate socket as decided by the server, as well as the userManager and marketplace object addresses
+    SocketHandler(Socket socket, UserManager userManager, Marketplace marketplace) {
 
         this.socket = socket;
         this.userManager = userManager;
@@ -30,52 +36,71 @@ public class SocketHandler implements Runnable{
             scanner = new Scanner(socket.getInputStream());
             printWriter = new PrintWriter(socket.getOutputStream(), true);
 
+            // If the first command recieved is to create a new account, call the new account method
             String command = scanner.nextLine();
             if(command.equals("NewAccount")){
                 newAccountPrompt();
             }
 
+            // Call the login method to allow users to log in to an account
             login();
 
+            // Confirm if the user logged in successfully
             if (userExists)
             {
+                // If the user is not an admin, set the status of the user object to true and add them to the socket hashmap
                 if(!username.equals(admin)) {
                     userManager.setUserStatus(username, true);
                     userManager.assignToSocket(socket, username);
                 }
+
+                /*
+                    Main loop body that will run until the user exists
+                    This is used to parse incoming commands and then run the appropriate actions
+                 */
                 boolean running = true;
                 while(running){
                     command = scanner.nextLine();
                     ArrayList<String> data = new ArrayList<>(Arrays.asList(command.split("-")));
                     switch(data.get(0)){
                         case "Inventory":
+                            // return the users inventory
                             getInventory(data);
                             break;
                         case "Users":
+                            // return the list of users
                             getUsers(data);
                             break;
                         case "Transfer":
+                            // transfer funds between two users
                             transferFunds(data);
                             break;
                         case "Buy":
+                            // buy a resource from the market
                             buyResource(data);
                             break;
                         case "Sell":
+                            // sell a resource to the market
                             sellResource(data);
                             break;
                         case "AddFunds":
+                            // ADMINISTRATOR - command to add funds to a targeted user
                             addFunds(data);
                             break;
                         case "RemoveFunds":
+                            // ADMINISTRATOR - command to remove funds from a targeted user
                             removeFunds(data);
                             break;
                         case "AddResource":
+                            // ADMINISTRATOR - command to add a resource to a targeted user
                             addResource(data);
                             break;
                         case "RemoveResource":
+                            // ADMINISTRATOR - command to remove a resource from a targeted user
                             removeResource(data);
                             break;
                         case "Quit":
+                            // end the loop and exit the application
                             quit();
                             running = false;
                             break;
@@ -93,6 +118,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    // Method used for test cases to test incoming commands
     public int runTest(String username, String password, String command) {
         try {
 
@@ -155,6 +181,8 @@ public class SocketHandler implements Runnable{
         return 0;
     }
 
+    // Method used to prompt a user for a nw username and then a password.
+    // Includes validation to restrict multiple users with the same username, or with restricted usernames
     private void newAccountPrompt(){
         User user;
         while(true) {
@@ -175,6 +203,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    // Method to request a users username and password and validates the user exists/the password is valid
     private void login(){
         User user = null;
         while (true) {
@@ -208,6 +237,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    // Method to test logging in
     private void testLogin(String username, String password){
         User user = null;
         while (true) {
@@ -239,6 +269,10 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    /*
+        This method will receive an array list of strings and then either return the current resources within the marketplace or;
+        return a specific users resources and their current funds
+     */
     public int getInventory(ArrayList<String> data) throws IOException {
         if(data.get(1).equals("Marketplace")){
             StringBuilder s = new StringBuilder();
@@ -266,6 +300,10 @@ public class SocketHandler implements Runnable{
         return -1;
     }
 
+    /*
+        This method will get the current list of logged-in users (excluding the administrator)
+        The initiating user will be excluded from the list and given a custom message if they are the only logged on user.
+     */
     private int getUsers(ArrayList<String> data) throws IOException {
         StringBuilder str = new StringBuilder();
         int count = 0;
@@ -285,6 +323,10 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    /*
+        This method receive an array list of command strings that will initiate the transfer of funds between two users.
+        It will print an error message if the user does not exist, or if the user does not have enough funds
+     */
     private int transferFunds(ArrayList<String> data) throws IOException {
         String senderUsername = data.get(1);
         String receiverUsername = data.get(2);
@@ -304,6 +346,10 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    /*
+        This method receive an array list of command strings that will initiate the buying of a resource from the marketplace
+        It provides error handling if the resource ID is invalid, the user doesn't have enough funds or the marketplace has insufficient quantity
+     */
     private int buyResource(ArrayList<String> data) throws IOException {
         String username = data.get(2);
         int resourceID = Integer.parseInt(data.get(3));
@@ -335,6 +381,10 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    /*
+        This method receive an array list of command strings that will initiate the selling of a resource from the marketplace
+        It provides error handling if the resource ID is invalid or the user doesn't have enough of the resource
+     */
     public int sellResource(ArrayList<String> data) throws IOException {
         String username = data.get(2);
         int resourceID = Integer.parseInt(data.get(3));
@@ -363,6 +413,11 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    /*
+        This method receive an array list of command strings that will initiate adding funds to a targeted user.
+        !!This is only used by the administrator!!
+        It provides error handling if the username is invalid and will notify the user that the funds have been added
+     */
     private int addFunds(ArrayList<String> data) throws IOException {
         String username = data.get(1);
         int quantity = Integer.parseInt(data.get(2));
@@ -377,6 +432,11 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    /*
+        This method receive an array list of command strings that will initiate removal of funds from a targeted user.
+        !!This is only used by the administrator!!
+        It provides error handling if the username is invalid and will notify the user that the funds have been removed
+     */
     private int removeFunds(ArrayList<String> data) throws IOException {
         String username = data.get(1);
         int quantity = Integer.parseInt(data.get(2));
@@ -394,6 +454,11 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    /*
+        This method receive an array list of command strings that will initiate adding resources to a targeted user.
+        !!This is only used by the administrator!!
+        It provides error handling if the username is invalid and will notify the user that the resources have been added
+     */
     private int addResource(ArrayList<String> data) throws IOException {
         String username = data.get(1);
         int resourceID = Integer.parseInt(data.get(2));
@@ -434,6 +499,11 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    /*
+        This method receive an array list of command strings that will initiate removing resources from a targeted user.
+        !!This is only used by the administrator!!
+        It provides error handling if the username is invalid and will notify the user that the resource have been removed
+     */
     private int removeResource(ArrayList<String> data) throws IOException {
         String username = data.get(1);
         int resourceID = Integer.parseInt(data.get(2));
@@ -472,6 +542,7 @@ public class SocketHandler implements Runnable{
         }
     }
 
+    // Quit method that will log a user out, or confirm the server is closing and close the administrator
     private void quit() throws IOException {
         if(username.equals(admin)) {
             printWriter.println("Closing server in 10 seconds");
@@ -481,4 +552,5 @@ public class SocketHandler implements Runnable{
             userManager.setUserStatus(username, false);
         }
     }
+
 }

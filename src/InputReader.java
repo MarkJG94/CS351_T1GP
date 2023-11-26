@@ -41,4 +41,5 @@ public class InputReader {
         }
         return true;
     }
+
 }

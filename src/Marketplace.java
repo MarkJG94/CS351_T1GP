@@ -15,8 +15,7 @@ public class Marketplace
     }
 
     // Method to add resources to the marketplace resource list
-    public boolean addResourceToMarket( int resourceID, int quantity )
-    {
+    public boolean addResourceToMarket( int resourceID, int quantity ) {
         Object lock0;
         if ( quantity > 0 )
         {
@@ -38,8 +37,7 @@ public class Marketplace
     }
 
     // Method to remove resources from the marketplace resource list
-    public boolean removeResourceFromMarket( int resourceID, int quantity )
-    {
+    public boolean removeResourceFromMarket( int resourceID, int quantity ) {
         Object lock0;
         if ( quantity > 0 )
         {
@@ -64,8 +62,7 @@ public class Marketplace
     }
 
     // Method to calculate the total cost when provided an ResourceID and a quantity
-    public int calculateTotalCost( int quantity, int resourceID )
-    {
+    public int calculateTotalCost( int quantity, int resourceID ) {
         if ( quantity > 0 )
         {
             int resourceIndex = getResourceIndex( resourceID );
@@ -79,8 +76,7 @@ public class Marketplace
     }
 
     // Method to calculate the total value when provided an ResourceID and a quantity
-    public int calculateTotalValue( int quantity, int resourceID )
-    {
+    public int calculateTotalValue( int quantity, int resourceID ) {
         if ( quantity > 0 )
         {
             int resourceIndex = getResourceIndex( resourceID );
@@ -94,8 +90,7 @@ public class Marketplace
     }
 
     // Method to return the index integer of a given resourceID, or -1 if the resource ID does not exist
-    public int getResourceIndex( int resourceID )
-    {
+    public int getResourceIndex( int resourceID ) {
         if ( ( resourceID - 1 ) >= 0 && resourceID -1 <= marketResources.size() )
         {
             return resourceID - 1;
@@ -104,8 +99,7 @@ public class Marketplace
     }
 
     // Method to return the quantity of a provided resource when given the resources ID
-    public int getResourceQuantity( int resourceID )
-    {
+    public int getResourceQuantity( int resourceID ) {
         Object lock0;
         int returnValue;
         int resourceIndex = getResourceIndex( resourceID );
@@ -122,8 +116,7 @@ public class Marketplace
     }
 
     // Method to get return a resource when provided a ResourceID, or null if the resource does not exist
-    public Resource getResourceDetails( int resourceID )
-    {
+    public Resource getResourceDetails( int resourceID ) {
         int resourceIndex = getResourceIndex( resourceID );
         if ( marketResources.size() > resourceIndex )
         {
@@ -136,15 +129,13 @@ public class Marketplace
     }
 
     // Returns the arraylist of resources
-    public ArrayList<Resource> getMarketResources()
-    {
+    public ArrayList<Resource> getMarketResources() {
 
         return marketResources;
     }
 
     // Method to return a resource when given the resource index within the resource arraylist
-    public Resource getResource( int resourceIndex )
-    {
+    public Resource getResource( int resourceIndex ) {
         Resource r = marketResources.get( resourceIndex );
         if ( r != null )
         {
@@ -152,4 +143,5 @@ public class Marketplace
         }
         return null;
     }
+
 }

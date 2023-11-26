@@ -17,23 +17,32 @@ public class Resource {
         this.value = value;
     }
 
+    // Returns the resource name
     public String getName() {
         return name;
     }
+
+    // Returns the resource ID
     public int getId() {
         return id;
     }
 
+    // Returns the resource cost
     public int getCost() {
         return cost;
     }
+
+    // Returns the resource value
     public int getValue() {
         return value;
     }
 
+    // Returns the resource quantity
     public int getQuantity() {
         return quantity;
     }
+
+    // Sets the resource quantity to a new value
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }

@@ -8,6 +8,10 @@ public class User {
     boolean status;
     int funds;
 
+    /*
+        This constructor will instantiate a new user with 0 resources and 1000 funds.
+        This will only be used when a new account is created
+     */
     public User(String username, String password, ArrayList<Resource> userResources){
 
         this.username = username.toLowerCase(Locale.ROOT);
@@ -23,6 +27,7 @@ public class User {
         this.userResources = defaultResources;
     }
 
+    // This constructor is used when a User Object is created from existing data, to ensure that the user maintains the same values as they had previously
     public User(String username, String password, ArrayList<Resource> userResources, int funds){
         this.username = username;
         this.password = password;
@@ -35,16 +40,19 @@ public class User {
         this.funds = funds;
         this.status = false;
     }
-    
+
+    // Method to return the user resources array
     public ArrayList<Resource> getUserInventory() {
         return userResources;
 
     }
 
+    // Method to return the current user objects status
     public boolean getStatus(){
         return status;
     }
-    
+
+    // Method to return the index for a specific resource when provided a resourceID
     public int getResourceIndex(int resourceID) {
         for (Resource resource : userResources) {
             if (resource.getId() == resourceID) {
@@ -54,10 +62,12 @@ public class User {
         return -1;
     }
 
+    // Method to return the current quantity of a given resource
     public int getResourceQuantity(int resourceID) {
         return userResources.get(getResourceIndex( resourceID )).getQuantity();
     }
-    
+
+    // Method to add funds to a User object
     public synchronized int addFunds(int amount) {
         if (amount > 0)
         {
@@ -67,7 +77,7 @@ public class User {
         return -1;
     }
 
-
+    // Method to remove funds from a User object
     public int deductFunds(int amount) {
         if (amount > 0 && validateCurrency( amount ))
         {
@@ -76,24 +86,29 @@ public class User {
         }
         return -1;
     }
-    
+
+    // Method to validate that the current user object has >= the specified amount in the parameter
     public boolean validateCurrency(int amount) {
         return funds >= amount;
     }
-    
+
+    // Returns the current funds value for the user
     public int getFunds() {
         return funds;
     }
 
+    // Returns the username for the user
     public String getUsername(){
         return username;
     }
-    
+
+    // Returns the password for the user
     public String getPassword()
     {
         return password;
     }
-    
+
+    // Adds an amount of a specific resource to a user, as specified in the method parameters
     public boolean addResource(int resourceID, int quantity) {
         int resourceIndex = getResourceIndex(resourceID);
         if (resourceIndex != -1 && (quantity > 0)){
@@ -103,7 +118,8 @@ public class User {
         }
         else return false;
     }
-    
+
+    // Removes an amount of a specific resource from a user, as specified in the method parameters
     public boolean removeResource(int resourceID, int quantity) {
         int resourceIndex = getResourceIndex(resourceID);
         if ( resourceIndex != -1 && (quantity > 0)){
@@ -116,10 +132,12 @@ public class User {
         return false;
     }
 
+    // Sets the user's status to online (true)
     public void setOnline(){
         this.status = true;
     }
 
+    // Sets the user's status to offline (false)
     public void setOffline(){
         this.status = false;
     }
