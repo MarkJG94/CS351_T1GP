@@ -58,8 +58,7 @@ public class Server implements Runnable {
     }
 
     // Constructor that calls the main constructor and provides a default value for the runMode
-    Server() throws IOException
-    {
+    Server() throws IOException {
         this(0);
     }
 
@@ -346,6 +345,5 @@ public class Server implements Runnable {
             e.printStackTrace();
         }
     }
-
 
 }
