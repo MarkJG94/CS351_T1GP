@@ -87,8 +87,8 @@ public class SocketHandlerTest
         marketResources.add(gold1);
         
         User user1 = new User(userOne, "password", resourceList, 5000);
-        User user2 = new User("UserTwo", "password", resourceList, 100);
-        User user3 = new User("UserThree", "password", resourceList, 10000);
+        User user2 = new User(userTwo, "password", resourceList, 100);
+        User user3 = new User(userThree, "password", resourceList, 10000);
         
         userList.clear();
         userList.add(user1);
@@ -104,12 +104,16 @@ public class SocketHandlerTest
         serverThread.interrupt();
     }
     
+    // Test to ensure runTest returns -1 when an invalid command is given
     @Test
     public void givenInvalidCommandThenMenuReturnsFalse() throws IOException {
         assertEquals(-1, socketHandler.runTest(userOne, "password", "Invenztttory-Marketplace"));
         
     }
     
+    // test that the runTest method returns 0 when a valid command is given
+    // and depending on command displays the correct output for the user
+    // In this case to display the user's inventory
     @Test
     public void givenValidCommandThenGetUserInventory() throws IOException {
         assertEquals(0, socketHandler.runTest(userOne, "password", "Inventory-UserOne"));
@@ -122,6 +126,9 @@ public class SocketHandlerTest
         
     }
     
+    // test that the runTest method returns 0 when a valid command is given
+    // and depending on command displays the correct output for the user
+    // In this case to display the marketplace inventory
     @Test
     public void givenValidCommandThenGetMarketInventory() throws IOException {
         assertEquals(0, socketHandler.runTest(userOne, "password", "Inventory-Marketplace"));
@@ -140,6 +147,8 @@ public class SocketHandlerTest
         
     }
     
+    // Testing that the runTest method correctly calls the getUsers method which will display
+    // all other users that are currently using the system except from the user that called the command
     @Test
     public void givenMultipleOnlineUsersThenReturnOtherOnlineUsers() throws IOException {
         socketHandler.runTest(userTwo, "password", "Users-UserOne");
@@ -148,6 +157,11 @@ public class SocketHandlerTest
         
     }
     
+    // Test to ensure that runTest returns 0 when a valid command is given
+    // and depending on command displays the correct output for the user
+    // In this case userOne is transferring 1000 currency to user 2
+    // and the assert checks that the funds have been transferred correctly
+    // by checking the funds of both users
     @Test
     public void givenValidCommandThenParseCommandTransfersCurrency() {
         String command = "Transfer-UserOne-UserTwo-1000";
@@ -158,6 +172,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test to ensure that runTest returns -1 when an invalid command is given
+    // In this case the command is invalid as the source user does not exist
+    // and the assert checks that the funds of both users have not been changed
     @Test
     public void givenInvalidSourceThenParseCommandReturnsFalse() {
         String command = "Transfer-UserNine-UserTwo-1000";
@@ -168,6 +185,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test to ensure that runTest returns -1 when an invalid command is given
+    // In this case the command is invalid as the destination user does not exist
+    // and the assert checks that the funds of both users have not been changed
     @Test
     public void givenInvalidDestinationThenParseCommandReturnsFalse() {
         String command = "Transfer-UserOne-UserNine-1000";
@@ -178,6 +198,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test to ensure that runTest returns -1 when an invalid command is given
+    // In this case the command is invalid as the source and destination users do not exist
+    // and the assert checks that the funds of both users have not been changed
     @Test
     public void givenInvalidSourceAndDestinationThenParseCommandReturnsFalse() {
         String command = "Transfer-UserNine-UserNinety-1000";
@@ -188,6 +211,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test to ensure that runTest returns -1 when an invalid command is given
+    // In this case the command is invalid as the source user does not have sufficient funds
+    // and the assert checks that the funds of both users have not been changed
     @Test
     public void givenInsufficientFundsThenParseCommandReturnsFalse() {
         String command = "Transfer-UserOne-UserTwo-10000";
@@ -198,6 +224,11 @@ public class SocketHandlerTest
         
     }
     
+    
+    // Test that runTest returns 0 when a valid command is given
+    // In this instance UserOne is buying 10 iron from the marketplace
+    // and the assert checks that the funds and resources of both the user and marketplace
+    // have been updated correctly
     @Test
     public void givenValidCommandThenBuyItems() {
         String command = "Buy-Marketplace-UserOne-2-10";
@@ -219,6 +250,10 @@ public class SocketHandlerTest
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the resourceID is invalid
+    // and the assert checks that the funds and resources of both the user and marketplace
+    // remain the same as before the method call
     @Test
     public void givenInValidResourceIdThenBuyItemsReturnsError() {
         String command = "Buy-Marketplace-UserOne-8-10";
@@ -240,6 +275,10 @@ public class SocketHandlerTest
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the username is invalid
+    // and the assert checks that the funds and resources of both the user and marketplace
+    // remain the same as before the method call
     @Test
     public void givenInValidUsernameThenBuyItemsReturnsError() {
         String command = "Buy-Marketplace-UserNnine-1-10";
@@ -261,6 +300,10 @@ public class SocketHandlerTest
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the marketplace does not have sufficient quantity of the resource
+    // and the assert checks that the funds and resources of both the user and marketplace
+    // remain the same as before the method call
     @Test
     public void givenInsufficientResourceQuantityThenBuyItemsReturnsError() {
         serverThread.start();
@@ -285,6 +328,10 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the user does not have sufficient funds
+    // and the assert checks that the funds and resources of both the user and marketplace
+    // remain the same as before the method call
     @Test
     public void givenInsufficientUserFundsThenBuyItemsReturnsError() {
         
@@ -309,6 +356,10 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns 0 when a valid command is given
+    // In this instance UserOne is selling 10 iron to the marketplace
+    // and the assert checks that the funds and resources of both the user and marketplace
+    // have been updated correctly
     @Test
     public void givenValidCommandThenSellItems() {
         String command = "Sell-Marketplace-UserOne-2-10";
@@ -330,6 +381,10 @@ public class SocketHandlerTest
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the resourceID is invalid
+    // and the assert checks that the funds and resources of both the user and marketplace
+    // remain the same as before the method call
     @Test
     public void givenInValidResourceIdThenSellItemsReturnsError() {
         String command = "Sell-Marketplace-UserOne-8-10";
@@ -351,6 +406,10 @@ public class SocketHandlerTest
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the username is invalid
+    // and the assert checks that the funds and resources of both the user and marketplace
+    // remain the same as before the method call
     @Test
     public void givenInValidUsernameThenSellItemsReturnsError() {
         String command = "Sell-Marketplace-UserNnine-1-10";
@@ -371,6 +430,10 @@ public class SocketHandlerTest
         assertEquals(10, marketplace.getResourceDetails(4).getQuantity());
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
+    
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the user does not have sufficient resources
+    // and the assert checks that the funds and resources of both the user and marketplace
     
     @Test
     public void givenInsufficientResourceQuantityThenSellItemsReturnsError() {
@@ -393,6 +456,9 @@ public class SocketHandlerTest
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
     
+    // Test that runTest returns 0 when a valid command is given
+    // In this instance addFunds is called to add 200 currency to userOne
+    // and the assert checks that the funds of userOne have been updated correctly
     @Test
     public void givenValidCommandThenAddFunds() {
         String command = "AddFunds-UserOne-200";
@@ -402,6 +468,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the username is invalid
+    // and the assert checks that the funds of userOne have not been changed
     @Test
     public void givenInvalidUsernameThenAddFundsReturnsError() {
         String command = "AddFunds-UserNine-200";
@@ -411,6 +480,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns 0 when a valid command is given
+    // In this instance removeFunds is called to remove 200 currency from userOne
+    // and the assert checks that the funds of userOne have been updated correctly
     @Test
     public void givenValidCommandThenRemoveFunds() {
         String command = "RemoveFunds-UserOne-200";
@@ -420,6 +492,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the username is invalid
+    // and the assert checks that the funds of userOne have not been changed
     @Test
     public void givenInvalidUsernameThenRemoveFundsReturnsError() {
         String command = "RemoveFunds-UserNine-200";
@@ -429,6 +504,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the user does not have sufficient funds to remove
+    // and the assert checks that the funds of userOne have not been changed
     @Test
     public void givenInsufficientFundsThenRemoveFundsReturnsError() {
         String command = "RemoveFunds-UserOne-10000";
@@ -438,6 +516,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns 0 when a valid command is given
+    // In this instance addResource is called to add 100 iron to userOne
+    // and the assert checks that the resources of userOne have been updated correctly
     @Test
     public void givenValidCommandThenAddResourceToUser() {
         String command = "AddResource-UserOne-2-100";
@@ -453,6 +534,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the username is invalid
+    // and the assert checks that the resources of userOne have not been changed
     @Test
     public void givenInvalidUsernameThenAddResourceToUserReturnsError() {
         String command = "AddResource-UserNine-2-100";
@@ -469,6 +553,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the resourceID is invalid
+    // and the assert checks that the resources of userOne have not been changed
     @Test
     public void givenInvalidResourceIdThenAddResourceToUserReturnsError() {
         String command = "AddResource-UserOne-6-100";
@@ -482,7 +569,10 @@ public class SocketHandlerTest
         assertEquals(1, userManager.getUser(userOne).getResourceQuantity( 5 ));
         assertEquals(5000, userManager.getUser(userOne).getFunds());
     }
-    
+
+    // Test that runTest returns 0 when a valid command is given
+    // In this instance removeResource is called to remove 100 iron from userOne
+    // and the assert checks that the resources of userOne have been updated correctly
     @Test
     public void givenValidCommandThenRemoveResourceFromUser() {
         String command = "RemoveResource-UserOne-2-100";
@@ -498,6 +588,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the username is invalid
+    // and the assert checks that the resources of userOne have not been changed
     @Test
     public void givenInvalidUsernameThenRemoveResourceFromUserReturnsError() {
         String command = "RemoveResource-UserNine-2-100";
@@ -514,6 +607,9 @@ public class SocketHandlerTest
         
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the resourceID is invalid
+    // and the assert checks that the resources of userOne have not been changed
     @Test
     public void givenInvalidResourceIdThenRemoveResourceFromUserReturnsError() {
         String command = "RemoveResource-UserOne-9-100";
@@ -535,6 +631,9 @@ public class SocketHandlerTest
         assertEquals(1, marketplace.getResourceDetails(5).getQuantity());
     }
     
+    // Test that runTest returns -1 when an invalid command is given
+    // In this instance the command is invalid as the user does not have sufficient resources to remove
+    // and the assert checks that the resources of userOne have not been changed
     @Test
     public void givenInsufficientResourceQuantityThenRemoveResourceFromUserReturnsError() {
         String command = "RemoveResource-UserNine-5-100";

@@ -75,6 +75,8 @@ public class UserTest {
         userList.add(user3);
     }
 
+    // Test to check that addFunds is called correctly when provided with
+    // a valid username and a valid integer amount
     @Test
     public void givenValidUserNameAndAmountThenAddFunds() throws IOException {
 
@@ -84,6 +86,8 @@ public class UserTest {
         serverThread.interrupt();
     }
 
+    // Test to check that addFunds returns -1 when provided with
+    // a valid username and an invalid integer amount
     @Test
     public void givenValidUserNameAndInvalidAmountThenAddFundsReturnsFalse() throws IOException {
 
@@ -91,7 +95,9 @@ public class UserTest {
         server.serverSocket.close();
         serverThread.interrupt();
     }
-
+    
+    // Test to check that deductFunds is called correctly when provided with
+    // a valid username and a valid integer amount
     @Test
     public void givenValidUserNameAndAmountThenDeductFunds() throws IOException {
 
@@ -101,6 +107,8 @@ public class UserTest {
         serverThread.interrupt();
     }
 
+    // Test to check that deductFunds returns -1 when provided with
+    // a valid username and an invalid integer amount
     @Test
     public void givenValidUserNameAndInvalidAmountThenDeductFundsReturnsFalse() throws IOException {
 
@@ -109,38 +117,53 @@ public class UserTest {
         serverThread.interrupt();
     }
 
+    // Test to check that and getUser returns null when provided with
+    // an invalid username and as such deductFunds will not be invoked
+    // as it is caught in the try catch block
     @Test
-    public void givenInvalidUserNameAndAmountThenDeductFundsReturnsFalse() throws IOException {
+    public void givenInvalidUserNameAndAmountThenDeductFundsReturnsFalse() throws IOException, NullPointerException {
 
-        assertEquals(-1, userManager.getUser(userOne).deductFunds(-100));
+        try
+        {
+            assertEquals(-1, userManager.getUser("UserNine").deductFunds(-100));
+        }
+        catch (NullPointerException e)
+        {
+            assertEquals( null, userManager.getUser("UserNine"));
+        }
         server.serverSocket.close();
         serverThread.interrupt();
     }
 
 
+    // Checks that the correct resource quantity is returned after a resource has been added
     @Test
     public void givenValidInformationThenAddResource() throws IOException {
 
         userManager.getUser(userOne).addResource(1, 100);
-        assertEquals(1100, userManager.getUser(userOne).userResources.get(0).getQuantity());
+        assertEquals(1100, userManager.getUser(userOne).getResourceQuantity( 1 ));
 
         userManager.getUser(userTwo).addResource(1, 200);
-        assertEquals(1200, userManager.getUser(userTwo).userResources.get(0).getQuantity());
+        assertEquals(1200, userManager.getUser(userTwo).getResourceQuantity( 1 ));
 
         server.serverSocket.close();
         serverThread.interrupt();
     }
 
+    // Checks that addResource returns false when provided with an invalid resourceID
+    // and as such no resourcs are added to the user
     @Test
     public void givenInvalidResourceIdThenAddResourceReturnsFalse() throws IOException {
 
         assertEquals(false, userManager.getUser(userOne).addResource(11, 100));
-        assertEquals(1000, userManager.getUser(userOne).userResources.get(0).getQuantity());
-        assertEquals(1000, userManager.getUser(userTwo).userResources.get(0).getQuantity());
+        assertEquals(1000, userManager.getUser(userOne).getResourceQuantity( 1 ));
+        assertEquals(1000, userManager.getUser(userTwo).getResourceQuantity( 1 ));
         server.serverSocket.close();
         serverThread.interrupt();
     }
 
+    // Checks that addResource returns false when provided with an invalid quantity
+    // in this instance a negative quantity is given
     @Test
     public void givenInvalidQuantityThenAddResourceReturnsFalse() throws IOException {
 
@@ -149,20 +172,22 @@ public class UserTest {
         serverThread.interrupt();
     }
 
+    // Checks that the correct resource quantity is returned after a resource has been removed
     @Test
     public void givenValidInformationThenRemoveResource() throws IOException {
 
         userManager.getUser(userOne).addResource(1, 100);
-        assertEquals(1100, userManager.getUser(userOne).userResources.get(0).getQuantity());
+        assertEquals(1100, userManager.getUser(userOne).getResourceQuantity( 1 ));
 
         userManager.getUser(userTwo).addResource(2, 100);
-        assertEquals(200, userManager.getUser(userTwo).userResources.get(1).getQuantity());
+        assertEquals(200, userManager.getUser(userTwo).getResourceQuantity( 2 ));
 
         server.serverSocket.close();
         serverThread.interrupt();
     }
 
-
+    // Checks that removeResource returns false when provided with an invalid resourceID
+    // and as such no resourcs are removed from the user
     @Test
     public void givenInvalidResourceIdThenRemoveResourceReturnsFalse() throws IOException {
 
@@ -171,6 +196,8 @@ public class UserTest {
         serverThread.interrupt();
     }
 
+    // Checks that removeResource returns false when provided with an invalid quantity
+    // in this instance a negative quantity is given
     @Test
     public void givenInvalidQuantityThenRemoveResourceReturnsFalse() throws IOException {
 
@@ -181,6 +208,7 @@ public class UserTest {
     }
 
 
+    // Checks that validateCurrency returns true if their funds are greater than or equal to the amount provided
     @Test
     public void givenCorrectAmountThenValidateCurrency() throws IOException {
 
@@ -191,6 +219,7 @@ public class UserTest {
 
     }
 
+    // Checks that validateCurrency returns false if their funds are less than the amount provided
     @Test
     public void givenInvalidAmountThenValidateCurrencyReturnFalse() throws IOException {
 
@@ -201,6 +230,7 @@ public class UserTest {
 
     }
 
+    // Checks that getFunds returns expected values
     @Test
     public void getFunds() throws IOException {
 
@@ -211,6 +241,7 @@ public class UserTest {
 
     }
 
+    // Checks that getUsername returns expected values
     @Test
     public void getUserName() throws IOException {
 
@@ -221,6 +252,7 @@ public class UserTest {
 
     }
 
+    // Checks that getResourceQuantity returns expected values
     @Test
     public void getResourceQuantity() throws IOException {
 
@@ -237,6 +269,7 @@ public class UserTest {
 
     }
 
+    // checks that getUserInventory returns expected values
     @Test
     public void getUserInventory() throws IOException {
 

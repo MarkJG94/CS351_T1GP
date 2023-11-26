@@ -132,6 +132,8 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    // Testing addFunds to see if it is thread safe whilst being iterated a large amount of times
+    // on multiple threads
     @Test
     public void testBulkAddFundsConcurrency() throws InterruptedException, IOException
     {
@@ -230,6 +232,9 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    
+    // Testing deductFunds to see if it is thread safe whilst being iterated a large amount of times
+    // on multiple threads
     @Test
     public void testBulkDeductFundsConcurrency() throws InterruptedException, IOException
     {
@@ -327,6 +332,9 @@ public class ConcurrencyTest
         server.serverSocket.close();
     }
     
+    
+    // Testing deductFunds to see if it is thread safe whilst being iterated a large amount of times
+    // on multiple threads
     @Test
     public void testBulkDeductInsufficientFundsConcurrency() throws InterruptedException, IOException
     {
@@ -447,6 +455,8 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    // Testing transferFunds to see if it is thread safe whilst being iterated a large amount of times
+    // on multiple threads
     @Test
     public void testBulkTransferFundsConcurrency() throws InterruptedException, IOException
     {
@@ -593,6 +603,8 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    // Test that the transferFunds method in UserManager is thread safe when funds are insufficient from a user to
+    // transfer and the users are being iterated a large amount of times on multiple threads
     @Test
     public void testBulkTransferInsufficientFundsConcurrency() throws InterruptedException, IOException
     {
@@ -668,7 +680,7 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
 
-    // Test that multiple users can sell to the marketplace at the same time and that the marketplace is thread safe
+    // Test that multiple users can sell to the marketplace at the same time
     // Assume that all prerequisites are met for the function to execute the actual logic
     @Test
     public void testMultipleUsersSellResources() throws InterruptedException, IOException, IndexOutOfBoundsException
@@ -734,6 +746,9 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    // Test that multiple users can sell to the marketplace at the same time and that the marketplace is thread safe
+    // whilst a large amount of transactions are being made
+    // Assume that all prerequisites are met for the function to execute the actual logic
     @Test
     public void testMultipleUsersBulkSellResources() throws InterruptedException, IOException, IndexOutOfBoundsException
     {
@@ -810,6 +825,8 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    // Test that multiple users can buy from the marketplace at the same time and that the marketplace is thread safe
+    // Assume that all prerequisites are met for the function to execute the actual logic
     @Test
     public void testMultipleUsersBuyResources() throws InterruptedException, IOException, IndexOutOfBoundsException
     {
@@ -874,6 +891,9 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    // Test that multiple users can buy from the marketplace at the same time and that the marketplace is thread safe
+    // whilst a large amount of transactions are being made
+    // Assume that all prerequisites are met for the function to execute the actual logic
     @Test
     public void testMultipleUsersBulkBuyResources() throws InterruptedException, IOException, IndexOutOfBoundsException
     {
@@ -950,6 +970,11 @@ public class ConcurrencyTest
         thread3.interrupt();
     }
     
+    // Test that multiple users can buy from the marketplace at the same time and that the marketplace is thread safe
+    // AND the marketplace can deal with users trying to buy resources
+    // when there is insufficient supply on the marketplace
+    // whilst a large amount of transactions are being made
+    // Assume that all prerequisites are met for the function to execute the actual logic
     @Test
     public void testMultipleUsersBulkBuyInsufficientResources() throws InterruptedException, IOException,
                                                                          IndexOutOfBoundsException
